@@ -1,0 +1,14 @@
+pandas
+tqdm
+transformers
+aiohttp
+datasets
+vllm
+evalscope
+tiktoken
+omegaconf
+requests 
+matplotlib 
+jinja2 
+aiohttp 
+pyyaml
