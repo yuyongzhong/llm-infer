@@ -40,9 +40,15 @@ def main():
     parser.add_argument("--top_p", type=float, required=False, default=0.95, help="The sampling top-p(default=1).")
     parser.add_argument("--answer_num", type=int, required=False, default=1, help="The answer for each request(default=1).")
     parser.add_argument("--use_cache", type=str, required=False, default="", help="The  cache path for the inference results.")
-    parser.add_argument("--eval_batch_size", type=int, required=False, default=1, help="The  cache path for the inference results.")
+    parser.add_argument("--eval_batch_size", type=int, required=False, default=1, help="并发量")
 
     args = parser.parse_args()
+
+    # 打印所有参数
+    print("\n===== 传入的参数 =====")
+    for arg_name, arg_value in vars(args).items():
+        print(f"{arg_name}: {arg_value}")
+    print("=====================\n")
 
     base_url = args.base_url
     api_key = args.api_key
