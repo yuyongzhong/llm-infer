@@ -39,8 +39,16 @@ def main():
     parser.add_argument("--temperature", type=float, required=False, default=0.6, help="The sampling temperature(default=0.6).")
     parser.add_argument("--top_p", type=float, required=False, default=0.95, help="The sampling top-p(default=1).")
     parser.add_argument("--answer_num", type=int, required=False, default=1, help="The answer for each request(default=1).")
+    parser.add_argument("--use_cache", type=str, required=False, default="", help="The  cache path for the inference results.")
+    parser.add_argument("--eval_batch_size", type=int, required=False, default=1, help="并发量")
 
     args = parser.parse_args()
+
+    # 打印所有参数
+    print("\n===== 传入的参数 =====")
+    for arg_name, arg_value in vars(args).items():
+        print(f"{arg_name}: {arg_value}")
+    print("=====================\n")
 
     base_url = args.base_url
     api_key = args.api_key
@@ -50,6 +58,8 @@ def main():
     temperature = args.temperature
     top_p = args.top_p
     answer_num = args.answer_num
+    eval_batch_size = args.eval_batch_size
+    use_cache = args.use_cache
 
     subset_list = load_subset(tasks)
 
@@ -66,7 +76,7 @@ def main():
                 }
         },
 
-        eval_batch_size=1,
+        eval_batch_size=eval_batch_size,
         generation_config={
             'max_tokens': max_tokens,
             'temperature': temperature,
@@ -77,6 +87,9 @@ def main():
         stream=True
     )
 
+    if use_cache != "":
+        task_cfg.cache_path = use_cache
+
     # run_task(task_cfg=task_cfg)
     # 执行评估任务
     max_run_retries = 5  # 最大运行重试次数
@@ -85,12 +98,14 @@ def main():
         try:
             print(f"开始第 {run_retries + 1} 次评估尝试...")
             run_task(task_cfg=task_cfg)
-            update_subset_main()
+            # 删除subset_list 列表数据
+            # update_subset_main()
             break  # 评估成功，跳出循环
         except Exception as e:
             print(f"评估过程中发生错误 (尝试 {run_retries + 1}/{max_run_retries}): {e}")
             run_retries += 1  # 增加重试计数
-            update_subset_main()
+            # 删除subset_list 列表数据
+            # update_subset_main()
             # 重新加载
             subset_list = load_subset(tasks)
             # 更新配置

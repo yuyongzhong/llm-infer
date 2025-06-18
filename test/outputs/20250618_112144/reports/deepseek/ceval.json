@@ -1,0 +1,34 @@
+{
+    "name": "deepseek@ceval",
+    "dataset_name": "ceval",
+    "dataset_pretty_name": "C-Eval",
+    "dataset_description": null,
+    "model_name": "deepseek",
+    "score": 0.9318,
+    "metrics": [
+        {
+            "name": "AverageAccuracy",
+            "num": 22,
+            "score": 0.9318,
+            "macro_score": 0.9318,
+            "categories": [
+                {
+                    "name": [
+                        "Humanities"
+                    ],
+                    "num": 22,
+                    "score": 0.9318,
+                    "macro_score": 0.9318,
+                    "subsets": [
+                        {
+                            "name": "middle_school_history",
+                            "score": 0.9318,
+                            "num": 22
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "analysis": "N/A"
+}

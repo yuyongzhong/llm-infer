@@ -1,0 +1,72 @@
+2025-06-18 11:15:29,670 - evalscope - INFO - Dump task config to ./outputs/20250618_111524/configs/task_config_74969e.yaml
+2025-06-18 11:15:29,673 - evalscope - INFO - {
+    "model": "deepseek",
+    "model_id": "deepseek",
+    "model_args": {},
+    "model_task": "text_generation",
+    "template_type": null,
+    "chat_template": null,
+    "datasets": [
+        "ceval"
+    ],
+    "dataset_args": {
+        "ceval": {
+            "name": "ceval",
+            "dataset_id": "modelscope/ceval-exam",
+            "model_adapter": "generation",
+            "output_types": [
+                "multiple_choice_logits",
+                "generation"
+            ],
+            "subset_list": [
+                "middle_school_history"
+            ],
+            "metric_list": [
+                "AverageAccuracy"
+            ],
+            "few_shot_num": 0,
+            "few_shot_random": false,
+            "train_split": "dev",
+            "eval_split": "val",
+            "prompt_template": "以下是中国关于{subset_name}考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n{query}",
+            "system_prompt": null,
+            "query_template": null,
+            "pretty_name": "C-Eval",
+            "description": null,
+            "filters": null,
+            "extra_params": {}
+        }
+    },
+    "dataset_dir": "/root/.cache/modelscope/hub/datasets",
+    "dataset_hub": "modelscope",
+    "generation_config": {
+        "max_tokens": 3000,
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "n": 5
+    },
+    "eval_type": "service",
+    "eval_backend": "Native",
+    "eval_config": null,
+    "stage": "all",
+    "limit": null,
+    "eval_batch_size": 1,
+    "mem_cache": false,
+    "use_cache": null,
+    "work_dir": "./outputs/20250618_111524",
+    "outputs": null,
+    "ignore_errors": false,
+    "debug": false,
+    "dry_run": false,
+    "seed": 42,
+    "api_url": "http://10.10.133.112:8000/v1",
+    "api_key": "KEY",
+    "timeout": null,
+    "stream": true,
+    "judge_strategy": "auto",
+    "judge_worker_num": 1,
+    "judge_model_args": {},
+    "analysis_report": false
+}
+2025-06-18 11:15:29,673 - evalscope - INFO - Start evaluating on dataset modelscope/ceval-exam
+2025-06-18 11:15:29,673 - evalscope - INFO - Loading dataset from hub: modelscope/ceval-exam
