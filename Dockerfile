@@ -28,7 +28,6 @@ RUN pip install --upgrade pip \
 
 # 仅复制必要代码目录，避免覆盖系统路径
 COPY test ./test
-RUN pip install -e ./test/llmperf
 
 # 默认保持 bash 运行
 CMD ["bash", "-c", "tail -f /dev/null"]
