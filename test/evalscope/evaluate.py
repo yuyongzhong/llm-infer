@@ -62,7 +62,7 @@ def main():
     )
 
     if use_cache != "":
-        task_cfg.cache_path = use_cache
+        task_cfg.use_cache = use_cache
 
 
     run_task(task_cfg=task_cfg)

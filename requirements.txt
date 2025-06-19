@@ -136,7 +136,6 @@ lazy_loader==0.4
 lightning-utilities==0.14.3
 litellm==1.72.6
 llguidance==0.7.29
--e git+https://github.com/ray-project/llmperf.git@f1d6bed47e4501b0e371082b41601b59ab55269f#egg=LLMPerf
 llvmlite==0.44.0
 lm-format-enforcer==0.10.11
 lmdb==1.6.2

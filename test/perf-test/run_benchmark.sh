@@ -11,8 +11,8 @@ while [[ "$#" -gt 0 ]]; do
   esac
   shift
 done
-INPUT_LENS=(32)
-BATCH_SIZES=(16)
+INPUT_LENS=(32 128)
+BATCH_SIZES=(16 32)
 # INPUT_LENS=(32 128 256 1024)
 # BATCH_SIZES=(1 4 16 32 64)
 num_prompts=200
