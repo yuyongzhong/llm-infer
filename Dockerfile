@@ -20,15 +20,16 @@ RUN apt-get update && apt-get install -y curl bash git
 
 # 复制依赖并安装
 COPY requirements.txt ./
-RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+RUN pip install --upgrade pip 
+
+RUN pip install --no-deps -r requirements.txt
+
 
 # # 设置 git 加速（可选）
 # RUN git config --global url."https://hgithub.xyz".insteadOf "https://github.com"
 
 # 仅复制必要代码目录，避免覆盖系统路径
 COPY test ./test
-RUN pip install -e ./test/llmperf
 
 # 默认保持 bash 运行
 CMD ["bash", "-c", "tail -f /dev/null"]
