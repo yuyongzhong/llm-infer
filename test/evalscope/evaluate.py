@@ -24,6 +24,13 @@ def main():
     parser.add_argument("--eval_batch_size", type=int, required=False,  default=1, help="The  cache path for the inference results.")
     args = parser.parse_args()
 
+#   --base_url http://10.10.133.112:8000/v1 \
+#   --model_name deepseek \
+#   --max_tokens 3000 \
+#   --tasks ceval \
+#   --answer_num 2 \
+#   --eval_batch_size 15 
+
     base_url = args.base_url
     api_key = args.api_key
     model_name = args.model_name

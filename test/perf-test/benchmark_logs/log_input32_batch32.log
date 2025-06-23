@@ -1,69 +1,0 @@
-Running input_len=32, batch_size=32...
-Intel oneMKL FATAL ERROR: Cannot load /usr/local/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so.
-�?FAILED input_len=32 batch_size=32
----
-
-Running input_len=32, batch_size=32...
-INFO 06-19 02:21:06 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
-Traceback (most recent call last):
-  File "/home/llm-infer/test/perf-test/vllm/benchmarks/benchmark_serving.py", line 50, in <module>
-    from vllm.transformers_utils.tokenizer import get_tokenizer
-  File "/usr/local/lib/python3.10/site-packages/vllm/__init__.py", line 13, in <module>
-    from vllm.engine.arg_utils import AsyncEngineArgs, EngineArgs
-  File "/usr/local/lib/python3.10/site-packages/vllm/engine/arg_utils.py", line 22, in <module>
-    from vllm.config import (BlockSize, CacheConfig, CacheDType, CompilationConfig,
-  File "/usr/local/lib/python3.10/site-packages/vllm/config.py", line 1736, in <module>
-    class ParallelConfig:
-  File "/usr/local/lib/python3.10/site-packages/pydantic/dataclasses.py", line 213, in dataclass
-    return create_dataclass(_cls)
-  File "/usr/local/lib/python3.10/site-packages/pydantic/dataclasses.py", line 204, in create_dataclass
-    pydantic_complete = _pydantic_dataclasses.complete_dataclass(
-  File "/usr/local/lib/python3.10/site-packages/pydantic/_internal/_dataclasses.py", line 174, in complete_dataclass
-    cls.__pydantic_validator__ = validator = create_schema_validator(
-  File "/usr/local/lib/python3.10/site-packages/pydantic/plugin/_schema_validator.py", line 34, in create_schema_validator
-    return SchemaValidator(schema, config)
-pydantic_core._pydantic_core.SchemaError: Error building "dataclass" validator:
-  SchemaError: Error building "dataclass-args" validator:
-  SchemaError: Field 'distributed_executor_backend':
-  SchemaError: Error building "default" validator:
-  SchemaError: Error building "nullable" validator:
-  SchemaError: Error building "union" validator:
-  SchemaError: Error building "is-subclass" validator:
-  TypeError: 'str' object cannot be converted to 'PyType'
-�?FAILED input_len=32 batch_size=32
----
-
-Running input_len=32, batch_size=32...
-INFO 06-19 03:33:48 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
-WARNING 06-19 03:33:49 [_custom_ops.py:22] Failed to import from vllm._C with ImportError('libcuda.so.1: cannot open shared object file: No such file or directory')
-Namespace(backend='vllm', base_url='http://10.10.133.112:8000', host='127.0.0.1', port=8000, endpoint='/v1/completions', dataset_name='random', dataset_path=None, max_concurrency=32, model='deepseek', tokenizer='/home/models/DeepSeek-R1-32B/', use_beam_search=False, num_prompts=200, logprobs=None, request_rate=inf, burstiness=1.0, seed=0, trust_remote_code=False, disable_tqdm=False, profile=False, save_result=True, save_detailed=False, append_result=False, metadata=None, result_dir=None, result_filename='/home/llm-infer/test/perf-test/benchmark_logs/result_input32_batch32.json', ignore_eos=False, percentile_metrics='ttft,tpot,itl', metric_percentiles='99', goodput=None, custom_output_len=256, custom_skip_chat_template=False, sonnet_input_len=550, sonnet_output_len=150, sonnet_prefix_len=200, sharegpt_output_len=None, random_input_len=32, random_output_len=128, random_range_ratio=0.0, random_prefix_len=0, hf_subset=None, hf_split=None, hf_output_len=None, top_p=None, top_k=None, min_p=None, temperature=None, tokenizer_mode='auto', served_model_name=None, lora_modules=None)
-Starting initial single prompt test run...
-Initial test run completed. Starting main benchmark run...
-Traffic request rate: inf
-Burstiness factor: 1.0 (Poisson process)
-Maximum request concurrency: 32
-  0%|          | 0/200 [00:00<?, ?it/s]  0%|          | 1/200 [00:03<10:33,  3.19s/it]  2%|▏         | 3/200 [00:04<04:20,  1.32s/it]  2%|▏         | 4/200 [00:04<03:12,  1.02it/s]  2%|▎         | 5/200 [00:05<02:49,  1.15it/s]  3%|▎         | 6/200 [00:08<04:31,  1.40s/it]  4%|▎         | 7/200 [00:10<05:08,  1.60s/it] 16%|█▋        | 33/200 [00:12<00:33,  4.94it/s] 18%|█▊        | 35/200 [00:13<00:38,  4.24it/s] 18%|█▊        | 37/200 [00:14<00:42,  3.80it/s] 19%|█▉        | 38/200 [00:14<00:42,  3.78it/s] 20%|██        | 40/200 [00:14<00:38,  4.15it/s] 20%|██        | 41/200 [00:15<00:40,  3.93it/s] 22%|██▏       | 43/200 [00:15<00:40,  3.84it/s] 22%|██▏       | 44/200 [00:15<00:39,  3.96it/s] 22%|██▎       | 45/200 [00:16<00:41,  3.71it/s] 23%|██▎       | 46/200 [00:16<00:53,  2.90it/s] 24%|██▎       | 47/200 [00:18<01:20,  1.91it/s] 24%|██▍       | 48/200 [00:20<02:33,  1.01s/it] 32%|███▎      | 65/200 [00:21<00:24,  5.56it/s] 33%|███▎      | 66/200 [00:22<00:35,  3.79it/s] 34%|███▍      | 68/200 [00:23<00:33,  3.88it/s] 34%|███▍      | 69/200 [00:23<00:40,  3.27it/s] 36%|███▌      | 72/200 [00:24<00:37,  3.38it/s] 36%|███▋      | 73/200 [00:24<00:36,  3.50it/s] 37%|███▋      | 74/200 [00:25<00:35,  3.51it/s] 38%|███▊      | 76/200 [00:25<00:28,  4.28it/s] 39%|███▉      | 78/200 [00:25<00:24,  5.06it/s] 40%|███▉      | 79/200 [00:25<00:24,  5.03it/s] 40%|████      | 80/200 [00:26<00:31,  3.85it/s] 41%|████      | 82/200 [00:26<00:31,  3.74it/s] 42%|████▏     | 83/200 [00:27<00:40,  2.90it/s] 42%|████▏     | 84/200 [00:28<01:03,  1.83it/s] 42%|████▎     | 85/200 [00:31<01:56,  1.01s/it] 50%|████▉     | 99/200 [00:31<00:20,  4.88it/s] 50%|█████     | 100/200 [00:33<00:30,  3.30it/s] 50%|█████     | 101/200 [00:33<00:31,  3.18it/s] 51%|█████     | 102/200 [00:34<00:35,  2.74it/s] 53%|█████▎    | 106/200 [00:35<00:28,  3.33it/s] 54%|█████▍    | 108/200 [00:35<00:24,  3.82it/s] 55%|█████▍    | 109/200 [00:35<00:23,  3.94it/s] 56%|█████▌    | 112/200 [00:36<00:17,  4.90it/s] 57%|█████▋    | 114/200 [00:36<00:15,  5.53it/s] 58%|█████▊    | 116/200 [00:36<00:14,  5.97it/s] 58%|█████▊    | 117/200 [00:37<00:18,  4.51it/s] 60%|█████▉    | 119/200 [00:38<00:26,  3.01it/s] 60%|██████    | 121/200 [00:38<00:22,  3.55it/s] 61%|██████    | 122/200 [00:39<00:37,  2.07it/s] 62%|██████▏   | 123/200 [00:40<00:44,  1.73it/s] 62%|██████▏   | 124/200 [00:41<00:51,  1.49it/s] 62%|██████▎   | 125/200 [00:42<00:43,  1.74it/s] 66%|██████▋   | 133/200 [00:42<00:13,  5.07it/s] 67%|██████▋   | 134/200 [00:43<00:17,  3.86it/s] 68%|██████▊   | 135/200 [00:44<00:21,  3.00it/s] 68%|██████▊   | 137/200 [00:44<00:19,  3.27it/s] 69%|██████▉   | 138/200 [00:44<00:18,  3.33it/s] 70%|██████▉   | 139/200 [00:45<00:19,  3.09it/s] 72%|███████▎  | 145/200 [00:46<00:12,  4.46it/s] 73%|███████▎  | 146/200 [00:46<00:12,  4.49it/s] 74%|███████▎  | 147/200 [00:46<00:11,  4.53it/s] 74%|███████▍  | 149/200 [00:47<00:10,  5.01it/s] 76%|███████▌  | 151/200 [00:47<00:08,  5.74it/s] 77%|███████▋  | 154/200 [00:48<00:09,  4.94it/s] 78%|███████▊  | 156/200 [00:49<00:13,  3.34it/s] 79%|███████▉  | 158/200 [00:49<00:10,  3.88it/s] 80%|███████▉  | 159/200 [00:50<00:16,  2.52it/s] 80%|████████  | 160/200 [00:51<00:17,  2.32it/s] 80%|████████  | 161/200 [00:52<00:24,  1.59it/s] 81%|████████  | 162/200 [00:52<00:20,  1.84it/s] 82%|████████▏ | 164/200 [00:53<00:14,  2.46it/s] 84%|████████▍ | 169/200 [00:54<00:09,  3.30it/s] 86%|████████▌ | 171/200 [00:55<00:09,  3.16it/s] 86%|████████▌ | 172/200 [00:55<00:09,  3.10it/s] 86%|████████▋ | 173/200 [00:55<00:08,  3.30it/s] 87%|████████▋ | 174/200 [00:55<00:08,  3.18it/s] 90%|█████████ | 180/200 [00:56<00:02,  6.73it/s] 90%|█████████ | 181/200 [00:56<00:03,  4.87it/s] 91%|█████████ | 182/200 [00:56<00:03,  5.04it/s] 92%|█████████▏| 183/200 [00:57<00:03,  5.21it/s] 92%|█████████▎| 185/200 [00:57<00:02,  6.05it/s] 94%|█████████▎| 187/200 [00:57<00:01,  7.38it/s] 95%|█████████▌| 190/200 [00:58<00:01,  6.39it/s] 96%|█████████▌| 191/200 [00:59<00:02,  3.11it/s] 96%|█████████▌| 192/200 [01:00<00:04,  1.88it/s] 96%|█████████▋| 193/200 [01:01<00:04,  1.48it/s] 97%|█████████▋| 194/200 [01:02<00:03,  1.77it/s] 98%|█████████▊| 196/200 [01:02<00:01,  2.56it/s]100%|██████████| 200/200 [01:02<00:00,  3.21it/s]
-============ Serving Benchmark Result ============
-Successful requests:                     200       
-Benchmark duration (s):                  62.35     
-Total input tokens:                      6200      
-Total generated tokens:                  22618     
-Request throughput (req/s):              3.21      
-Output token throughput (tok/s):         362.77    
-Total Token throughput (tok/s):          462.22    
----------------Time to First Token----------------
-Mean TTFT (ms):                          252.51    
-Median TTFT (ms):                        177.46    
-P99 TTFT (ms):                           495.93    
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          80.60     
-Median TPOT (ms):                        81.01     
-P99 TPOT (ms):                           87.24     
----------------Inter-token Latency----------------
-Mean ITL (ms):                           80.58     
-Median ITL (ms):                         72.99     
-P99 ITL (ms):                            185.92    
-==================================================
-�?SUCCESS input_len=32 batch_size=32
----
-

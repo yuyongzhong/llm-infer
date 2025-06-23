@@ -1,69 +1,0 @@
-Running input_len=128, batch_size=16...
-Intel oneMKL FATAL ERROR: Cannot load /usr/local/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so.
-�?FAILED input_len=128 batch_size=16
----
-
-Running input_len=128, batch_size=16...
-INFO 06-19 02:21:01 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
-Traceback (most recent call last):
-  File "/home/llm-infer/test/perf-test/vllm/benchmarks/benchmark_serving.py", line 50, in <module>
-    from vllm.transformers_utils.tokenizer import get_tokenizer
-  File "/usr/local/lib/python3.10/site-packages/vllm/__init__.py", line 13, in <module>
-    from vllm.engine.arg_utils import AsyncEngineArgs, EngineArgs
-  File "/usr/local/lib/python3.10/site-packages/vllm/engine/arg_utils.py", line 22, in <module>
-    from vllm.config import (BlockSize, CacheConfig, CacheDType, CompilationConfig,
-  File "/usr/local/lib/python3.10/site-packages/vllm/config.py", line 1736, in <module>
-    class ParallelConfig:
-  File "/usr/local/lib/python3.10/site-packages/pydantic/dataclasses.py", line 213, in dataclass
-    return create_dataclass(_cls)
-  File "/usr/local/lib/python3.10/site-packages/pydantic/dataclasses.py", line 204, in create_dataclass
-    pydantic_complete = _pydantic_dataclasses.complete_dataclass(
-  File "/usr/local/lib/python3.10/site-packages/pydantic/_internal/_dataclasses.py", line 174, in complete_dataclass
-    cls.__pydantic_validator__ = validator = create_schema_validator(
-  File "/usr/local/lib/python3.10/site-packages/pydantic/plugin/_schema_validator.py", line 34, in create_schema_validator
-    return SchemaValidator(schema, config)
-pydantic_core._pydantic_core.SchemaError: Error building "dataclass" validator:
-  SchemaError: Error building "dataclass-args" validator:
-  SchemaError: Field 'distributed_executor_backend':
-  SchemaError: Error building "default" validator:
-  SchemaError: Error building "nullable" validator:
-  SchemaError: Error building "union" validator:
-  SchemaError: Error building "is-subclass" validator:
-  TypeError: 'str' object cannot be converted to 'PyType'
-�?FAILED input_len=128 batch_size=16
----
-
-Running input_len=128, batch_size=16...
-INFO 06-19 03:31:14 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
-WARNING 06-19 03:31:15 [_custom_ops.py:22] Failed to import from vllm._C with ImportError('libcuda.so.1: cannot open shared object file: No such file or directory')
-Namespace(backend='vllm', base_url='http://10.10.133.112:8000', host='127.0.0.1', port=8000, endpoint='/v1/completions', dataset_name='random', dataset_path=None, max_concurrency=16, model='deepseek', tokenizer='/home/models/DeepSeek-R1-32B/', use_beam_search=False, num_prompts=200, logprobs=None, request_rate=inf, burstiness=1.0, seed=0, trust_remote_code=False, disable_tqdm=False, profile=False, save_result=True, save_detailed=False, append_result=False, metadata=None, result_dir=None, result_filename='/home/llm-infer/test/perf-test/benchmark_logs/result_input128_batch16.json', ignore_eos=False, percentile_metrics='ttft,tpot,itl', metric_percentiles='99', goodput=None, custom_output_len=256, custom_skip_chat_template=False, sonnet_input_len=550, sonnet_output_len=150, sonnet_prefix_len=200, sharegpt_output_len=None, random_input_len=128, random_output_len=128, random_range_ratio=0.0, random_prefix_len=0, hf_subset=None, hf_split=None, hf_output_len=None, top_p=None, top_k=None, min_p=None, temperature=None, tokenizer_mode='auto', served_model_name=None, lora_modules=None)
-Starting initial single prompt test run...
-Initial test run completed. Starting main benchmark run...
-Traffic request rate: inf
-Burstiness factor: 1.0 (Poisson process)
-Maximum request concurrency: 16
-  0%|          | 0/200 [00:00<?, ?it/s]  0%|          | 1/200 [00:02<09:04,  2.74s/it]  2%|▏         | 3/200 [00:05<05:23,  1.64s/it]  2%|▏         | 4/200 [00:06<04:46,  1.46s/it]  2%|▎         | 5/200 [00:06<03:28,  1.07s/it]  3%|▎         | 6/200 [00:10<05:52,  1.82s/it]  4%|▎         | 7/200 [00:11<05:21,  1.67s/it]  8%|▊         | 17/200 [00:13<01:29,  2.03it/s] 10%|█         | 20/200 [00:15<01:26,  2.07it/s] 10%|█         | 21/200 [00:15<01:34,  1.90it/s] 11%|█         | 22/200 [00:16<01:35,  1.87it/s] 12%|█▏        | 23/200 [00:17<01:51,  1.59it/s] 12%|█▏        | 24/200 [00:19<02:33,  1.14it/s] 12%|█▎        | 25/200 [00:21<03:04,  1.05s/it] 13%|█▎        | 26/200 [00:22<03:14,  1.12s/it] 17%|█▋        | 34/200 [00:24<01:24,  1.97it/s] 18%|█▊        | 37/200 [00:26<01:19,  2.05it/s] 19%|█▉        | 38/200 [00:26<01:23,  1.94it/s] 20%|█▉        | 39/200 [00:27<01:19,  2.03it/s] 20%|██        | 40/200 [00:27<01:19,  2.02it/s] 20%|██        | 41/200 [00:28<01:30,  1.75it/s] 21%|██        | 42/200 [00:28<01:22,  1.91it/s] 22%|██▏       | 43/200 [00:30<02:11,  1.19it/s] 22%|██▎       | 45/200 [00:32<01:56,  1.33it/s] 23%|██▎       | 46/200 [00:32<01:57,  1.31it/s] 24%|██▎       | 47/200 [00:34<02:18,  1.10it/s] 26%|██▌       | 52/200 [00:36<01:30,  1.64it/s] 28%|██▊       | 55/200 [00:38<01:33,  1.55it/s] 28%|██▊       | 56/200 [00:39<01:30,  1.59it/s] 28%|██▊       | 57/200 [00:39<01:32,  1.55it/s] 29%|██▉       | 58/200 [00:40<01:21,  1.75it/s] 30%|██▉       | 59/200 [00:40<01:13,  1.91it/s] 30%|███       | 60/200 [00:40<01:12,  1.93it/s] 30%|███       | 61/200 [00:42<01:46,  1.31it/s] 31%|███       | 62/200 [00:43<01:58,  1.17it/s] 32%|███▏      | 64/200 [00:44<01:31,  1.49it/s] 32%|███▎      | 65/200 [00:45<01:51,  1.21it/s] 35%|███▌      | 70/200 [00:47<01:14,  1.74it/s] 36%|███▌      | 72/200 [00:49<01:19,  1.60it/s] 36%|███▋      | 73/200 [00:50<01:20,  1.58it/s] 37%|███▋      | 74/200 [00:50<01:16,  1.65it/s] 38%|███▊      | 75/200 [00:51<01:13,  1.71it/s] 38%|███▊      | 76/200 [00:51<01:05,  1.88it/s] 38%|███▊      | 77/200 [00:51<00:57,  2.14it/s] 39%|███▉      | 78/200 [00:52<00:53,  2.28it/s] 40%|████      | 80/200 [00:54<01:20,  1.49it/s] 40%|████      | 81/200 [00:55<01:32,  1.29it/s] 41%|████      | 82/200 [00:57<02:07,  1.08s/it] 44%|████▎     | 87/200 [00:59<01:15,  1.51it/s] 44%|████▍     | 88/200 [01:00<01:16,  1.46it/s] 44%|████▍     | 89/200 [01:00<01:10,  1.57it/s] 45%|████▌     | 90/200 [01:00<01:07,  1.64it/s] 46%|████▌     | 91/200 [01:01<01:07,  1.61it/s] 46%|████▌     | 92/200 [01:02<01:03,  1.69it/s] 46%|████▋     | 93/200 [01:02<01:00,  1.76it/s] 47%|████▋     | 94/200 [01:02<00:53,  1.96it/s] 48%|████▊     | 95/200 [01:03<00:46,  2.25it/s] 48%|████▊     | 96/200 [01:03<00:43,  2.38it/s] 48%|████▊     | 97/200 [01:04<00:50,  2.04it/s] 49%|████▉     | 98/200 [01:05<01:12,  1.41it/s] 50%|████▉     | 99/200 [01:06<01:25,  1.18it/s] 50%|█████     | 101/200 [01:07<00:57,  1.71it/s] 51%|█████     | 102/200 [01:08<01:08,  1.44it/s] 52%|█████▏    | 103/200 [01:09<01:07,  1.43it/s] 55%|█████▍    | 109/200 [01:10<00:31,  2.89it/s] 55%|█████▌    | 110/200 [01:11<00:42,  2.10it/s] 56%|█████▌    | 112/200 [01:12<00:41,  2.12it/s] 56%|█████▋    | 113/200 [01:13<00:46,  1.89it/s] 57%|█████▋    | 114/200 [01:14<00:51,  1.67it/s] 57%|█████▊    | 115/200 [01:14<00:51,  1.64it/s] 58%|█████▊    | 116/200 [01:15<00:49,  1.71it/s] 59%|█████▉    | 118/200 [01:16<00:43,  1.87it/s] 60%|█████▉    | 119/200 [01:17<00:59,  1.37it/s] 60%|██████    | 120/200 [01:18<01:11,  1.12it/s] 60%|██████    | 121/200 [01:19<01:07,  1.17it/s] 61%|██████    | 122/200 [01:20<01:10,  1.11it/s] 63%|██████▎   | 126/200 [01:21<00:37,  1.98it/s] 64%|██████▎   | 127/200 [01:22<00:46,  1.56it/s] 64%|██████▍   | 128/200 [01:23<00:48,  1.48it/s] 64%|██████▍   | 129/200 [01:24<00:44,  1.61it/s] 65%|██████▌   | 130/200 [01:24<00:41,  1.69it/s] 66%|██████▌   | 131/200 [01:25<00:46,  1.49it/s] 66%|██████▌   | 132/200 [01:26<00:45,  1.50it/s] 66%|██████▋   | 133/200 [01:26<00:41,  1.61it/s] 68%|██████▊   | 135/200 [01:27<00:35,  1.82it/s] 68%|██████▊   | 136/200 [01:29<00:48,  1.32it/s] 68%|██████▊   | 137/200 [01:30<00:52,  1.21it/s] 69%|██████▉   | 138/200 [01:30<00:42,  1.47it/s] 70%|██████▉   | 139/200 [01:30<00:35,  1.69it/s] 70%|███████   | 140/200 [01:31<00:37,  1.59it/s] 70%|███████   | 141/200 [01:35<01:34,  1.60s/it] 71%|███████   | 142/200 [01:36<01:19,  1.37s/it] 72%|███████▎  | 145/200 [01:38<00:54,  1.01it/s] 73%|███████▎  | 146/200 [01:38<00:47,  1.15it/s] 74%|███████▎  | 147/200 [01:39<00:45,  1.16it/s] 74%|███████▍  | 148/200 [01:40<00:40,  1.29it/s] 74%|███████▍  | 149/200 [01:40<00:40,  1.25it/s] 75%|███████▌  | 150/200 [01:41<00:34,  1.43it/s] 76%|███████▌  | 151/200 [01:41<00:29,  1.66it/s] 76%|███████▌  | 152/200 [01:42<00:27,  1.74it/s] 77%|███████▋  | 154/200 [01:43<00:22,  2.04it/s] 78%|███████▊  | 155/200 [01:44<00:33,  1.33it/s] 78%|███████▊  | 156/200 [01:45<00:36,  1.21it/s] 78%|███████▊  | 157/200 [01:45<00:29,  1.48it/s] 80%|███████▉  | 159/200 [01:46<00:20,  2.05it/s] 80%|████████  | 160/200 [01:47<00:21,  1.84it/s] 80%|████████  | 161/200 [01:47<00:19,  2.02it/s] 81%|████████  | 162/200 [01:48<00:21,  1.73it/s] 82%|████████▏ | 163/200 [01:50<00:38,  1.04s/it] 82%|████████▏ | 164/200 [01:51<00:35,  1.02it/s] 82%|████████▎ | 165/200 [01:52<00:33,  1.05it/s] 83%|████████▎ | 166/200 [01:52<00:27,  1.22it/s] 84%|████████▎ | 167/200 [01:53<00:23,  1.42it/s] 84%|████████▍ | 168/200 [01:53<00:19,  1.66it/s] 84%|████████▍ | 169/200 [01:54<00:17,  1.73it/s] 86%|████████▌ | 171/200 [01:54<00:14,  2.04it/s] 86%|████████▌ | 172/200 [01:56<00:19,  1.47it/s] 86%|████████▋ | 173/200 [01:56<00:16,  1.63it/s] 87%|████████▋ | 174/200 [01:57<00:20,  1.29it/s] 88%|████████▊ | 176/200 [01:58<00:12,  1.92it/s] 88%|████████▊ | 177/200 [01:58<00:13,  1.75it/s] 89%|████████▉ | 178/200 [01:59<00:15,  1.45it/s] 90%|████████▉ | 179/200 [02:02<00:23,  1.10s/it] 90%|█████████ | 180/200 [02:02<00:20,  1.02s/it] 91%|█████████ | 182/200 [02:03<00:14,  1.27it/s] 92%|█████████▏| 183/200 [02:04<00:12,  1.39it/s] 92%|█████████▏| 184/200 [02:04<00:10,  1.55it/s] 92%|█████████▎| 185/200 [02:05<00:08,  1.76it/s] 94%|█████████▎| 187/200 [02:05<00:05,  2.49it/s] 94%|█████████▍| 188/200 [02:05<00:04,  2.55it/s] 94%|█████████▍| 189/200 [02:06<00:03,  2.89it/s] 95%|█████████▌| 190/200 [02:07<00:05,  1.88it/s] 96%|█████████▌| 191/200 [02:07<00:04,  2.17it/s] 96%|█████████▌| 192/200 [02:07<00:03,  2.25it/s] 96%|█████████▋| 193/200 [02:08<00:03,  2.13it/s] 98%|█████████▊| 195/200 [02:09<00:02,  1.70it/s] 98%|█████████▊| 196/200 [02:11<00:03,  1.14it/s] 98%|█████████▊| 197/200 [02:12<00:02,  1.27it/s] 99%|█████████▉| 198/200 [02:12<00:01,  1.29it/s]100%|█████████▉| 199/200 [02:13<00:00,  1.54it/s]100%|██████████| 200/200 [02:13<00:00,  1.90it/s]100%|██████████| 200/200 [02:13<00:00,  1.50it/s]
-============ Serving Benchmark Result ============
-Successful requests:                     200       
-Benchmark duration (s):                  133.40    
-Total input tokens:                      25400     
-Total generated tokens:                  22284     
-Request throughput (req/s):              1.50      
-Output token throughput (tok/s):         167.05    
-Total Token throughput (tok/s):          357.45    
----------------Time to First Token----------------
-Mean TTFT (ms):                          332.58    
-Median TTFT (ms):                        205.97    
-P99 TTFT (ms):                           996.30    
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          90.24     
-Median TPOT (ms):                        88.70     
-P99 TPOT (ms):                           120.62    
----------------Inter-token Latency----------------
-Mean ITL (ms):                           90.25     
-Median ITL (ms):                         75.67     
-P99 ITL (ms):                            320.52    
-==================================================
-�?SUCCESS input_len=128 batch_size=16
----
-
