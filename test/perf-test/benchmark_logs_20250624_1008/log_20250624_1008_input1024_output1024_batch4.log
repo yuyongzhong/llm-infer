@@ -1,0 +1,34 @@
+[2025-06-24 19:13:00] Running input_len=1024, output_len=1024, batch_size=4...
+INFO 06-24 19:13:04 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
+WARNING 06-24 19:13:06 [_custom_ops.py:22] Failed to import from vllm._C with ImportError('libcuda.so.1: cannot open shared object file: No such file or directory')
+Namespace(backend='vllm', base_url='http://127.0.0.1:8000', host='127.0.0.1', port=8000, endpoint='/v1/completions', dataset_name='random', dataset_path=None, max_concurrency=4, model='deepseek', tokenizer='/home/models/DeepSeek-R1-32B/', use_beam_search=False, num_prompts=200, logprobs=None, request_rate=inf, burstiness=1.0, seed=0, trust_remote_code=False, disable_tqdm=False, profile=False, save_result=True, save_detailed=True, append_result=False, metadata=None, result_dir=None, result_filename='/home/llm-infer/test/perf-test/benchmark_logs_20250624_1008/result_20250624_1008_input1024_output1024_batch4.json', ignore_eos=True, percentile_metrics='ttft,tpot,itl', metric_percentiles='99', goodput=None, custom_output_len=256, custom_skip_chat_template=False, sonnet_input_len=550, sonnet_output_len=150, sonnet_prefix_len=200, sharegpt_output_len=None, random_input_len=1024, random_output_len=1024, random_range_ratio=0.0, random_prefix_len=0, hf_subset=None, hf_split=None, hf_output_len=None, top_p=None, top_k=None, min_p=None, temperature=None, tokenizer_mode='auto', served_model_name=None, lora_modules=None)
+Starting initial single prompt test run...
+Initial test run completed. Starting main benchmark run...
+Traffic request rate: inf
+Burstiness factor: 1.0 (Poisson process)
+Maximum request concurrency: 4
+  0%|          | 0/200 [00:00<?, ?it/s]  0%|          | 1/200 [01:11<3:57:17, 71.55s/it]  2%|▎         | 5/200 [02:23<1:24:12, 25.91s/it]  4%|▍         | 9/200 [03:34<1:08:25, 21.49s/it]  6%|▋         | 13/200 [04:46<1:02:05, 19.92s/it]  8%|▊         | 17/200 [05:57<58:22, 19.14s/it]   10%|█         | 21/200 [07:09<55:42, 18.68s/it] 12%|█▎        | 25/200 [08:20<53:39, 18.40s/it] 14%|█▍        | 29/200 [09:32<51:55, 18.22s/it] 16%|█▋        | 33/200 [10:43<50:22, 18.10s/it] 18%|█▊        | 37/200 [11:54<48:58, 18.03s/it] 20%|██        | 41/200 [13:06<47:37, 17.97s/it] 22%|██▎       | 45/200 [14:17<46:19, 17.93s/it] 24%|██▍       | 49/200 [15:29<45:04, 17.91s/it] 26%|██▋       | 53/200 [16:40<43:49, 17.89s/it] 28%|██▊       | 57/200 [17:51<42:37, 17.88s/it] 30%|███       | 61/200 [19:03<41:24, 17.87s/it] 32%|███▎      | 65/200 [20:15<40:16, 17.90s/it] 34%|███▍      | 69/200 [21:26<39:01, 17.88s/it] 36%|███▋      | 73/200 [22:38<37:50, 17.88s/it] 38%|███▊      | 77/200 [23:49<36:37, 17.86s/it] 40%|████      | 81/200 [25:00<35:26, 17.87s/it] 42%|████▎     | 85/200 [26:12<34:12, 17.85s/it] 44%|████▍     | 89/200 [27:23<33:02, 17.86s/it] 46%|████▋     | 93/200 [28:36<31:58, 17.93s/it] 48%|████▊     | 97/200 [29:47<30:45, 17.91s/it] 50%|█████     | 101/200 [30:58<29:29, 17.87s/it] 52%|█████▎    | 105/200 [32:09<28:15, 17.85s/it] 55%|█████▍    | 109/200 [33:21<27:03, 17.84s/it] 56%|█████▋    | 113/200 [34:31<25:49, 17.81s/it] 58%|█████▊    | 117/200 [35:43<24:40, 17.83s/it] 60%|██████    | 121/200 [36:55<23:29, 17.85s/it] 62%|██████▎   | 125/200 [38:06<22:17, 17.83s/it] 64%|██████▍   | 129/200 [39:16<21:01, 17.76s/it] 66%|██████▋   | 133/200 [40:28<19:54, 17.84s/it] 68%|██████▊   | 137/200 [41:40<18:43, 17.83s/it] 70%|███████   | 141/200 [42:51<17:31, 17.82s/it] 72%|███████▎  | 145/200 [44:02<16:20, 17.82s/it] 74%|███████▍  | 149/200 [45:13<15:09, 17.83s/it] 76%|███████▋  | 153/200 [46:25<13:58, 17.84s/it] 78%|███████▊  | 157/200 [47:36<12:47, 17.84s/it] 80%|████████  | 161/200 [48:47<11:34, 17.81s/it] 82%|████████▎ | 165/200 [49:59<10:23, 17.82s/it] 84%|████████▍ | 169/200 [51:10<09:12, 17.83s/it] 86%|████████▋ | 173/200 [52:21<08:01, 17.84s/it] 88%|████████▊ | 177/200 [53:33<06:50, 17.85s/it] 90%|█████████ | 181/200 [54:44<05:38, 17.84s/it] 92%|█████████▎| 185/200 [55:55<04:27, 17.81s/it] 94%|█████████▍| 189/200 [57:06<03:15, 17.78s/it] 96%|█████████▋| 193/200 [58:17<02:04, 17.79s/it] 98%|█████████▊| 197/200 [59:28<00:53, 17.77s/it]100%|██████████| 200/200 [59:28<00:00, 17.84s/it]
+============ Serving Benchmark Result ============
+Successful requests:                     200       
+Benchmark duration (s):                  3568.56   
+Total input tokens:                      204600    
+Total generated tokens:                  204800    
+Request throughput (req/s):              0.06      
+Output token throughput (tok/s):         57.39     
+Total Token throughput (tok/s):          114.72    
+---------------Time to First Token----------------
+Mean TTFT (ms):                          3256.35   
+Median TTFT (ms):                        3295.80   
+P99 TTFT (ms):                           3626.69   
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms):                          66.58     
+Median TPOT (ms):                        66.57     
+P99 TPOT (ms):                           68.15     
+---------------Inter-token Latency----------------
+Mean ITL (ms):                           66.58     
+Median ITL (ms):                         66.49     
+P99 ITL (ms):                            73.35     
+==================================================
+[2025-06-24 20:13:37] SUCCESS input_len=1024 output_len=1024 batch_size=4
+---
+

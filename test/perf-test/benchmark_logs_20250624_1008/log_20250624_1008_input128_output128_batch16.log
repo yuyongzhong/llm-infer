@@ -1,0 +1,34 @@
+[2025-06-24 23:23:23] Running input_len=128, output_len=128, batch_size=16...
+INFO 06-24 23:23:28 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
+WARNING 06-24 23:23:29 [_custom_ops.py:22] Failed to import from vllm._C with ImportError('libcuda.so.1: cannot open shared object file: No such file or directory')
+Namespace(backend='vllm', base_url='http://127.0.0.1:8000', host='127.0.0.1', port=8000, endpoint='/v1/completions', dataset_name='random', dataset_path=None, max_concurrency=16, model='deepseek', tokenizer='/home/models/DeepSeek-R1-32B/', use_beam_search=False, num_prompts=200, logprobs=None, request_rate=inf, burstiness=1.0, seed=0, trust_remote_code=False, disable_tqdm=False, profile=False, save_result=True, save_detailed=True, append_result=False, metadata=None, result_dir=None, result_filename='/home/llm-infer/test/perf-test/benchmark_logs_20250624_1008/result_20250624_1008_input128_output128_batch16.json', ignore_eos=True, percentile_metrics='ttft,tpot,itl', metric_percentiles='99', goodput=None, custom_output_len=256, custom_skip_chat_template=False, sonnet_input_len=550, sonnet_output_len=150, sonnet_prefix_len=200, sharegpt_output_len=None, random_input_len=128, random_output_len=128, random_range_ratio=0.0, random_prefix_len=0, hf_subset=None, hf_split=None, hf_output_len=None, top_p=None, top_k=None, min_p=None, temperature=None, tokenizer_mode='auto', served_model_name=None, lora_modules=None)
+Starting initial single prompt test run...
+Initial test run completed. Starting main benchmark run...
+Traffic request rate: inf
+Burstiness factor: 1.0 (Poisson process)
+Maximum request concurrency: 16
+  0%|          | 0/200 [00:00<?, ?it/s]  0%|          | 1/200 [00:10<34:26, 10.39s/it]  8%|▊         | 17/200 [00:20<03:12,  1.05s/it] 16%|█▋        | 33/200 [00:31<02:16,  1.22it/s] 24%|██▍       | 49/200 [00:41<01:51,  1.35it/s] 32%|███▎      | 65/200 [00:51<01:35,  1.42it/s] 40%|████      | 81/200 [01:02<01:21,  1.46it/s] 48%|████▊     | 97/200 [01:12<01:09,  1.49it/s] 56%|█████▋    | 113/200 [01:22<00:57,  1.51it/s] 64%|██████▍   | 129/200 [01:33<00:46,  1.52it/s] 72%|███████▎  | 145/200 [01:43<00:35,  1.53it/s] 80%|████████  | 161/200 [01:53<00:25,  1.54it/s] 88%|████████▊ | 177/200 [02:04<00:14,  1.55it/s] 96%|█████████▋| 193/200 [02:12<00:04,  1.62it/s]100%|██████████| 200/200 [02:12<00:00,  1.51it/s]
+============ Serving Benchmark Result ============
+Successful requests:                     200       
+Benchmark duration (s):                  132.86    
+Total input tokens:                      25400     
+Total generated tokens:                  25600     
+Request throughput (req/s):              1.51      
+Output token throughput (tok/s):         192.68    
+Total Token throughput (tok/s):          383.86    
+---------------Time to First Token----------------
+Mean TTFT (ms):                          717.99    
+Median TTFT (ms):                        721.44    
+P99 TTFT (ms):                           827.14    
+-----Time per Output Token (excl. 1st token)------
+Mean TPOT (ms):                          75.22     
+Median TPOT (ms):                        75.60     
+P99 TPOT (ms):                           76.49     
+---------------Inter-token Latency----------------
+Mean ITL (ms):                           75.22     
+Median ITL (ms):                         75.45     
+P99 ITL (ms):                            80.68     
+==================================================
+[2025-06-24 23:25:52] SUCCESS input_len=128 output_len=128 batch_size=16
+---
+
