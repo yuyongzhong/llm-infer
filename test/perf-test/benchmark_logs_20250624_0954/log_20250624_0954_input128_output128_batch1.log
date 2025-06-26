@@ -1,3 +1,0 @@
-[2025-06-24 09:54:31] Running input_len=128, output_len=128, batch_size=1...
-INFO 06-24 09:54:36 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
-WARNING 06-24 09:54:37 [_custom_ops.py:22] Failed to import from vllm._C with ImportError('libcuda.so.1: cannot open shared object file: No such file or directory')
