@@ -1,0 +1,88 @@
+2025-06-26 08:07:59,228 - evalscope - INFO - Dump task config to ./outputs/20250626_080754/configs/task_config_417df6.yaml
+2025-06-26 08:07:59,231 - evalscope - INFO - {
+    "model": "deepseek",
+    "model_id": "deepseek",
+    "model_args": {},
+    "model_task": "text_generation",
+    "template_type": null,
+    "chat_template": null,
+    "datasets": [
+        "ceval"
+    ],
+    "dataset_args": {
+        "ceval": {
+            "name": "ceval",
+            "dataset_id": "modelscope/ceval-exam",
+            "model_adapter": "generation",
+            "output_types": [
+                "multiple_choice_logits",
+                "generation"
+            ],
+            "subset_list": [
+                "middle_school_history"
+            ],
+            "metric_list": [
+                "AverageAccuracy"
+            ],
+            "few_shot_num": 0,
+            "few_shot_random": false,
+            "train_split": "dev",
+            "eval_split": "val",
+            "prompt_template": "以下是中国关于{subset_name}考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n{query}",
+            "system_prompt": null,
+            "query_template": null,
+            "pretty_name": "C-Eval",
+            "description": null,
+            "filters": null,
+            "extra_params": {}
+        }
+    },
+    "dataset_dir": "/root/.cache/modelscope/hub/datasets",
+    "dataset_hub": "modelscope",
+    "generation_config": {
+        "max_tokens": 3000,
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "n": 2
+    },
+    "eval_type": "service",
+    "eval_backend": "Native",
+    "eval_config": null,
+    "stage": "all",
+    "limit": null,
+    "eval_batch_size": 15,
+    "mem_cache": false,
+    "use_cache": null,
+    "work_dir": "./outputs/20250626_080754",
+    "outputs": null,
+    "ignore_errors": false,
+    "debug": false,
+    "dry_run": false,
+    "seed": 42,
+    "api_url": "http://10.10.133.112:8000/v1",
+    "api_key": "KEY",
+    "timeout": null,
+    "stream": true,
+    "judge_strategy": "auto",
+    "judge_worker_num": 1,
+    "judge_model_args": {},
+    "analysis_report": false
+}
+2025-06-26 08:07:59,231 - evalscope - INFO - Start evaluating on dataset modelscope/ceval-exam
+2025-06-26 08:07:59,231 - evalscope - INFO - Loading dataset from hub: modelscope/ceval-exam
+2025-06-26 08:07:59,449 - evalscope - INFO - Loading dataset: dataset_name: modelscope/ceval-exam > subsets: ['middle_school_history']
+2025-06-26 08:08:08,333 - evalscope - INFO - Use settings: > few_shot_num: 0, > few_shot_split: dev, > target_eval_split: val
+2025-06-26 08:09:54,832 - evalscope - ERROR - Error when calling remote API: Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,833 - evalscope - ERROR - Failed to get answer for [{'data': ['以下是中国关于初中历史考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n问题：下列关于河姆渡原始居民生活状况的描述，不正确的一项是____\nA. 会饲养家畜\nB. 会制造青铜器\nC. 种植水稻\nD. 会制造干栏式房屋\n答案: '], 'index': 17, 'multi_choices': ['A', 'B', 'C', 'D'], 'raw_input': {'id': 17, 'question': '下列关于河姆渡原始居民生活状况的描述，不正确的一项是____', 'A': '会饲养家畜', 'B': '会制造青铜器', 'C': '种植水稻', 'D': '会制造干栏式房屋', 'answer': 'B', 'explanation': ''}}], due to Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,834 - evalscope - ERROR - Error when calling remote API: Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,834 - evalscope - ERROR - Failed to get answer for [{'data': ['以下是中国关于初中历史考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n问题：改革开放以来，我国的外交事业取得重大成就的根本原因是____\nA. 综合国力的增强\nB. 独立自主的和平外交政策\nC. 中国是联合国安理会常任理事国\nD. 成功举办亚太经合组织会议\n答案: '], 'index': 18, 'multi_choices': ['A', 'B', 'C', 'D'], 'raw_input': {'id': 18, 'question': '改革开放以来，我国的外交事业取得重大成就的根本原因是____', 'A': '综合国力的增强', 'B': '独立自主的和平外交政策', 'C': '中国是联合国安理会常任理事国', 'D': '成功举办亚太经合组织会议', 'answer': 'A', 'explanation': ''}}], due to Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,834 - evalscope - ERROR - Error when calling remote API: Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,840 - evalscope - ERROR - Failed to get answer for [{'data': ['以下是中国关于初中历史考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n问题：改革开放以来，党和政府为发展社会主义经济采取的举措不包括____\nA. 建立经济特区\nB. 农村实行家庭联产承包责任制\nC. 城市实行经济体制改革\nD. 农村建立人民公社\n答案: '], 'index': 21, 'multi_choices': ['A', 'B', 'C', 'D'], 'raw_input': {'id': 21, 'question': '改革开放以来，党和政府为发展社会主义经济采取的举措不包括____', 'A': '建立经济特区', 'B': '农村实行家庭联产承包责任制', 'C': '城市实行经济体制改革', 'D': '农村建立人民公社', 'answer': 'D', 'explanation': ''}}], due to Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,839 - evalscope - ERROR - Error when calling remote API: Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,839 - evalscope - ERROR - Error when calling remote API: Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,840 - evalscope - ERROR - Error when calling remote API: Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,839 - evalscope - ERROR - Error when calling remote API: Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,840 - evalscope - ERROR - Failed to get answer for [{'data': ['以下是中国关于初中历史考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n问题：形成日后华夏族的主要部落是____\nA. 黄帝、蚩尤部落\nB. 炎帝、蚩尤部落\nC. 黄帝、炎帝、蚩尤部落\nD. 黄帝、炎帝部落\n答案: '], 'index': 19, 'multi_choices': ['A', 'B', 'C', 'D'], 'raw_input': {'id': 19, 'question': '形成日后华夏族的主要部落是____', 'A': '黄帝、蚩尤部落', 'B': '炎帝、蚩尤部落', 'C': '黄帝、炎帝、蚩尤部落', 'D': '黄帝、炎帝部落', 'answer': 'D', 'explanation': ''}}], due to Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,841 - evalscope - ERROR - Failed to get answer for [{'data': ['以下是中国关于初中历史考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n问题：在今天菲律宾的马克坦岛上矗立着一块双面碑，一面的碑文是纪念麦哲伦，因为他完成了人类历史上第一次环球航行；另一面是纪念菲律宾的一位勇士，因为正是他杀死了殖民头子麦哲伦。对于新航路的开辟，以下说法不确切的是____\nA. 推动了海外扩张和世界市场的初步形成\nB. 加速了欧洲的资本原始积累\nC. 打破了世界各地区的封闭和孤立状态\nD. 导致了第一次鸦片战争的发生\n答案: '], 'index': 15, 'multi_choices': ['A', 'B', 'C', 'D'], 'raw_input': {'id': 15, 'question': '在今天菲律宾的马克坦岛上矗立着一块双面碑，一面的碑文是纪念麦哲伦，因为他完成了人类历史上第一次环球航行；另一面是纪念菲律宾的一位勇士，因为正是他杀死了殖民头子麦哲伦。对于新航路的开辟，以下说法不确切的是____', 'A': '推动了海外扩张和世界市场的初步形成', 'B': '加速了欧洲的资本原始积累', 'C': '打破了世界各地区的封闭和孤立状态', 'D': '导致了第一次鸦片战争的发生', 'answer': 'D', 'explanation': ''}}], due to Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,841 - evalscope - ERROR - Failed to get answer for [{'data': ['以下是中国关于初中历史考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n问题：党在社会主义初级阶段基本路线的核心内容是“一个中心，两个基本点”，这里“一个中心”是指____\nA. 以改革开放为中心\nB. 以经济建设为中心\nC. 以四项基本原则为中心\nD. 以艰苦创业为中心\n答案: '], 'index': 20, 'multi_choices': ['A', 'B', 'C', 'D'], 'raw_input': {'id': 20, 'question': '党在社会主义初级阶段基本路线的核心内容是“一个中心，两个基本点”，这里“一个中心”是指____', 'A': '以改革开放为中心', 'B': '以经济建设为中心', 'C': '以四项基本原则为中心', 'D': '以艰苦创业为中心', 'answer': 'B', 'explanation': ''}}], due to Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').
+2025-06-26 08:09:54,842 - evalscope - ERROR - Failed to get answer for [{'data': ['以下是中国关于初中历史考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n问题：把鸦片战争作为中国近代史的开端，主要是因为____\nA. 中国社会性质发生了变化\nB. 中国社会主要矛盾发生了变化\nC. 中国革命性质发生了变化\nD. 中国人民革命任务发生了变化\n答案: '], 'index': 16, 'multi_choices': ['A', 'B', 'C', 'D'], 'raw_input': {'id': 16, 'question': '把鸦片战争作为中国近代史的开端，主要是因为____', 'A': '中国社会性质发生了变化', 'B': '中国社会主要矛盾发生了变化', 'C': '中国革命性质发生了变化', 'D': '中国人民革命任务发生了变化', 'answer': 'A', 'explanation': ''}}], due to Engine loop is not running. Inspect the stacktrace to find the original error: RuntimeError('MUSA error: an illegal memory access was encountered').

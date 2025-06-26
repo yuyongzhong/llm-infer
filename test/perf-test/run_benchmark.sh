@@ -2,15 +2,34 @@
 
 # 默认 baseurl（可通过 --baseurl 参数覆盖）
 BASE_URL="http://127.0.0.1:8000"
+MODEL_NAME="deepseek"
+HOME_PATH=""
+MODEL_DIR_NAME=""
 
 # 解析命令行参数
 while [[ "$#" -gt 0 ]]; do
   case $1 in
+    --model-name) MODEL_NAME="$2"; shift ;;
+    --home-path) HOME_PATH="$2"; shift ;;
+    --model-dir-name) MODEL_DIR_NAME="$2"; shift ;;
     --baseurl) BASE_URL="$2"; shift ;;
-    *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    --help)
+      echo "Usage: run_benchmark.sh [--model-name NAME] [--home-path PATH] [--model-dir-name NAME]"
+      echo ""
+      echo "  --model-name       模型名称（默认：deepseek）"
+      echo "  --home-path        主目录路径，如 /home/llm-infer"
+      echo "  --model-dir-name   模型目录名，如 DeepSeek-R1-32B"
+      echo "  --baseurl          自定义推理服务 URL（默认：http://127.0.0.1:8000）"
+      exit 0 ;;
+    *) echo "Unknown parameter: $1"; exit 1 ;;
   esac
   shift
 done
+
+if [[ -z "$HOME_PATH" || -z "$MODEL_DIR_NAME" ]]; then
+  echo "❌ ERROR: --home-path 和 --model-dir-name 为必填项。"
+  exit 1
+fi
 
 # 统一时间戳（年月日_时分）
 timestamp=$(date '+%Y%m%d_%H%M')
@@ -35,12 +54,17 @@ num_prompts=200
 # num_prompts=5
 
 
-MODEL_NAME="deepseek"
-TOKENIZER_PATH="/home/models/DeepSeek-R1-32B/"
-OUTPUT_DIR="/home/llm-infer/test/perf-test/benchmark_logs_${timestamp}"
-SCRIPT="/home/llm-infer/test/perf-test/vllm/benchmarks/benchmark_serving.py"
-SUMMARY_SCRIPT="/home/llm-infer/test/perf-test/summarize_results.py"
-SUMMARY_OUTPUT_DIR="/home/llm-infer/test/perf-test/benchmark_summary"
+# 自动组装路径
+TOKENIZER_PATH="$HOME_PATH/models/$MODEL_DIR_NAME/"
+OUTPUT_DIR="$HOME_PATH/llm-infer/test/perf-test/benchmark_logs_${timestamp}"
+SCRIPT="$HOME_PATH/llm-infer/test/perf-test/vllm/benchmarks/benchmark_serving.py"
+SUMMARY_SCRIPT="$HOME_PATH/llm-infer/test/perf-test/summarize_results.py"
+SUMMARY_OUTPUT_DIR="$HOME_PATH/test/perf-test/benchmark_summary"
+
+echo "MODEL_NAME=$MODEL_NAME"
+echo "TOKENIZER_PATH=$TOKENIZER_PATH"
+echo "OUTPUT_DIR=$OUTPUT_DIR"
+
 
 mkdir -p "$OUTPUT_DIR"
 mkdir -p "$SUMMARY_OUTPUT_DIR"
