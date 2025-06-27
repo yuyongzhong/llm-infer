@@ -47,27 +47,28 @@ num_prompts=200
 
 
 # PROMPT_PAIRS=(
-#   "64 64"
+#   "16 16"
 #   "32 32"
 # )
-# BATCH_SIZES=(16 32)
+# BATCH_SIZES=(5 10)
 # num_prompts=5
 
 
 # 自动组装路径
 TOKENIZER_PATH="$HOME_PATH/models/$MODEL_DIR_NAME/"
-OUTPUT_DIR="$HOME_PATH/llm-infer/test/perf-test/benchmark_logs_${timestamp}"
+OUTPUT_DIR_FATHER="$HOME_PATH/llm-infer/test/perf-test/benchmark_logs"
+OUTPUT_DIR="$OUTPUT_DIR_FATHER/benchmark_logs_${timestamp}"
 SCRIPT="$HOME_PATH/llm-infer/test/perf-test/vllm/benchmarks/benchmark_serving.py"
 SUMMARY_SCRIPT="$HOME_PATH/llm-infer/test/perf-test/summarize_results.py"
-SUMMARY_OUTPUT_DIR="$HOME_PATH/test/perf-test/benchmark_summary"
+SUMMARY_OUTPUT_MD="$OUTPUT_DIR/summary_result_${timestamp}_.md"
 
 echo "MODEL_NAME=$MODEL_NAME"
 echo "TOKENIZER_PATH=$TOKENIZER_PATH"
 echo "OUTPUT_DIR=$OUTPUT_DIR"
 
-
+mkdir -p "$OUTPUT_DIR_FATHER"
 mkdir -p "$OUTPUT_DIR"
-mkdir -p "$SUMMARY_OUTPUT_DIR"
+
 
 start_time=$(date +%s)  # ⏱ 开始时间戳
 
@@ -104,7 +105,7 @@ for batch_size in "${BATCH_SIZES[@]}"; do
   done
 done
 # 🔍 汇总所有结果并生成 markdown 表格
-python3 "$SUMMARY_SCRIPT" --dir "$OUTPUT_DIR" --output "$SUMMARY_OUTPUT_DIR/summary_result_${timestamp}_.md"
+python3 "$SUMMARY_SCRIPT" --dir "$OUTPUT_DIR" --output "$SUMMARY_OUTPUT_MD"
 
 end_time=$(date +%s)  # ⏱ 结束时间戳
 elapsed=$((end_time - start_time))  # 运行秒数

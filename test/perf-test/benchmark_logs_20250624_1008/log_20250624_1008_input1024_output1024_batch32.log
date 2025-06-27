@@ -1,34 +1,0 @@
-[2025-06-25 00:39:29] Running input_len=1024, output_len=1024, batch_size=32...
-INFO 06-25 00:39:33 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
-WARNING 06-25 00:39:35 [_custom_ops.py:22] Failed to import from vllm._C with ImportError('libcuda.so.1: cannot open shared object file: No such file or directory')
-Namespace(backend='vllm', base_url='http://127.0.0.1:8000', host='127.0.0.1', port=8000, endpoint='/v1/completions', dataset_name='random', dataset_path=None, max_concurrency=32, model='deepseek', tokenizer='/home/models/DeepSeek-R1-32B/', use_beam_search=False, num_prompts=200, logprobs=None, request_rate=inf, burstiness=1.0, seed=0, trust_remote_code=False, disable_tqdm=False, profile=False, save_result=True, save_detailed=True, append_result=False, metadata=None, result_dir=None, result_filename='/home/llm-infer/test/perf-test/benchmark_logs_20250624_1008/result_20250624_1008_input1024_output1024_batch32.json', ignore_eos=True, percentile_metrics='ttft,tpot,itl', metric_percentiles='99', goodput=None, custom_output_len=256, custom_skip_chat_template=False, sonnet_input_len=550, sonnet_output_len=150, sonnet_prefix_len=200, sharegpt_output_len=None, random_input_len=1024, random_output_len=1024, random_range_ratio=0.0, random_prefix_len=0, hf_subset=None, hf_split=None, hf_output_len=None, top_p=None, top_k=None, min_p=None, temperature=None, tokenizer_mode='auto', served_model_name=None, lora_modules=None)
-Starting initial single prompt test run...
-Initial test run completed. Starting main benchmark run...
-Traffic request rate: inf
-Burstiness factor: 1.0 (Poisson process)
-Maximum request concurrency: 32
-  0%|          | 0/200 [00:00<?, ?it/s]  0%|          | 1/200 [01:55<6:24:28, 115.92s/it] 16%|█▋        | 33/200 [03:51<16:43,  6.01s/it]   32%|███▎      | 65/200 [05:47<10:22,  4.61s/it] 48%|████▊     | 97/200 [07:42<07:08,  4.16s/it] 64%|██████▍   | 129/200 [09:37<04:39,  3.94s/it] 80%|████████  | 161/200 [11:33<02:29,  3.82s/it] 96%|█████████▋| 193/200 [12:53<00:23,  3.37s/it]100%|██████████| 200/200 [12:53<00:00,  3.87s/it]
-============ Serving Benchmark Result ============
-Successful requests:                     200       
-Benchmark duration (s):                  773.44    
-Total input tokens:                      204600    
-Total generated tokens:                  204800    
-Request throughput (req/s):              0.26      
-Output token throughput (tok/s):         264.79    
-Total Token throughput (tok/s):          529.32    
----------------Time to First Token----------------
-Mean TTFT (ms):                          18290.98  
-Median TTFT (ms):                        19924.98  
-P99 TTFT (ms):                           26306.96  
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          93.69     
-Median TPOT (ms):                        91.24     
-P99 TPOT (ms):                           108.25    
----------------Inter-token Latency----------------
-Mean ITL (ms):                           93.69     
-Median ITL (ms):                         87.93     
-P99 ITL (ms):                            96.80     
-==================================================
-[2025-06-25 00:53:29] SUCCESS input_len=1024 output_len=1024 batch_size=32
----
-

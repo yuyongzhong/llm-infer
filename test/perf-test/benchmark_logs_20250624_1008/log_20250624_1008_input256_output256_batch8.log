@@ -1,34 +1,0 @@
-[2025-06-24 21:44:29] Running input_len=256, output_len=256, batch_size=8...
-INFO 06-24 21:44:34 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
-WARNING 06-24 21:44:36 [_custom_ops.py:22] Failed to import from vllm._C with ImportError('libcuda.so.1: cannot open shared object file: No such file or directory')
-Namespace(backend='vllm', base_url='http://127.0.0.1:8000', host='127.0.0.1', port=8000, endpoint='/v1/completions', dataset_name='random', dataset_path=None, max_concurrency=8, model='deepseek', tokenizer='/home/models/DeepSeek-R1-32B/', use_beam_search=False, num_prompts=200, logprobs=None, request_rate=inf, burstiness=1.0, seed=0, trust_remote_code=False, disable_tqdm=False, profile=False, save_result=True, save_detailed=True, append_result=False, metadata=None, result_dir=None, result_filename='/home/llm-infer/test/perf-test/benchmark_logs_20250624_1008/result_20250624_1008_input256_output256_batch8.json', ignore_eos=True, percentile_metrics='ttft,tpot,itl', metric_percentiles='99', goodput=None, custom_output_len=256, custom_skip_chat_template=False, sonnet_input_len=550, sonnet_output_len=150, sonnet_prefix_len=200, sharegpt_output_len=None, random_input_len=256, random_output_len=256, random_range_ratio=0.0, random_prefix_len=0, hf_subset=None, hf_split=None, hf_output_len=None, top_p=None, top_k=None, min_p=None, temperature=None, tokenizer_mode='auto', served_model_name=None, lora_modules=None)
-Starting initial single prompt test run...
-Initial test run completed. Starting main benchmark run...
-Traffic request rate: inf
-Burstiness factor: 1.0 (Poisson process)
-Maximum request concurrency: 8
-  0%|          | 0/200 [00:00<?, ?it/s]  0%|          | 1/200 [00:18<1:00:37, 18.28s/it]  4%|▍         | 9/200 [00:36<11:21,  3.57s/it]    8%|▊         | 17/200 [00:54<08:39,  2.84s/it] 12%|█▎        | 25/200 [01:12<07:32,  2.59s/it] 16%|█▋        | 33/200 [01:31<06:51,  2.47s/it] 20%|██        | 41/200 [01:49<06:22,  2.40s/it] 24%|██▍       | 49/200 [02:07<05:56,  2.36s/it] 28%|██▊       | 57/200 [02:26<05:34,  2.34s/it] 32%|███▎      | 65/200 [02:44<05:13,  2.32s/it] 36%|███▋      | 73/200 [03:02<04:53,  2.31s/it] 40%|████      | 81/200 [03:20<04:33,  2.30s/it] 44%|████▍     | 89/200 [03:39<04:15,  2.30s/it] 48%|████▊     | 97/200 [03:57<03:56,  2.30s/it] 52%|█████▎    | 105/200 [04:15<03:37,  2.29s/it] 56%|█████▋    | 113/200 [04:34<03:19,  2.29s/it] 60%|██████    | 121/200 [04:52<03:00,  2.29s/it] 64%|██████▍   | 129/200 [05:10<02:42,  2.29s/it] 68%|██████▊   | 137/200 [05:28<02:23,  2.28s/it] 72%|███████▎  | 145/200 [05:47<02:05,  2.28s/it] 76%|███████▋  | 153/200 [06:05<01:47,  2.28s/it] 80%|████████  | 161/200 [06:23<01:28,  2.28s/it] 84%|████████▍ | 169/200 [06:41<01:10,  2.28s/it] 88%|████████▊ | 177/200 [07:00<00:52,  2.28s/it] 92%|█████████▎| 185/200 [07:18<00:34,  2.28s/it] 96%|█████████▋| 193/200 [07:36<00:15,  2.28s/it]100%|██████████| 200/200 [07:36<00:00,  2.28s/it]
-============ Serving Benchmark Result ============
-Successful requests:                     200       
-Benchmark duration (s):                  456.52    
-Total input tokens:                      51000     
-Total generated tokens:                  51200     
-Request throughput (req/s):              0.44      
-Output token throughput (tok/s):         112.15    
-Total Token throughput (tok/s):          223.87    
----------------Time to First Token----------------
-Mean TTFT (ms):                          894.11    
-Median TTFT (ms):                        894.91    
-P99 TTFT (ms):                           903.69    
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          68.10     
-Median TPOT (ms):                        68.09     
-P99 TPOT (ms):                           68.50     
----------------Inter-token Latency----------------
-Mean ITL (ms):                           68.10     
-Median ITL (ms):                         68.10     
-P99 ITL (ms):                            74.20     
-==================================================
-[2025-06-24 21:52:29] SUCCESS input_len=256 output_len=256 batch_size=8
----
-
