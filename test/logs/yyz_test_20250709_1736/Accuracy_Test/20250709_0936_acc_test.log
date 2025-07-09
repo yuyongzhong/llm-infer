@@ -126,3 +126,24 @@ base_info: 112机器 模型：Qwen-1.5B
 
 2025-07-09 09:40:07,711 - evalscope - INFO - Finished evaluation for deepseek on ['ceval']
 2025-07-09 09:40:07,711 - evalscope - INFO - Output directory: ./outputs/20250709_093751
+检查时间: 2025-07-09 09:42:51
+
+找到 Finished 标记，停止监控
+
+本次检查未发现错误
+
+在日志中找到 work_dir: ./outputs/20250709_093751
+
+找到ceval.json文件，metrics数据如下:
+[{'name': 'AverageAccuracy', 'num': 22, 'score': 0.9091, 'macro_score': 0.9091, 'categories': [{'name': ['Humanities'], 'num': 22, 'score': 0.9091, 'macro_score': 0.9091, 'subsets': [{'name': 'middle_school_history', 'score': 0.9091, 'num': 22}]}]}]
+
+112机器 模型：Qwen-1.5B
+docker eval 运行检测
+ 运行正常结束
+  评估分数汇总:
+    总体分数 : 0.9091
+    类别分数:
+    - Humanities: 0.9091
+
+已发送钉钉信息
+

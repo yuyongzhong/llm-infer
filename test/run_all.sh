@@ -43,7 +43,7 @@ echo "🎯 运行模式: $RUN_MODE"
 echo ""
 
 ### ========= 精度评估函数 ========= ###
-ACC_SCRIPT="$HOME_PATH/llm-infer/test/acc_test/scripts/evaluate_debug_yyz.py"
+ACC_SCRIPT="$HOME_PATH/llm-infer/test/acc_test/scripts/evaluate_test.py"
 
 run_accuracy() {
   echo "🚀 [$(date '+%Y-%m-%d %H:%M:%S')] 开始精度评估..."
