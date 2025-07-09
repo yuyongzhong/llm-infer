@@ -5,17 +5,8 @@ import re
 from datetime import datetime
 import requests
 import json
+import argparse
 
-# 定义日志文件路径
-LOG_FILE = "monitor.txt"
-
-# 打开日志文件以追加模式写入
-log_file = open(LOG_FILE, 'w', buffering=1)
-# 重定向标准输出到日志文件
-sys.stdout = log_file
-
-DEFAULT_WEBHOOK_URL = "https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49"
-CHECK_INTERVAL = 300
 
 
 def send_post_request(url, text):
@@ -43,13 +34,6 @@ def send_post_request(url, text):
     return response
 
 
-def find_latest_log_file():
-    """查找当前目录下最新的 .log 文件"""
-    log_files = [f for f in os.listdir('.') if f.endswith('.log')]
-    if not log_files:
-        print("错误：当前目录下没有找到 .log 文件\n")
-        sys.exit(1)
-    return max(log_files, key=lambda x: os.path.getmtime(x))
 
 
 def find_work_dir(log_file_path):
@@ -76,9 +60,10 @@ def report(log_file_path):
     # 查找work_dir
     work_dir = find_work_dir(log_file_path)
 
+
     if not work_dir:
-        print("警告: 未找到work_dir，无法继续处理JSON文件\n")
-        return None
+        message = f"警告: 在{log_file_path}中未找到work_dir ，无法继续处理JSON文件\n"
+        return None,message
 
     # 处理work_dir的JSON文件
     json_path = os.path.join(work_dir, "reports/deepseek/ceval.json")
@@ -90,12 +75,16 @@ def report(log_file_path):
                 metrics = data.get("metrics", {})
                 print("找到ceval.json文件，metrics数据如下:")
                 print(str(metrics) + "\n")
+                message = "找到ceval.json文件，metrics数据如下:\n" + str(metrics) + "\n"
                 # 添加到通知内容
-                return metrics
+                return metrics,message
         else:
-            print(f"警告: 文件不存在: {json_path}\n")
+            message = f"警告: 未找到JSON文件: {json_path}\n"
+            return None,message
     except Exception as e:
-        print(f"解析JSON文件时出错: {e}\n")
+        message = f"解析JSON文件时出错: {e}\n"
+        return None,message
+        
 
 
 def parse_metrics_data(metrics_data):
@@ -149,24 +138,17 @@ def extract_errors(file_path, last_position):
         error_lines.append(f"处理文件时出错: {e}\n")
         errors_found = True
 
-    # 发送错误通知
-    if errors_found:
-        message_content = "\n".join([
-            "docker eval 运行检测",
-            "运行出现异常",
-            "检测出Error/Failed 错误详情见 ",
-            f"eval日志文件: {os.path.basename(file_path)}"
-        ])
-        print(message_content)
-        send_post_request(DEFAULT_WEBHOOK_URL, message_content)
-        print("\n已发送钉钉信息\n")
 
-    return finished_found
+    return finished_found,errors_found
 
 
-def main():
-    """主函数"""
-    file_path = find_latest_log_file()
+def acc_log_monitor(file_path,base_info = None, webhook_url="https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49",CHECK_INTERVAL=300):
+
+    if base_info:
+        base_info_text = f"{base_info}\n"
+    else:
+        base_info_text = ""
+
     print(f"日志文件: {file_path}")
 
     print(f"开始监控日志文件，每 {CHECK_INTERVAL / 60} 分钟检查一次\n")
@@ -175,11 +157,24 @@ def main():
     try:
         while True:
             print(f"检查时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            finished = extract_errors(file_path, last_position)
+            finished,errors_found = extract_errors(file_path, last_position)
+            
+            # 发送错误通知
+            if errors_found:
+                message_content = "\n".join([
+                    base_info_text.rstrip(),  # 去掉末尾多余的换行
+                    "docker eval 运行检测",
+                    "运行出现异常",
+                    "检测出Error/Failed 错误详情见 ",
+                    f"eval日志文件: {file_path}"
+                ])
+                print(message_content)
+                send_post_request(webhook_url, message_content)
+                print("\n已发送钉钉信息\n")
 
             if finished:
                 # 任务完成，获取评估报告
-                metrics = report(file_path)
+                metrics,message = report(file_path)
                 if metrics:
                     # 解析复杂的metrics结构
                     overall_score, categories = parse_metrics_data(metrics)
@@ -196,29 +191,80 @@ def main():
                     # 合并所有文本
                     metrics_text = "\n".join([score_text, "  类别分数:", *category_text])
 
+
+
                     # 构建通知内容
                     message_content = "\n".join([
+                        base_info_text.rstrip(),  # 去掉末尾多余的换行
                         "docker eval 运行检测",
                         " 运行正常结束",
                         "  评估分数汇总:",
                         metrics_text.replace("\n", "\n  ")
                     ])
                     print(message_content)
-                    send_post_request(DEFAULT_WEBHOOK_URL, message_content)
+                    send_post_request(webhook_url, message_content)
+                    print("\n已发送钉钉信息\n")
+                else:
+                    # 如果没有找到metrics数据，发送警告信息
+                    message_content = "\n".join([
+                        base_info_text.rstrip(),  # 去掉末尾多余的换行
+                        "docker eval 运行检测",
+                        "运行正常结束，但未找到评估分数数据",
+                        message
+                    ])
+                    print(message_content)
+                    send_post_request(webhook_url, message_content)
                     print("\n已发送钉钉信息\n")
 
-                print("\n监控程序已停止\n")
-                break
 
             # 更新文件位置
             last_position = os.path.getsize(file_path)
             time.sleep(CHECK_INTERVAL)
     except KeyboardInterrupt:
         print("\n程序已停止")
-    finally:
-        # 关闭日志文件
-        log_file.close()
 
+def benchmark_log_monitor(benchmark_result, base_info=None, webhook_url="https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49"):
+    if base_info:
+        base_info_text = f"{base_info}\n"
+    else:
+        base_info_text = ""
+
+    """
+    构建推理性能测试通知内容（支持读取 result.md 文件）
+    """
+    if not os.path.exists(benchmark_result):
+        message_content = "\n".join([
+            base_info_text.rstrip(),
+            "⚠️ 性能测试结果文件未找到: `{}`".format(benchmark_result)
+        ])
+    else:
+        with open(benchmark_result, 'r', encoding='utf-8') as f:
+            result_md = f.read()
+
+        message_content = "\n".join([
+            base_info_text.rstrip(),
+            "✅ docker 性能测试结果如下：",
+            "```markdown",
+            result_md.strip(),
+            "```"
+        ])
+
+    print(message_content)
+    send_post_request(webhook_url, message_content)
+    print("\n已发送钉钉信息\n")
 
 if __name__ == "__main__":
-    main()
+    # base_info = "143机器，deepseek-r1"
+    # file_path ="../../logs/temp.log"
+    # acc_log_monitor(file_path,base_info)
+
+    parser = argparse.ArgumentParser(description="Run evaluate tests on an OpenAI-compatible API.")
+    parser.add_argument("--benchmark_result", type=str, required=True, help="The log file to monitor for errors.")
+    parser.add_argument("--base_info", type=str, required=False, default="", help="The base information to include in notifications.")
+    parser.add_argument("--webhook_url", type=str, required=False, default="https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49") 
+    
+    args = parser.parse_args()
+
+    benchmark_log_monitor(benchmark_result=args.benchmark_result,
+                          base_info=args.base_info,
+                          webhook_url=args.webhook_url)

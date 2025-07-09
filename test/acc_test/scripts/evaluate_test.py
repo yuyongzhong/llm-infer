@@ -8,7 +8,7 @@ from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 from evalscope import TaskConfig, run_task
 from evalscope.constants import EvalType
 from update_subset_list import main as update_subset_main
-from log_monitor import main as log_monitor_main
+from test.evalscope.tools import log_monitor 
 
 # 全局停止标志
 stop_flag = threading.Event()
@@ -95,8 +95,8 @@ def main():
     if use_cache != "":
         task_cfg.use_cache = use_cache
 
-    # 创建守护线程来执行 log_monitor_main
-    monitor_thread = threading.Thread(target=log_monitor_main)
+    # 创建守护线程来执行 log_monitor
+    monitor_thread = threading.Thread(target=log_monitor)
     monitor_thread.daemon = True
     monitor_thread.start()
 
