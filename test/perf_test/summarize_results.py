@@ -28,7 +28,7 @@ def summarize_json_files(input_dir: Path, output_file: Path, sort_by: str):
             records.append({
                 "date": date_fmt,
                 "model": data["model_id"],
-                "concurrency": data["max_concurrency"],
+                "concurrency": data.get("max_concurrency", None),
                 "input_tokens": total_input,
                 "output_tokens": total_output,
                 "avg_input": avg_input,
@@ -55,7 +55,8 @@ def summarize_json_files(input_dir: Path, output_file: Path, sort_by: str):
     elif sort_by == "ttft":
         df.sort_values(by=["mean_ttft"], ascending=True, inplace=True)
     else:  # 默认按并发+期望输入token排序
-        df.sort_values(by=["concurrency", "expected_input"], inplace=True)
+        if "concurrency" in df.columns and "expected_input" in df.columns:
+            df.sort_values(by=["concurrency", "expected_input"], inplace=True)
 
     # 输出 Markdown 表格
     header = (
@@ -67,13 +68,14 @@ def summarize_json_files(input_dir: Path, output_file: Path, sort_by: str):
         ":------------------:|:------------------:|:----------------:|:-------------:|:-------------:|"
     )
 
-    rows = [
-        f"| {r.date} | {r.model} | {r.concurrency} | {r.input_tokens} | {r.output_tokens} | "
-        f"{r.expected_input} | {r.expected_output} | {r.avg_input:.1f} | {r.avg_output:.1f} | "
-        f"{r.duration:.2f} | {r.request_throughput:.2f} | {r.output_throughput:.2f} | "
-        f"{r.total_token_throughput:.2f} | {r.mean_ttft:.2f} | {r.p99_ttft:.2f} |"
-        for r in df.itertuples()
-    ]
+    rows = []
+    for r in df.itertuples():
+        rows.append(
+            f"| {r.date} | {r.model} | {r.concurrency} | {r.input_tokens} | {r.output_tokens} | "
+            f"{r.expected_input} | {r.expected_output} | {r.avg_input:.1f} | {r.avg_output:.1f} | "
+            f"{r.duration:.2f} | {r.request_throughput:.2f} | {r.output_throughput:.2f} | "
+            f"{r.total_token_throughput:.2f} | {r.mean_ttft:.2f} | {r.p99_ttft:.2f} |"
+        )
 
     with open(output_file, "w") as f:
         f.write("\n".join([header, align] + rows))
@@ -92,4 +94,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     summarize_json_files(args.dir, args.output, args.sort_by)
-
