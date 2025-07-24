@@ -1,0 +1,144 @@
+{
+    "project_id": "yyz_test_20250723_1000",
+    "timestamp": "2025-07-23T03:05:15.593620Z",
+    "model_name": "deepseek",
+    "run_mode": "acc-then-bench",
+    "base_info": {
+        "device": "s4000",
+        "model": "Qwen-1.5B",
+        "version": "1.0.1",
+        "software_version": 449,
+        "software_url": "https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjA=",
+        "vllm_image_harbor": {
+            "huoshan_harbor_url": "registry.mthreads.com/mcconline/vllm-musa-qy2-py310:v0.8.4-release",
+            "shanghai_harbor_url": "sh-harbor.mthreads.com/vllm-images/vllm-musa-qy2-py310:v0.8.4-release"
+        }
+    },
+    "tests": [
+        {
+            "test_type": "benchmark",
+            "results": [
+                {
+                    "timestamp": "2025-07-23",
+                    "concurrency": 16,
+                    "input_tokens": 1270,
+                    "output_tokens": 1280,
+                    "expected_input": 128,
+                    "expected_output": 128,
+                    "avg_input": 127.0,
+                    "avg_output": 128.0,
+                    "total_time": 9.01,
+                    "req_throughput": 1.11,
+                    "output_throughput": 142.04,
+                    "total_throughput": 282.97,
+                    "avg_ttft": 538.96,
+                    "p99_ttft": 540.88
+                },
+                {
+                    "timestamp": "2025-07-23",
+                    "concurrency": 16,
+                    "input_tokens": 1270,
+                    "output_tokens": 640,
+                    "expected_input": 128,
+                    "expected_output": 64,
+                    "avg_input": 127.0,
+                    "avg_output": 64.0,
+                    "total_time": 4.76,
+                    "req_throughput": 2.1,
+                    "output_throughput": 134.43,
+                    "total_throughput": 401.19,
+                    "avg_ttft": 538.98,
+                    "p99_ttft": 541.06
+                },
+                {
+                    "timestamp": "2025-07-23",
+                    "concurrency": 32,
+                    "input_tokens": 1270,
+                    "output_tokens": 1280,
+                    "expected_input": 128,
+                    "expected_output": 128,
+                    "avg_input": 127.0,
+                    "avg_output": 128.0,
+                    "total_time": 9.05,
+                    "req_throughput": 1.11,
+                    "output_throughput": 141.5,
+                    "total_throughput": 281.9,
+                    "avg_ttft": 539.25,
+                    "p99_ttft": 541.16
+                },
+                {
+                    "timestamp": "2025-07-23",
+                    "concurrency": 32,
+                    "input_tokens": 1270,
+                    "output_tokens": 640,
+                    "expected_input": 128,
+                    "expected_output": 64,
+                    "avg_input": 127.0,
+                    "avg_output": 64.0,
+                    "total_time": 4.75,
+                    "req_throughput": 2.1,
+                    "output_throughput": 134.68,
+                    "total_throughput": 401.95,
+                    "avg_ttft": 536.53,
+                    "p99_ttft": 538.59
+                }
+            ],
+            "log_path": "/home/yuyongzhong/llm-infer/test/output/yyz_test_20250723_1000/benchmark/result/summary_result_20250723_0303.md"
+        },
+        {
+            "test_type": "accuracy",
+            "datasets": [
+                {
+                    "name": "deepseek@ceval",
+                    "dataset_name": "ceval",
+                    "dataset_pretty_name": "C-Eval",
+                    "dataset_description": null,
+                    "model_name": "deepseek",
+                    "score": 0.8,
+                    "metrics": [
+                        {
+                            "name": "AverageAccuracy",
+                            "num": 40,
+                            "score": 0.8,
+                            "macro_score": 0.803,
+                            "categories": [
+                                {
+                                    "name": [
+                                        "Humanities"
+                                    ],
+                                    "num": 22,
+                                    "score": 0.7727,
+                                    "macro_score": 0.7727,
+                                    "subsets": [
+                                        {
+                                            "name": "logic",
+                                            "score": 0.7727,
+                                            "num": 22
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": [
+                                        "STEM"
+                                    ],
+                                    "num": 18,
+                                    "score": 0.8333,
+                                    "macro_score": 0.8333,
+                                    "subsets": [
+                                        {
+                                            "name": "high_school_mathematics",
+                                            "score": 0.8333,
+                                            "num": 18
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "analysis": "N/A"
+                }
+            ],
+            "log_path": "/home/yuyongzhong/llm-infer/test/output/yyz_test_20250723_1000/Accuracy_Test/20250723_0246_acc_test.log"
+        }
+    ]
+}

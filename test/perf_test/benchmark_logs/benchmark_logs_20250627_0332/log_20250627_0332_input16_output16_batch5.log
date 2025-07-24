@@ -1,34 +1,0 @@
-[2025-06-27 03:32:58] Running input_len=16, output_len=16, batch_size=5...
-INFO 06-27 03:33:03 [__init__.py:248] No platform detected, vLLM is running on UnspecifiedPlatform
-WARNING 06-27 03:33:04 [_custom_ops.py:22] Failed to import from vllm._C with ImportError('libcuda.so.1: cannot open shared object file: No such file or directory')
-Namespace(backend='vllm', base_url='http://127.0.0.1:8000', host='127.0.0.1', port=8000, endpoint='/v1/completions', dataset_name='random', dataset_path=None, max_concurrency=5, model='deepseek', tokenizer='/home/yuyongzhong/models/DeepSeek-R1-32B/', use_beam_search=False, num_prompts=5, logprobs=None, request_rate=inf, burstiness=1.0, seed=0, trust_remote_code=False, disable_tqdm=False, profile=False, save_result=True, save_detailed=True, append_result=False, metadata=None, result_dir=None, result_filename='/home/yuyongzhong/llm-infer/test/perf-test/benchmark_logs/benchmark_logs_20250627_0332/result_20250627_0332_input16_output16_batch5.json', ignore_eos=True, percentile_metrics='ttft,tpot,itl', metric_percentiles='99', goodput=None, custom_output_len=256, custom_skip_chat_template=False, sonnet_input_len=550, sonnet_output_len=150, sonnet_prefix_len=200, sharegpt_output_len=None, random_input_len=16, random_output_len=16, random_range_ratio=0.0, random_prefix_len=0, hf_subset=None, hf_split=None, hf_output_len=None, top_p=None, top_k=None, min_p=None, temperature=None, tokenizer_mode='auto', served_model_name=None, lora_modules=None)
-Starting initial single prompt test run...
-Initial test run completed. Starting main benchmark run...
-Traffic request rate: inf
-Burstiness factor: 1.0 (Poisson process)
-Maximum request concurrency: 5
-  0%|          | 0/5 [00:00<?, ?it/s] 20%|██        | 1/5 [00:01<00:04,  1.01s/it]100%|██████████| 5/5 [00:01<00:00,  4.96it/s]
-============ Serving Benchmark Result ============
-Successful requests:                     5         
-Benchmark duration (s):                  1.01      
-Total input tokens:                      75        
-Total generated tokens:                  80        
-Request throughput (req/s):              4.96      
-Output token throughput (tok/s):         79.38     
-Total Token throughput (tok/s):          153.80    
----------------Time to First Token----------------
-Mean TTFT (ms):                          128.19    
-Median TTFT (ms):                        127.63    
-P99 TTFT (ms):                           129.43    
------Time per Output Token (excl. 1st token)------
-Mean TPOT (ms):                          58.41     
-Median TPOT (ms):                        58.42     
-P99 TPOT (ms):                           58.44     
----------------Inter-token Latency----------------
-Mean ITL (ms):                           58.42     
-Median ITL (ms):                         58.51     
-P99 ITL (ms):                            60.76     
-==================================================
-[2025-06-27 03:33:09] SUCCESS input_len=16 output_len=16 batch_size=5
----
-

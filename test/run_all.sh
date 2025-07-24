@@ -5,7 +5,7 @@
 # 必须传入配置文件
 if [ $# -lt 1 ]; then
   echo "❌ 用法错误：请指定配置文件路径"
-  echo "✅ 示例：sh run_all.sh ./config.env"
+  echo "✅ 示例：sh run_all.sh ./config.yaml"
   exit 1
 fi
 
@@ -16,10 +16,43 @@ if [ ! -f "$CONFIG_FILE" ]; then
   exit 1
 fi
 
-# 加载配置变量
-set -a
-. "$CONFIG_FILE"
-set +a
+# 检查 yq 是否安装（用于解析 YAML）
+if ! command -v yq &> /dev/null; then
+  echo "⚠️ yq 未安装，正在自动安装（需要 sudo 权限）..."
+  sudo apt update && sudo apt install -y yq
+  if ! command -v yq &> /dev/null; then
+    echo "❌ yq 安装失败。请手动安装 yq (e.g., sudo apt install yq) 并重试。"
+    exit 1
+  fi
+  echo "✅ yq 已安装。"
+fi
+
+# 从 YAML 加载配置并导出为环境变量
+export model_name=$(yq e '.basic.model_name' "$CONFIG_FILE")
+export HOME_PATH=$(yq e '.basic.home_path' "$CONFIG_FILE")
+export LOG_INFO=$(yq e '.basic.log_info' "$CONFIG_FILE")
+export BASE_INFO=$(yq e '.basic.base_info | tojson' "$CONFIG_FILE")  # 将整个 base_info 对象转换为 JSON 字符串
+export RUN_MODE=$(yq e '.basic.run_mode' "$CONFIG_FILE")
+export ENABLE_JSON_OUTPUT=$(yq e '.basic.enable_json_output // false' "$CONFIG_FILE")  # 默认 false 如果未设置
+
+export api_url=$(yq e '.accuracy.api_url' "$CONFIG_FILE")
+export temperature=$(yq e '.accuracy.temperature' "$CONFIG_FILE")
+export top_p=$(yq e '.accuracy.top_p' "$CONFIG_FILE")
+export use_cache=$(yq e '.accuracy.use_cache' "$CONFIG_FILE")
+export max_tokens=$(yq e '.accuracy.max_tokens' "$CONFIG_FILE")
+export datasets=$(yq e '.accuracy.datasets' "$CONFIG_FILE")
+export data_mode=$(yq e '.accuracy.data_mode' "$CONFIG_FILE")
+export answer_num=$(yq e '.accuracy.answer_num' "$CONFIG_FILE")
+export eval_batch_size=$(yq e '.accuracy.eval_batch_size' "$CONFIG_FILE")
+
+export webhook_url=$(yq e '.notification.webhook_url' "$CONFIG_FILE")
+export CHECK_INTERVAL=$(yq e '.notification.check_interval' "$CONFIG_FILE")
+
+export BASE_URL=$(yq e '.benchmark.base_url' "$CONFIG_FILE")
+export TOKENIZER_PATH=$(yq e '.benchmark.tokenizer_path' "$CONFIG_FILE")
+export BATCH_SIZES=$(yq e '.benchmark.batch_sizes | join(" ")' "$CONFIG_FILE")  # 将数组转换为空格分隔字符串
+export PROMPT_PAIRS=$(yq e '.benchmark.prompt_pairs | map(join(" ")) | join(";")' "$CONFIG_FILE")  # 将嵌套数组转换为原格式 "128 128;128 64;"
+export NUM_PROMPTS=$(yq e '.benchmark.num_prompts' "$CONFIG_FILE")
 
 # 检查关键变量
 if [[ -z "$LOG_INFO" || -z "$HOME_PATH" ]]; then
@@ -30,9 +63,16 @@ fi
 # 设置默认模式
 RUN_MODE="${RUN_MODE:-acc-then-bench}"  # 如果未设置，默认先精度后性能
 
+# 创建基础输出目录
+BASE_OUTPUT_DIR="$HOME_PATH/llm-infer/test/output"
+if [ ! -d "$BASE_OUTPUT_DIR" ]; then
+  echo "📁 创建基础输出目录: $BASE_OUTPUT_DIR"
+  mkdir -p "$BASE_OUTPUT_DIR"
+fi
+
 # 日志输出目录
 TIMESTAMP=$(date '+%Y%m%d_%H%M')
-OUTPUT_DIR="$HOME_PATH/llm-infer/test/logs/$LOG_INFO"
+OUTPUT_DIR="$BASE_OUTPUT_DIR/$LOG_INFO"
 mkdir -p "$OUTPUT_DIR"
 
 echo "🟢 日志目录: $OUTPUT_DIR"
@@ -49,7 +89,11 @@ run_accuracy() {
   echo "🚀 [$(date '+%Y-%m-%d %H:%M:%S')] 开始精度评估..."
 
   ACCURACY_DIR="$OUTPUT_DIR/Accuracy_Test"
-  mkdir -p "$ACCURACY_DIR"
+
+  if [ ! -d "$ACCURACY_DIR" ]; then
+    mkdir -p "$ACCURACY_DIR"
+  fi
+
   ACC_LOG_FILE="$ACCURACY_DIR/${TIMESTAMP}_acc_test.log"
 
   # 记录开始时间（秒级时间戳）
@@ -114,7 +158,7 @@ run_benchmark() {
   BENCHMARK_MD=$(ls -t "$OUTPUT_DIR/benchmark/result/"*.md 2>/dev/null | head -n 1)
 
   if [ -f "$BENCHMARK_MD" ]; then
-    echo "📩 发送 Feishu 通知..."
+    echo "📩 发送 dingding 通知..."
     python3 "$HOME_PATH/llm-infer/test/acc_test/scripts/tools.py" \
       --benchmark_result "$BENCHMARK_MD" \
       --base_info "$BASE_INFO" \
@@ -141,11 +185,35 @@ case "$RUN_MODE" in
     run_benchmark
     run_accuracy
     ;;
+  skip)
+    echo "⚠️ 跳过精度测试和性能测试"
+    BENCHMARK_MD=$(ls -t "$OUTPUT_DIR/benchmark/result/"*.md 2>/dev/null | head -n 1)
+    ACC_LOG_FILE=$(ls -t "$OUTPUT_DIR/Accuracy_Test/"*.log 2>/dev/null | head -n 1)
+    ;;  
   *)
     echo "❌ 错误：未知模式 '$RUN_MODE'"
-    echo "🧭 请在 config.env 中设置 RUN_MODE 为以下之一：accuracy | benchmark | acc-then-bench | bench-then-acc"
+    echo "🧭 请在 config.yaml 中设置 RUN_MODE 为以下之一：accuracy | benchmark | acc-then-bench | bench-then-acc"
     exit 1
     ;;
 esac
+
+# ========= 生成标准化 JSON 结果 ========= ###
+if [ "$ENABLE_JSON_OUTPUT" = "true" ]; then
+  echo "🚀 生成标准化测试结果 JSON..."
+
+  # 确保日志文件存在（从函数中获取）
+  # 注意：ACC_LOG_FILE 和 BENCHMARK_MD 需要在函数中 export 或全局定义；这里假设已定义
+
+
+  python3 "$HOME_PATH/llm-infer/test/acc_test/scripts/generate_test_results.py" \
+    --output-dir "$OUTPUT_DIR" \
+    --acc-log "$ACC_LOG_FILE" \
+    --benchmark-md "$BENCHMARK_MD" \
+    --config "$HOME_PATH/llm-infer/test/config.yaml"
+
+  echo "✅ JSON 生成完成"
+else
+  echo "⚠️ 标准化 JSON 输出已禁用（enable_json_output=false）"
+fi
 
 echo "🎉 所有任务执行完成 ✅"

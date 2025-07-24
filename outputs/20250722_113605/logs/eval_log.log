@@ -1,0 +1,101 @@
+2025-07-22 11:36:10,057 - evalscope - INFO - Dump task config to ./outputs/20250722_113605/configs/task_config_861ebf.yaml
+2025-07-22 11:36:10,060 - evalscope - INFO - {
+    "model": "deepseek",
+    "model_id": "deepseek",
+    "model_args": {},
+    "model_task": "text_generation",
+    "template_type": null,
+    "chat_template": null,
+    "datasets": [
+        "ceval"
+    ],
+    "dataset_args": {
+        "ceval": {
+            "name": "ceval",
+            "dataset_id": "modelscope/ceval-exam",
+            "model_adapter": "generation",
+            "output_types": [
+                "multiple_choice_logits",
+                "generation"
+            ],
+            "subset_list": [
+                "high_school_mathematics",
+                "logic"
+            ],
+            "metric_list": [
+                "AverageAccuracy"
+            ],
+            "few_shot_num": 0,
+            "few_shot_random": false,
+            "train_split": "dev",
+            "eval_split": "val",
+            "prompt_template": "以下是中国关于{subset_name}考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n{query}",
+            "system_prompt": null,
+            "query_template": null,
+            "pretty_name": "C-Eval",
+            "description": null,
+            "filters": null,
+            "extra_params": {}
+        }
+    },
+    "dataset_dir": "/root/.cache/modelscope/hub/datasets",
+    "dataset_hub": "modelscope",
+    "generation_config": {
+        "max_tokens": 3000,
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "n": 1
+    },
+    "eval_type": "service",
+    "eval_backend": "Native",
+    "eval_config": null,
+    "stage": "all",
+    "limit": null,
+    "eval_batch_size": 10,
+    "mem_cache": false,
+    "use_cache": null,
+    "work_dir": "./outputs/20250722_113605",
+    "outputs": null,
+    "ignore_errors": false,
+    "debug": false,
+    "dry_run": false,
+    "seed": 42,
+    "api_url": "http://127.0.0.1:8000/v1",
+    "api_key": "KEY",
+    "timeout": null,
+    "stream": true,
+    "judge_strategy": "auto",
+    "judge_worker_num": 1,
+    "judge_model_args": {},
+    "analysis_report": false
+}
+2025-07-22 11:36:10,060 - evalscope - INFO - Start evaluating on dataset modelscope/ceval-exam
+2025-07-22 11:36:10,060 - evalscope - INFO - Loading dataset from hub: modelscope/ceval-exam
+2025-07-22 11:36:10,274 - evalscope - INFO - Loading dataset: dataset_name: modelscope/ceval-exam > subsets: ['high_school_mathematics', 'logic']
+2025-07-22 11:36:29,251 - evalscope - INFO - Use settings: > few_shot_num: 0, > few_shot_split: dev, > target_eval_split: val
+2025-07-22 11:42:00,721 - evalscope - INFO - Dump predictions to ./outputs/20250722_113605/predictions/deepseek/ceval_high_school_mathematics.jsonl.
+2025-07-22 11:47:38,134 - evalscope - INFO - Dump predictions to ./outputs/20250722_113605/predictions/deepseek/ceval_logic.jsonl.
+2025-07-22 11:47:38,154 - evalscope - INFO - modelscope/ceval-exam report table: 
++----------+-----------+-----------------+-------------------------+-------+---------+------------+
+| Model    | Dataset   | Metric          | Subset                  |   Num |   Score | Cat.0      |
++==========+===========+=================+=========================+=======+=========+============+
+| deepseek | ceval     | AverageAccuracy | logic                   |    22 |  0.8636 | Humanities |
++----------+-----------+-----------------+-------------------------+-------+---------+------------+
+| deepseek | ceval     | AverageAccuracy | high_school_mathematics |    18 |  0.8889 | STEM       |
++----------+-----------+-----------------+-------------------------+-------+---------+------------+ 
+
+2025-07-22 11:47:38,154 - evalscope - INFO - Skipping report analysis (`analysis_report=False`).
+2025-07-22 11:47:38,155 - evalscope - INFO - Dump report to: ./outputs/20250722_113605/reports/deepseek/ceval.json 
+
+2025-07-22 11:47:38,155 - evalscope - INFO - Evaluation finished on modelscope/ceval-exam
+2025-07-22 11:47:38,158 - evalscope - INFO - Overall report table: 
++----------+-----------+-----------------+-------------------------+-------+---------+------------+
+| Model    | Dataset   | Metric          | Subset                  |   Num |   Score | Cat.0      |
++==========+===========+=================+=========================+=======+=========+============+
+| deepseek | ceval     | AverageAccuracy | logic                   |    22 |  0.8636 | Humanities |
++----------+-----------+-----------------+-------------------------+-------+---------+------------+
+| deepseek | ceval     | AverageAccuracy | high_school_mathematics |    18 |  0.8889 | STEM       |
++----------+-----------+-----------------+-------------------------+-------+---------+------------+ 
+
+2025-07-22 11:47:38,158 - evalscope - INFO - Finished evaluation for deepseek on ['ceval']
+2025-07-22 11:47:38,158 - evalscope - INFO - Output directory: ./outputs/20250722_113605

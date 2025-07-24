@@ -1,0 +1,186 @@
+2025-07-23 02:46:49,311 - evalscope - INFO - Args: Task config is provided with TaskConfig type.
+/usr/local/lib/python3.10/site-packages/torch/amp/autocast_mode.py:266: UserWarning: User provided device_type of 'cuda', but CUDA is not available. Disabling
+  warnings.warn(
+2025-07-23 02:46:53,537 - evalscope - INFO - Dump task config to ./outputs/20250723_024649/configs/task_config_47594d.yaml
+2025-07-23 02:46:53,540 - evalscope - INFO - {
+    "model": "deepseek",
+    "model_id": "deepseek",
+    "model_args": {},
+    "model_task": "text_generation",
+    "template_type": null,
+    "chat_template": null,
+    "datasets": [
+        "ceval"
+    ],
+    "dataset_args": {
+        "ceval": {
+            "name": "ceval",
+            "dataset_id": "modelscope/ceval-exam",
+            "model_adapter": "generation",
+            "output_types": [
+                "multiple_choice_logits",
+                "generation"
+            ],
+            "subset_list": [
+                "high_school_mathematics",
+                "logic"
+            ],
+            "metric_list": [
+                "AverageAccuracy"
+            ],
+            "few_shot_num": 0,
+            "few_shot_random": false,
+            "train_split": "dev",
+            "eval_split": "val",
+            "prompt_template": "以下是中国关于{subset_name}考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中 LETTER 是 A、B、C、D 中的一个。\n{query}",
+            "system_prompt": null,
+            "query_template": null,
+            "pretty_name": "C-Eval",
+            "description": null,
+            "filters": null,
+            "extra_params": {}
+        }
+    },
+    "dataset_dir": "/root/.cache/modelscope/hub/datasets",
+    "dataset_hub": "modelscope",
+    "generation_config": {
+        "max_tokens": 3000,
+        "temperature": 0.6,
+        "top_p": 0.95,
+        "n": 1
+    },
+    "eval_type": "service",
+    "eval_backend": "Native",
+    "eval_config": null,
+    "stage": "all",
+    "limit": null,
+    "eval_batch_size": 10,
+    "mem_cache": false,
+    "use_cache": null,
+    "work_dir": "./outputs/20250723_024649",
+    "outputs": null,
+    "ignore_errors": false,
+    "debug": false,
+    "dry_run": false,
+    "seed": 42,
+    "api_url": "http://127.0.0.1:8000/v1",
+    "api_key": "KEY",
+    "timeout": null,
+    "stream": true,
+    "judge_strategy": "auto",
+    "judge_worker_num": 1,
+    "judge_model_args": {},
+    "analysis_report": false
+}
+2025-07-23 02:46:53,540 - evalscope - INFO - Start evaluating on dataset modelscope/ceval-exam
+2025-07-23 02:46:53,540 - evalscope - INFO - Loading dataset from hub: modelscope/ceval-exam
+2025-07-23 02:46:53,754 - evalscope - INFO - Loading dataset: dataset_name: modelscope/ceval-exam > subsets: ['high_school_mathematics', 'logic']
+2025-07-23 02:47:11,903 - evalscope - INFO - Use settings: > few_shot_num: 0, > few_shot_split: dev, > target_eval_split: val
+['high_school_mathematics', 'logic']
+
+===== 传入的参数 =====
+api_url: http://127.0.0.1:8000/v1
+api_key: KEY
+model: deepseek
+max_tokens: 3000
+datasets: ceval
+temperature: 0.6
+top_p: 0.95
+answer_num: 1
+use_cache: 
+eval_batch_size: 10
+data_mode: subset
+acc_log_file: /home/yuyongzhong/llm-infer/test/output/yyz_test_20250723_1000/Accuracy_Test/20250723_0246_acc_test.log
+webhook_url: https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49
+CHECK_INTERVAL: 60
+base_info: {
+  "device": "docker-yyz 112(6core)",
+  "model": "Qwen-1.5B",
+  "version": "v1.0.0",
+  "software_version": 701,
+  "software_url": "https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjA=",
+  "vllm_image_harbor": {
+    "huoshan_harbor_url": "registry.mthreads.com/mcconline/vllm-musa-qy2-py310:v0.8.4-release",
+    "shanghai_harbor_url": "sh-harbor.mthreads.com/vllm-images/vllm-musa-qy2-py310:v0.8.4-release"
+  }
+}
+=====================
+
+日志文件: /home/yuyongzhong/llm-infer/test/output/yyz_test_20250723_1000/Accuracy_Test/20250723_0246_acc_test.log
+开始监控日志文件，每 5.0 分钟检查一次
+
+检查时间: 2025-07-23 02:46:49
+
+开始第 1 次评估尝试...
+本次检查未发现错误
+
+Predicting(high_school_mathematics):   0%|          | 0/18 [00:00<?, ?it/s]Predicting(high_school_mathematics):   6%|▌         | 1/18 [01:05<18:25, 65.02s/it]Predicting(high_school_mathematics):  11%|█         | 2/18 [01:18<09:14, 34.68s/it]Predicting(high_school_mathematics):  17%|█▋        | 3/18 [02:44<14:32, 58.19s/it]Predicting(high_school_mathematics):  22%|██▏       | 4/18 [02:59<09:34, 41.04s/it]Predicting(high_school_mathematics):  28%|██▊       | 5/18 [03:01<05:50, 26.93s/it]Predicting(high_school_mathematics):  33%|███▎      | 6/18 [03:12<04:20, 21.68s/it]Predicting(high_school_mathematics):  39%|███▉      | 7/18 [03:47<04:43, 25.81s/it]Predicting(high_school_mathematics):  44%|████▍     | 8/18 [03:50<03:07, 18.77s/it]Predicting(high_school_mathematics):  67%|██████▋   | 12/18 [04:08<00:57,  9.57s/it]Predicting(high_school_mathematics):  72%|███████▏  | 13/18 [04:12<00:42,  8.52s/it]Predicting(high_school_mathematics):  78%|███████▊  | 14/18 [04:15<00:29,  7.33s/it]Predicting(high_school_mathematics):  83%|████████▎ | 15/18 [04:31<00:28,  9.41s/it]Predicting(high_school_mathematics):  89%|████████▉ | 16/18 [04:48<00:22, 11.22s/it]Predicting(high_school_mathematics):  94%|█████████▍| 17/18 [05:12<00:14, 14.53s/it]Predicting(high_school_mathematics): 100%|██████████| 18/18 [05:43<00:00, 19.03s/it]Predicting(high_school_mathematics): 100%|██████████| 18/18 [05:43<00:00, 19.09s/it]
+2025-07-23 02:52:55,488 - evalscope - INFO - Dump predictions to ./outputs/20250723_024649/predictions/deepseek/ceval_high_school_mathematics.jsonl.
+检查时间: 2025-07-23 02:51:49
+
+本次检查未发现错误
+
+Reviewing(high_school_mathematics):   0%|          | 0/18 [00:00<?, ?it/s]Reviewing(high_school_mathematics): 100%|██████████| 18/18 [00:00<00:00, 1435.37it/s]
+Predicting(logic):   0%|          | 0/22 [00:00<?, ?it/s]Predicting(logic):   5%|▍         | 1/22 [00:45<15:54, 45.46s/it]Predicting(logic):   9%|▉         | 2/22 [01:07<10:35, 31.75s/it]Predicting(logic):  14%|█▎        | 3/22 [01:09<05:42, 18.03s/it]Predicting(logic):  18%|█▊        | 4/22 [01:18<04:18, 14.34s/it]Predicting(logic):  23%|██▎       | 5/22 [01:22<03:05, 10.91s/it]Predicting(logic):  27%|██▋       | 6/22 [01:42<03:41, 13.87s/it]Predicting(logic):  32%|███▏      | 7/22 [01:43<02:24,  9.61s/it]Predicting(logic):  36%|███▋      | 8/22 [02:10<03:33, 15.28s/it]Predicting(logic):  41%|████      | 9/22 [02:36<04:00, 18.47s/it]Predicting(logic):  45%|████▌     | 10/22 [02:49<03:23, 16.96s/it]Predicting(logic):  50%|█████     | 11/22 [02:57<02:36, 14.19s/it]Predicting(logic):  55%|█████▍    | 12/22 [03:23<02:58, 17.86s/it]Predicting(logic):  59%|█████▉    | 13/22 [03:41<02:40, 17.80s/it]Predicting(logic):  68%|██████▊   | 15/22 [03:49<01:18, 11.28s/it]Predicting(logic):  82%|████████▏ | 18/22 [04:05<00:33,  8.43s/it]Predicting(logic):  86%|████████▋ | 19/22 [04:21<00:29,  9.88s/it]Predicting(logic):  91%|█████████ | 20/22 [04:38<00:22, 11.28s/it]Predicting(logic):  95%|█████████▌| 21/22 [05:21<00:18, 18.91s/it]Predicting(logic): 100%|██████████| 22/22 [06:01<00:00, 24.07s/it]Predicting(logic): 100%|██████████| 22/22 [06:01<00:00, 16.42s/it]
+2025-07-23 02:58:56,824 - evalscope - INFO - Dump predictions to ./outputs/20250723_024649/predictions/deepseek/ceval_logic.jsonl.
+检查时间: 2025-07-23 02:56:49
+
+本次检查未发现错误
+
+Reviewing(logic):   0%|          | 0/22 [00:00<?, ?it/s]Reviewing(logic): 100%|██████████| 22/22 [00:00<00:00, 2573.19it/s]
+2025-07-23 02:58:56,845 - evalscope - INFO - modelscope/ceval-exam report table: 
++----------+-----------+-----------------+-------------------------+-------+---------+------------+
+| Model    | Dataset   | Metric          | Subset                  |   Num |   Score | Cat.0      |
++==========+===========+=================+=========================+=======+=========+============+
+| deepseek | ceval     | AverageAccuracy | logic                   |    22 |  0.7727 | Humanities |
++----------+-----------+-----------------+-------------------------+-------+---------+------------+
+| deepseek | ceval     | AverageAccuracy | high_school_mathematics |    18 |  0.8333 | STEM       |
++----------+-----------+-----------------+-------------------------+-------+---------+------------+ 
+
+2025-07-23 02:58:56,845 - evalscope - INFO - Skipping report analysis (`analysis_report=False`).
+2025-07-23 02:58:56,845 - evalscope - INFO - Dump report to: ./outputs/20250723_024649/reports/deepseek/ceval.json 
+
+2025-07-23 02:58:56,845 - evalscope - INFO - Evaluation finished on modelscope/ceval-exam
+2025-07-23 02:58:56,848 - evalscope - INFO - Overall report table: 
++----------+-----------+-----------------+-------------------------+-------+---------+------------+
+| Model    | Dataset   | Metric          | Subset                  |   Num |   Score | Cat.0      |
++==========+===========+=================+=========================+=======+=========+============+
+| deepseek | ceval     | AverageAccuracy | logic                   |    22 |  0.7727 | Humanities |
++----------+-----------+-----------------+-------------------------+-------+---------+------------+
+| deepseek | ceval     | AverageAccuracy | high_school_mathematics |    18 |  0.8333 | STEM       |
++----------+-----------+-----------------+-------------------------+-------+---------+------------+ 
+
+2025-07-23 02:58:56,848 - evalscope - INFO - Finished evaluation for deepseek on ['ceval']
+2025-07-23 02:58:56,848 - evalscope - INFO - Output directory: ./outputs/20250723_024649
+检查时间: 2025-07-23 03:01:49
+
+找到 Finished 标记，停止监控
+
+本次检查未发现错误
+
+在日志中找到 work_dir: ./outputs/20250723_024649
+
+找到ceval.json文件，metrics数据如下:
+[{'name': 'AverageAccuracy', 'num': 40, 'score': 0.8, 'macro_score': 0.803, 'categories': [{'name': ['Humanities'], 'num': 22, 'score': 0.7727, 'macro_score': 0.7727, 'subsets': [{'name': 'logic', 'score': 0.7727, 'num': 22}]}, {'name': ['STEM'], 'num': 18, 'score': 0.8333, 'macro_score': 0.8333, 'subsets': [{'name': 'high_school_mathematics', 'score': 0.8333, 'num': 18}]}]}]
+
+{
+  "device": "docker-yyz 112(6core)",
+  "model": "Qwen-1.5B",
+  "version": "v1.0.0",
+  "software_version": 701,
+  "software_url": "https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjA=",
+  "vllm_image_harbor": {
+    "huoshan_harbor_url": "registry.mthreads.com/mcconline/vllm-musa-qy2-py310:v0.8.4-release",
+    "shanghai_harbor_url": "sh-harbor.mthreads.com/vllm-images/vllm-musa-qy2-py310:v0.8.4-release"
+  }
+}
+docker eval 运行检测
+ 运行正常结束
+  评估分数汇总:
+    总体分数 : 0.8000
+    类别分数:
+    - Humanities: 0.7727
+    - STEM: 0.8333
+
+已发送钉钉信息
+

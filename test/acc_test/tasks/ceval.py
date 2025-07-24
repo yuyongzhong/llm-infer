@@ -1,4 +1,6 @@
-subset_list = ['middle_school_history'
+subset_list = [
+    'high_school_mathematics', 
+    'logic'
 ]
 all = [
     'electrical_engineer', 

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>大模型测试 Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.6.0/dist/tinycolor-min.js"></script>
+  <style>
+    body {
+      background: #f4f8fb;
+      font-family: "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #222c38;
+      padding: 2em 0 3em 0;
+    }
+    .container {
+      background: #fff;
+      padding: 1.7em 2.1em 2.2em 2.1em;
+      border-radius: 16px;
+      box-shadow: 0 6px 36px 0 rgba(80,100,200,0.11);
+      max-width: 1180px;
+      margin: 38px auto 0 auto;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.3em;
+      font-weight: 900;
+      color: #145cce;
+      letter-spacing: .01em;
+      margin-bottom: 0.35em;
+      line-height: 1.2;
+      text-align: center;
+    }
+    .device-group {
+      margin-bottom: 2.4em;
+      border-radius: 16px;
+      box-shadow: 0 1.5px 7px rgba(80,110,160,0.04);
+      background: #f7faff;
+      padding: 1.3em 1.6em 1.5em 1.6em;
+      text-align: left;
+    }
+    .device-title {
+      font-size: 1.33em;
+      color: #284e87;
+      margin-bottom: .65em;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: .4em;
+    }
+    .summary-cards {
+      display: flex;
+      gap: 1.2em;
+      margin-bottom: 1.1em;
+      flex-wrap: wrap;
+    }
+    .summary-card {
+      background: linear-gradient(105deg, #dcefff 0%, #f1f6fc 100%);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(80,130,200,0.07);
+      min-width: 150px;
+      padding: 1.1em 1.1em 1.05em 1.1em;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      font-size: 1.02em;
+      font-weight: 600;
+      color: #1a3062;
+    }
+    .summary-card .card-title {
+      font-size: 0.98em;
+      color: #4271b6;
+      margin-bottom: .2em;
+      font-weight: 400;
+      letter-spacing: .02em;
+    }
+    .summary-card .card-value {
+      font-size: 1.42em;
+      font-weight: 800;
+      color: #145cce;
+      letter-spacing: .01em;
+    }
+    .chart-wrap {
+      margin: 1.2em 0 1.5em 0;
+      width: 100%;
+      max-width: none;
+      background: #f4f8fd;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(56,56,80,0.06);
+      padding: 0.7em 1.4em 0.5em 1.4em;
+    }
+    .chart-wrap canvas {
+      width: 100% !important;
+      max-width: none;
+      min-width: 320px;
+      height: 420px !important;
+      display: block;
+      margin: 0 auto;
+    }
+    .chart-title {
+      font-size: 1.14em;
+      font-weight: 700;
+      margin: 0.2em 0 0.6em 0.4em;
+      color: #2757b6;
+      letter-spacing: .01em;
+    }
+    .version-section {
+      border-top: 1px solid #e4eaf0;
+      margin-top: 1.2em;
+      padding-top: 1em;
+    }
+    .model-block {
+      margin-top: 1.1em;
+      padding: 1em 1em 0.8em 1em;
+      background: #fcfdff;
+      border-radius: 8px;
+      box-shadow: 0 1.5px 5px rgba(0,0,0,0.04);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+    }
+    th, td {
+      border: 1px solid #dde1ee;
+      padding: 0.45em 0.5em;
+      text-align: center;
+      font-size: 1em;
+    }
+    th {
+      background: linear-gradient(90deg, #e5edfd 60%, #f6f9fe 100%);
+      color: #23549c;
+      font-size: 1.05em;
+      font-weight: 700;
+      letter-spacing: .01em;
+      border-bottom: 2.5px solid #bdd2f8;
+    }
+    code {
+      background: #f0f3f9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 1.01em;
+    }
+    select {
+      margin-bottom: 1em;
+      padding: 0.35em;
+    }
+    .footer {
+      margin-top: 4em;
+      color: #6886ad;
+      font-size: 0.99em;
+      text-align: center;
+      letter-spacing: .02em;
+      opacity: 0.88;
+      border-top: 1.5px dashed #c8d6ee;
+      padding-top: 1.3em;
+    }
+    .footer span {
+      font-weight: 600;
+      color: #295cb8;
+      margin-left: 0.5em;
+      margin-right: 0.5em;
+    }
+    @media (max-width: 900px) {
+      .container { padding: 0.7em 0.2em 1.1em 0.2em; }
+      .summary-cards { flex-direction: column; gap: 0.7em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>大模型测试 Dashboard</h1>
+    <div id="app">📦 正在加载数据…</div>
+  </div>
+  <div class="footer">
+    Powered by <span>大模型推理测试</span> | 可视化升级定制 <span>ChatGPT Plus</span> | <span>2025</span>
+  </div>
+  <script>
+    const COLOR_PALETTE = [
+      "#4472c4", "#ed7d31", "#70ad47", "#ffc000", "#5b9bd5",
+      "#a5a5a5", "#264478", "#9e480e", "#636363", "#997300",
+      "#b855a1", "#2196f3", "#8bc34a", "#ff9800", "#00bcd4",
+      "#009688", "#d32f2f", "#ffeb3b", "#795548", "#607d8b"
+    ];
+    function getBarGradient(ctx, chartArea, color1, color2) {
+      const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+      gradient.addColorStop(0, color1);
+      gradient.addColorStop(1, color2);
+      return gradient;
+    }
+    function parseVersion(v) {
+      return v.split('.').map(n => parseInt(n));
+    }
+    function compareVersionDesc(a, b) {
+      const va = parseVersion(a), vb = parseVersion(b);
+      for (let i = 0; i < Math.max(va.length, vb.length); i++) {
+        const na = va[i] || 0, nb = vb[i] || 0;
+        if (na !== nb) return nb - na;
+      }
+      return 0;
+    }
+    function compareVersionAsc(a, b) {
+      const va = parseVersion(a), vb = parseVersion(b);
+      for (let i = 0; i < Math.max(va.length, vb.length); i++) {
+        const na = va[i] || 0, nb = vb[i] || 0;
+        if (na !== nb) return na - nb;
+      }
+      return 0;
+    }
+    async function fetchAllResults() {
+      const now = Date.now();
+      const indexResp = await fetch(`./results/index.json?t=${now}`);
+      if (!indexResp.ok) throw new Error("❌ 无法加载 index.json 文件");
+      const fileList = await indexResp.json();
+      const allData = [];
+      for (const file of fileList) {
+        try {
+          const resp = await fetch(`./results/${file}?t=${now}`);
+          const data = await resp.json();
+          allData.push(data);
+        } catch (err) {
+          console.error(`跳过无法加载的文件: ${file}`, err);
+        }
+      }
+      return allData;
+    }
+    function getSummaryData(perfRows, accRows) {
+      let maxOutput = null, minTTFT = null, latestAcc = null;
+      if (perfRows.length > 0) {
+        maxOutput = Math.max(...perfRows.map(r=>r.output_throughput||0));
+        minTTFT = Math.min(...perfRows.map(r=>r.avg_ttft||1e12));
+      }
+      if (accRows.length > 0) {
+        latestAcc = accRows[accRows.length-1]?.score;
+      }
+      return { maxOutput, minTTFT, latestAcc };
+    }
+    function renderGroupedResults(data) {
+      const app = document.getElementById("app");
+      app.innerHTML = "";
+      const grouped = {};
+      for (const entry of data) {
+        const device = entry.base_info?.device || "未知设备";
+        const version = entry.base_info?.version || "0.0.0";
+        const model = entry.base_info?.model || entry.model_name || "unknown";
+        if (!grouped[device]) grouped[device] = {};
+        if (!grouped[device][version]) grouped[device][version] = {};
+        if (!grouped[device][version][model]) grouped[device][version][model] = [];
+        grouped[device][version][model].push(entry);
+      }
+      for (const [device, versions] of Object.entries(grouped)) {
+        const groupDiv = document.createElement("div");
+        groupDiv.className = "device-group";
+        groupDiv.innerHTML = `<div class="device-title">🖥️ 设备: <code>${device}</code></div>`;
+        let perfRows = [], accRows = [];
+        for (const version of Object.keys(versions)) {
+          for (const model of Object.keys(versions[version])) {
+            for (const entry of versions[version][model]) {
+              const bench = entry.tests?.find(t => t.test_type === "benchmark");
+              if (bench) for (const r of bench.results || []) {
+                perfRows.push({ ...r, model, version });
+              }
+              const acc = entry.tests?.find(t => t.test_type === "accuracy");
+              if (acc && acc.datasets && acc.datasets[0]?.metrics?.[0]) {
+                accRows.push({
+                  model, version,
+                  score: acc.datasets[0].metrics[0].score
+                });
+              }
+            }
+          }
+        }
+        // 摘要卡片
+        const { maxOutput, minTTFT, latestAcc } = getSummaryData(perfRows, accRows);
+        const summaryDiv = document.createElement('div');
+        summaryDiv.className = 'summary-cards';
+        summaryDiv.innerHTML = `
+          <div class="summary-card">
+            <span class="card-title">最大吞吐 (output)</span>
+            <span class="card-value">${maxOutput !== null ? maxOutput.toFixed(2) : '-'}</span>
+          </div>
+          <div class="summary-card">
+            <span class="card-title">最低平均TTFT (ms)</span>
+            <span class="card-value">${minTTFT !== null ? minTTFT.toFixed(2) : '-'}</span>
+          </div>
+          <div class="summary-card">
+            <span class="card-title">最新精度 (%)</span>
+            <span class="card-value">${latestAcc !== null ? (latestAcc*100).toFixed(2) : '-'}</span>
+          </div>
+        `;
+        groupDiv.appendChild(summaryDiv);
+
+        if (perfRows.length > 0) {
+          // 所有并发数
+          const allConcurrency = [...new Set(perfRows.map(r => r.concurrency))].sort((a,b)=>a-b);
+          // 所有模型
+          const allModels = [...new Set(perfRows.map(r=>r.model))];
+          // 每个模型下所有 input/output 组合
+          const modelComboMap = {};
+          allModels.forEach(model => {
+            modelComboMap[model] = [...new Set(perfRows.filter(r => r.model === model).map(r => `in${r.input_tokens}-out${r.output_tokens}`))];
+          });
+          // combo 列表
+          const allCombos = [];
+          allModels.forEach(model => {
+            modelComboMap[model].forEach(combo => {
+              allCombos.push({model, combo});
+            });
+          });
+          // --- X轴：每个并发下，所有模型/组合为一组
+          // 所有 xLabels 其实就是 allConcurrency.map(String)
+          // 但组间间隔可用 Chart.js 的 groupSpacing 参数（新v4+支持），老版本只能用 barPercentage/categoryPercentage 调间隔
+          // 这里通过调整 barPercentage/categoryPercentage 达到最佳分隔
+
+          // === 生成 datasets ===
+          function getBarDatasets(metric, useGradient) {
+            return allCombos.map(({model, combo}, idx) => {
+              const comboIndex = modelComboMap[model].indexOf(combo);
+              const comboCount = modelComboMap[model].length;
+              const lightenAmt = comboCount > 1 ? 20 + (comboIndex * (40/(comboCount-1))) : 40;
+              const mainColor = COLOR_PALETTE[allModels.indexOf(model) % COLOR_PALETTE.length];
+              const color1 = tinycolor(mainColor).lighten(lightenAmt).toString();
+              const color2 = tinycolor(mainColor).darken(12).toString();
+              const [input, output] = combo.slice(2).split('-out').map(Number);
+              // 每个并发下都有数据
+              return {
+                label: `${model} (${input}-${output})`,
+                data: allConcurrency.map(conc => {
+                  const found = perfRows.find(r =>
+                    r.model === model &&
+                    r.concurrency === conc &&
+                    r.input_tokens === input &&
+                    r.output_tokens === output
+                  );
+                  return found && !isNaN(found[metric]) ? found[metric] : 0;
+                }),
+                backgroundColor: useGradient
+                  ? (ctx) => {
+                      const {chart} = ctx;
+                      if (!chart.chartArea) return color1;
+                      return getBarGradient(chart.ctx, chart.chartArea, color1, color2);
+                    }
+                  : color1
+              };
+            });
+          }
+          let chartObj1 = null, chartObj2 = null, chartAcc = null;
+          // Output Tokens 先展示
+          const otDiv = document.createElement('div');
+          otDiv.className = 'chart-wrap';
+          otDiv.innerHTML = `<div class="chart-title">Output Tokens（分组柱状图）</div>`;
+          const canvas2 = document.createElement('canvas');
+          otDiv.appendChild(canvas2);
+          groupDiv.appendChild(otDiv);
+          // TTFT 后展示
+          const ttftDiv = document.createElement('div');
+          ttftDiv.className = 'chart-wrap';
+          ttftDiv.innerHTML = `<div class="chart-title">平均TTFT(ms)（分组柱状图）</div>`;
+          const canvas1 = document.createElement('canvas');
+          ttftDiv.appendChild(canvas1);
+          groupDiv.appendChild(ttftDiv);
+          // 精度
+          const accDiv = document.createElement('div');
+          accDiv.className = 'chart-wrap';
+          accDiv.innerHTML = `<div class="chart-title">🎯 精度测试准确率 (%)</div>`;
+          const accuracyCanvas = document.createElement("canvas");
+          accDiv.appendChild(accuracyCanvas);
+          groupDiv.appendChild(accDiv);
+          // 柱状细、组间间隔大
+          const barOptions = {
+            categoryPercentage: 0.1,
+            barPercentage: 0.1
+          };
+          function drawBarChartsPure() {
+            if (chartObj1) chartObj1.destroy();
+            if (chartObj2) chartObj2.destroy();
+            chartObj2 = new Chart(canvas2, {
+              type: 'bar',
+              data: {
+                labels: allConcurrency.map(String),
+                datasets: getBarDatasets('output_tokens', false)
+              },
+              options: {
+                plugins: {
+                  legend: { position: 'top', maxHeight:80 },
+                  title: { display: false },
+                  datalabels: {
+                    color: "#166cbc",
+                    anchor: "end",
+                    align: "end",
+                    font: {weight:"bold",size:13},
+                    display: true,
+                    formatter: v => v ? v : ""
+                  }
+                },
+                responsive: true,
+                animation: false,
+                scales: {
+                  x: {
+                    title: { display: true, text: '并发数' },
+                    stacked: false,
+                    ...barOptions
+                  },
+                  y: { title: { display: true, text: 'Output Tokens' }, min: 0 }
+                }
+              },
+              plugins: [ChartDataLabels]
+            });
+            chartObj1 = new Chart(canvas1, {
+              type: 'bar',
+              data: {
+                labels: allConcurrency.map(String),
+                datasets: getBarDatasets('avg_ttft', false)
+              },
+              options: {
+                plugins: {
+                  legend: { position: 'top', maxHeight:80 },
+                  title: { display: false },
+                  datalabels: {
+                    color: "#214d97",
+                    anchor: "end",
+                    align: "end",
+                    font: {weight:"bold",size:13},
+                    display: true,
+                    formatter: v => v ? v : ""
+                  }
+                },
+                responsive: true,
+                animation: false,
+                scales: {
+                  x: {
+                    title: { display: true, text: '并发数' },
+                    stacked: false,
+                    ...barOptions
+                  },
+                  y: { title: { display: true, text: '平均TTFT(ms)' }, min: 0 }
+                }
+              },
+              plugins: [ChartDataLabels]
+            });
+          }
+          function drawBarChartsWithGradient() {
+            if (chartObj1) chartObj1.destroy();
+            if (chartObj2) chartObj2.destroy();
+            chartObj2 = new Chart(canvas2, {
+              type: 'bar',
+              data: {
+                labels: allConcurrency.map(String),
+                datasets: getBarDatasets('output_tokens', true)
+              },
+              options: {
+                plugins: {
+                  legend: { position: 'top', maxHeight:80 },
+                  title: { display: false },
+                  datalabels: {
+                    color: "#166cbc",
+                    anchor: "end",
+                    align: "end",
+                    font: {weight:"bold",size:13},
+                    display: true,
+                    formatter: v => v ? v : ""
+                  }
+                },
+                responsive: true,
+                animation: false,
+                scales: {
+                  x: {
+                    title: { display: true, text: '并发数' },
+                    stacked: false,
+                    ...barOptions
+                  },
+                  y: { title: { display: true, text: 'Output Tokens' }, min: 0 }
+                }
+              },
+              plugins: [ChartDataLabels]
+            });
+            chartObj1 = new Chart(canvas1, {
+              type: 'bar',
+              data: {
+                labels: allConcurrency.map(String),
+                datasets: getBarDatasets('avg_ttft', true)
+              },
+              options: {
+                plugins: {
+                  legend: { position: 'top', maxHeight:80 },
+                  title: { display: false },
+                  datalabels: {
+                    color: "#214d97",
+                    anchor: "end",
+                    align: "end",
+                    font: {weight:"bold",size:13},
+                    display: true,
+                    formatter: v => v ? v : ""
+                  }
+                },
+                responsive: true,
+                animation: false,
+                scales: {
+                  x: {
+                    title: { display: true, text: '并发数' },
+                    stacked: false,
+                    ...barOptions
+                  },
+                  y: { title: { display: true, text: '平均TTFT(ms)' }, min: 0 }
+                }
+              },
+              plugins: [ChartDataLabels]
+            });
+          }
+          drawBarChartsPure();
+          setTimeout(drawBarChartsWithGradient, 300);
+
+          // 精度图
+          const versionKeysAsc = Object.keys(versions).sort(compareVersionAsc);
+          const allModelsAcc = new Set();
+          for (const version of versionKeysAsc) {
+            for (const model of Object.keys(versions[version])) {
+              allModelsAcc.add(model);
+            }
+          }
+          const accDatasets = Array.from(allModelsAcc).map(model => {
+            const dataPoints = versionKeysAsc.map(version => {
+              const entry = versions[version][model]?.[0];
+              const accTest = entry?.tests?.find(t => t.test_type === "accuracy");
+              const score = accTest?.datasets?.[0]?.metrics?.[0]?.score;
+              return { x: version, y: score != null ? (score * 100).toFixed(2) : null };
+            });
+            return {
+              label: model,
+              data: dataPoints,
+              tension: 0.3,
+              borderColor: "#337be2",
+              backgroundColor: "#6fa5f2",
+              pointBackgroundColor: "#337be2"
+            };
+          });
+          chartAcc = new Chart(accuracyCanvas, {
+            type: 'line',
+            data: {
+              labels: versionKeysAsc,
+              datasets: accDatasets
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { position: 'top' },
+                title: { display: false }
+              },
+              scales: {
+                x: { title: { display: true, text: '版本' } },
+                y: { title: { display: true, text: '准确率 (%)' }, min: 0, max: 100 }
+              }
+            }
+          });
+        }
+        // 明细表格
+        for (const version of Object.keys(versions).sort(compareVersionDesc)) {
+          const versionDiv = document.createElement("div");
+          versionDiv.className = "version-section";
+          versionDiv.innerHTML = `<h3>📦 版本: <code>${version}</code></h3>`;
+          for (const [model, entries] of Object.entries(versions[version])) {
+            for (const entry of entries) {
+              const modelDiv = document.createElement("div");
+              modelDiv.className = "model-block";
+              modelDiv.innerHTML = `<h4>🤖 模型: <code>${model}</code></h4>`;
+              const bench = entry.tests?.find(t => t.test_type === "benchmark");
+              if (bench) {
+                let html = `<h5>🚀 性能测试</h5><table><tr>
+                  <th>并发数</th><th>输入Tokens</th><th>输出Tokens</th>
+                  <th>吞吐率 (output)</th><th>总吞吐率</th><th>平均TTFT (ms)</th>
+                </tr>`;
+                for (const r of bench.results || []) {
+                  html += `<tr>
+                    <td>${r.concurrency}</td><td>${r.input_tokens}</td><td>${r.output_tokens}</td>
+                    <td>${r.output_throughput}</td><td>${r.total_throughput}</td><td>${r.avg_ttft}</td>
+                  </tr>`;
+                }
+                html += `</table>`;
+                modelDiv.innerHTML += html;
+              }
+              const acc = entry.tests?.find(t => t.test_type === "accuracy");
+              if (acc) {
+                let html = `<h5>🎯 精度测试</h5><table><tr>
+                  <th>数据集</th><th>平均准确率</th><th>样本数</th>
+                </tr>`;
+                for (const d of acc.datasets || []) {
+                  const metric = d.metrics?.[0];
+                  html += `<tr>
+                    <td>${d.dataset_pretty_name || d.name}</td>
+                    <td>${(metric?.score * 100).toFixed(2)}%</td>
+                    <td>${metric?.num}</td>
+                  </tr>`;
+                }
+                html += `</table>`;
+                modelDiv.innerHTML += html;
+              }
+              versionDiv.appendChild(modelDiv);
+            }
+          }
+          groupDiv.appendChild(versionDiv);
+        }
+        app.appendChild(groupDiv);
+      }
+    }
+    fetchAllResults().then(renderGroupedResults).catch(err => {
+      document.getElementById("app").innerHTML = `<p style="color:red;">❌ 加载失败: ${err.message}</p>`;
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
