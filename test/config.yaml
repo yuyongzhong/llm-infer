@@ -5,9 +5,10 @@ basic:
   log_info: yyz_test_20250723_1000 # 当前测试任务标识，会用于输出日志文件夹命名
   run_mode: skip     # 控制主运行流程：accuracy | benchmark | acc-then-bench | bench-then-acc | skip
   base_info:                               
-    device: docker-yyztest(6core)
+    device: s4000
     model: Qwen-1.5B
     version: v1.0.0
+    remark: 72机器
     software_version: "0701"  # 添加双引号（或 '0701'），强制为字符串
     software_url: https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjA=
     vllm_image_harbor:
