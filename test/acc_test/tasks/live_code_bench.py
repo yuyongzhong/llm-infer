@@ -1,0 +1,3 @@
+all = [
+    "release_latest"
+]
