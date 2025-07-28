@@ -74,28 +74,52 @@ def load_subset(tasks, data_mode="all"):
                     'all' 表示使用模块名本身作为唯一项返回
 
     返回:
-        list[str]: 子集名称列表或包含模块名的全量列表
+        dict: 包含每个任务名称及其对应子集列表的字典
     """
-    try:
-        module_name = tasks
-        try:
-            module = sys.modules[module_name]
-            importlib.reload(module)
-        except (KeyError, NameError):
-            module = importlib.import_module(module_name)
+    # 兼容字符串和 list 输入
+    if isinstance(tasks, str):
+        task_list = [t.strip() for t in tasks.split(",") if t.strip()]
+    else:
+        task_list = list(tasks)
+    if isinstance(data_mode, str):
+        data_mode_list = [t.strip() for t in data_mode.split(",") if t.strip()]
+    else:
+        data_mode_list = list(data_mode)
 
-        if data_mode == "subset":
-            if not hasattr(module, 'subset_list'):
-                raise AttributeError(f"Module {module_name} has no attribute 'subset_list'")
-            return module.subset_list
-        elif data_mode == "all":
-            if not hasattr(module, 'all'):
-                raise AttributeError(f"Module {module_name} has no attribute 'subset_list'")
-            return module.all
-        else:
-            raise ValueError(f"Invalid mode '{data_mode}'. Use 'subset' or 'all'.")
-    except Exception as e:
-        raise ValueError(f"Failed to load subset list for {tasks}: {str(e)}")
+    if len(task_list) != len(data_mode_list):
+        raise ValueError(f"task_list 和 data_mode_list 长度不一致: {len(task_list)} vs {len(data_mode_list)}")
+    
+    
+    results = {}
+
+    for task_name, data_mode in zip(task_list, data_mode_list):
+        try:
+            module_name = task_name
+            try:
+                module = sys.modules[module_name]
+                importlib.reload(module)
+            except (KeyError, NameError):
+                module = importlib.import_module(module_name)
+            
+            # 根据模式获取数据
+            if data_mode == "subset":
+                if not hasattr(module, 'subset_list'):
+                    raise AttributeError(f"Module {module_name} has no attribute 'subset_list'")
+                results[task_name] = module.subset_list
+                # return module.subset_list        
+            elif data_mode == "all":
+                if not hasattr(module, 'all'):
+                    raise AttributeError(f"Module {module_name} has no attribute 'subset_list'")
+                results[task_name] = module.all
+                # return module.all
+            else:
+                raise ValueError(f"Invalid mode '{data_mode}'. Use 'subset' or 'all'.")
+        
+        except Exception as e:
+            raise ValueError(f"Failed to load subset list for {tasks}: {str(e)}")
+        
+    return results
+
 
 
 
@@ -144,7 +168,7 @@ def main():
     CHECK_INTERVAL = args.CHECK_INTERVAL
     base_info = args.base_info
 
-    subset_list = load_subset(datasets, data_mode=data_mode)
+    subset_lists = load_subset(datasets, data_mode=data_mode)
 
     task_cfg = TaskConfig(
         model = model,
@@ -152,11 +176,11 @@ def main():
         api_key = api_key,
         eval_type = EvalType.SERVICE,
 
-        datasets=[datasets],
+        datasets=list(subset_lists.keys()),
         dataset_args={
-            datasets: {
-                "subset_list": subset_list
-                }
+            task_name: {
+                "subset_list": subset_list,
+                } for task_name, subset_list in subset_lists.items()
         },
 
         eval_batch_size=eval_batch_size,
@@ -167,7 +191,7 @@ def main():
             'n': answer_num
         },
 
-        stream=True
+        stream=True,
     )
 
     if use_cache != "":
