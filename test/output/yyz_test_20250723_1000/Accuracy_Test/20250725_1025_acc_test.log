@@ -1,0 +1,58 @@
+['high_school_mathematics', 'logic']
+
+===== 传入的参数 =====
+api_url: http://127.0.0.1:8000/v1
+api_key: KEY
+model: deepseek
+max_tokens: 3000
+datasets: ceval,mmlu
+temperature: 0.6
+top_p: 0.95
+answer_num: 1
+use_cache: 
+eval_batch_size: 10
+data_mode: subset,subset
+acc_log_file: /home/yuyongzhong/llm-infer/test/output/yyz_test_20250723_1000/Accuracy_Test/20250725_1025_acc_test.log
+webhook_url: https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49
+CHECK_INTERVAL: 60
+base_info: {
+  "device": "s4000",
+  "model": "deepseek",
+  "version": "v1.0.0",
+  "remark": "72机器",
+  "software_version": "0701",
+  "software_url": "https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjA=",
+  "vllm_image_harbor": {
+    "huoshan_harbor_url": "registry.mthreads.com/mcconline/vllm-musa-qy2-py310:v0.8.4-release",
+    "shanghai_harbor_url": "sh-harbor.mthreads.com/vllm-images/vllm-musa-qy2-py310:v0.8.4-release"
+  }
+}
+=====================
+
+Traceback (most recent call last):
+  File "/home/yuyongzhong/llm-infer/test/acc_test/scripts/evaluate_test.py", line 82, in load_subset
+    module = sys.modules[module_name]
+KeyError: 'ceval,mmlu'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yuyongzhong/llm-infer/test/acc_test/scripts/evaluate_test.py", line 85, in load_subset
+    module = importlib.import_module(module_name)
+  File "/usr/local/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1004, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'ceval,mmlu'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yuyongzhong/llm-infer/test/acc_test/scripts/evaluate_test.py", line 213, in <module>
+    main()
+  File "/home/yuyongzhong/llm-infer/test/acc_test/scripts/evaluate_test.py", line 147, in main
+    subset_list = load_subset(datasets, data_mode=data_mode)
+  File "/home/yuyongzhong/llm-infer/test/acc_test/scripts/evaluate_test.py", line 98, in load_subset
+    raise ValueError(f"Failed to load subset list for {tasks}: {str(e)}")
+ValueError: Failed to load subset list for ceval,mmlu: No module named 'ceval,mmlu'
