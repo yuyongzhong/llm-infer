@@ -1,0 +1,674 @@
+{
+  "project_id": "yyz_test_20250723_1000",
+  "timestamp": "2025-06-27T03:05:15.593620Z",
+  "model_name": "deepseek",
+  "run_mode": "acc-then-bench",
+  "base_info": {
+    "device": "s4000",
+    "model": "ds-r1-671B",
+    "version": "1.1_beta",
+    "remark": "6core",
+    "software_version":"0610",
+    "software_url": "https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX0tVQUVfMi4wX2Zvcl9QSDFfTTNELzIwMjUtMDUtMTgv",
+    "vllm_image_harbor": {
+      "huoshan_harbor_url": "registry.mthreads.com/mcconline/vllm-musa-qy2-py310:v0.8.4-release",
+      "shanghai_harbor_url": "sh-harbor.mthreads.com/vllm-images/vllm-musa-qy2-py310:v0.8.4-release"
+    }
+  },
+  "tests": [
+    {
+      "test_type": "benchmark",
+      "results": [
+        {
+          "timestamp": 0,
+          "concurrency": 1,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 3.0,
+          "req_throughput": 0.33,
+          "output_throughput": 10.6,
+          "total_throughput": 21.33,
+          "avg_ttft": 600.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 1,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 12.5,
+          "req_throughput": 0.08,
+          "output_throughput": 10.3,
+          "total_throughput": 20.48,
+          "avg_ttft": 760.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 1,
+          "input_tokens": 256,
+          "output_tokens": 256,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256,
+          "avg_output": 256,
+          "total_time": 25.5,
+          "req_throughput": 0.04,
+          "output_throughput": 10.0,
+          "total_throughput": 20.08,
+          "avg_ttft": 980.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 1,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 115.5,
+          "req_throughput": 0.01,
+          "output_throughput": 8.9,
+          "total_throughput": 17.76,
+          "avg_ttft": 1930.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 4,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 1.2,
+          "req_throughput": 3.33,
+          "output_throughput": 26.4,
+          "total_throughput": 53.33,
+          "avg_ttft": 770.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 4,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 5.1,
+          "req_throughput": 0.78,
+          "output_throughput": 25.0,
+          "total_throughput": 49.80,
+          "avg_ttft": 920.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 4,
+          "input_tokens": 256,
+          "output_tokens": 256,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256,
+          "avg_output": 256,
+          "total_time": 10.6,
+          "req_throughput": 0.38,
+          "output_throughput": 24.2,
+          "total_throughput": 48.11,
+          "avg_ttft": 1320.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 4,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 52.5,
+          "req_throughput": 0.08,
+          "output_throughput": 19.5,
+          "total_throughput": 38.97,
+          "avg_ttft": 2380.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 16,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 0.5,
+          "req_throughput": 32.00,
+          "output_throughput": 66.2,
+          "total_throughput": 132.80,
+          "avg_ttft": 970.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 16,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 2.1,
+          "req_throughput": 7.62,
+          "output_throughput": 59.6,
+          "total_throughput": 119.24,
+          "avg_ttft": 1400.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 16,
+          "input_tokens": 256,
+          "output_tokens": 256,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256,
+          "avg_output": 256,
+          "total_time": 4.5,
+          "req_throughput": 3.56,
+          "output_throughput": 57.0,
+          "total_throughput": 114.04,
+          "avg_ttft": 2180.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 16,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 30.1,
+          "req_throughput": 0.53,
+          "output_throughput": 34.0,
+          "total_throughput": 67.91,
+          "avg_ttft": 3760.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 32,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 0.4,
+          "req_throughput": 80.00,
+          "output_throughput": 84.9,
+          "total_throughput": 169.80,
+          "avg_ttft": 1520.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 32,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 1.7,
+          "req_throughput": 18.82,
+          "output_throughput": 76.8,
+          "total_throughput": 153.41,
+          "avg_ttft": 2540.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 32,
+          "input_tokens": 256,
+          "output_tokens": 256,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256,
+          "avg_output": 256,
+          "total_time": 3.5,
+          "req_throughput": 9.14,
+          "output_throughput": 72.9,
+          "total_throughput": 145.66,
+          "avg_ttft": 5190.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 32,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 25.4,
+          "req_throughput": 1.26,
+          "output_throughput": 40.3,
+          "total_throughput": 80.55,
+          "avg_ttft": 15050.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 64,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 0.3,
+          "req_throughput": 213.33,
+          "output_throughput": 92.7,
+          "total_throughput": 185.33,
+          "avg_ttft": 2360.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 64,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 1.5,
+          "req_throughput": 42.67,
+          "output_throughput": 85.9,
+          "total_throughput": 171.73,
+          "avg_ttft": 5850.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 64,
+          "input_tokens": 256,
+          "output_tokens": 256,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256,
+          "avg_output": 256,
+          "total_time": 3.3,
+          "req_throughput": 19.39,
+          "output_throughput": 77.4,
+          "total_throughput": 154.67,
+          "avg_ttft": 10030.0,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 64,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 63622.2,
+          "req_throughput": 0.00,
+          "output_throughput": 0.0,
+          "total_throughput": 0.03,
+          "avg_ttft": 1980.0,
+          "p99_ttft": 0
+        }
+      ],
+      "log_path": ""
+    },
+    {
+      "test_type": "accuracy",
+      "datasets": [
+        {
+          "name": "deepseek（0619测试结果）",
+          "dataset_name": "ceval",
+          "dataset_pretty_name": "C-Eval",
+          "dataset_description": null,
+          "model_name": "deepseek",
+          "score": 0.9095,
+          "metrics": [
+            {
+              "name": "AverageAccuracy",
+              "num": 1346,
+              "score": 0.9095,
+              "macro_score": 0.9072,
+              "categories": [
+                {
+                  "name": [
+                    "Humanities"
+                  ],
+                  "num": 257,
+                  "score": 0.9176,
+                  "macro_score": 0.9176,
+                  "subsets": [
+                    {
+                      "name": "modern_chinese_history",
+                      "score": 0.887,
+                      "num": 23
+                    },
+                    {
+                      "name": "ideological_and_moral_cultivation",
+                      "score": 0.9789,
+                      "num": 19
+                    },
+                    {
+                      "name": "logic",
+                      "score": 0.9455,
+                      "num": 22
+                    },
+                    {
+                      "name": "law",
+                      "score": 0.9,
+                      "num": 24
+                    },
+                    {
+                      "name": "chinese_language_and_literature",
+                      "score": 0.8435,
+                      "num": 23
+                    },
+                    {
+                      "name": "art_studies",
+                      "score": 0.9333,
+                      "num": 33
+                    },
+                    {
+                      "name": "professional_tour_guide",
+                      "score": 0.9517,
+                      "num": 29
+                    },
+                    {
+                      "name": "legal_professional",
+                      "score": 0.9043,
+                      "num": 23
+                    },
+                    {
+                      "name": "high_school_chinese",
+                      "score": 0.8211,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_history",
+                      "score": 0.95,
+                      "num": 20
+                    },
+                    {
+                      "name": "middle_school_history",
+                      "score": 0.9545,
+                      "num": 22
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "Other"
+                  ],
+                  "num": 384,
+                  "score": 0.9015,
+                  "macro_score": 0.9015,
+                  "subsets": [
+                    {
+                      "name": "civil_servant",
+                      "score": 0.8766,
+                      "num": 47
+                    },
+                    {
+                      "name": "sports_science",
+                      "score": 0.9789,
+                      "num": 19
+                    },
+                    {
+                      "name": "plant_protection",
+                      "score": 0.9636,
+                      "num": 22
+                    },
+                    {
+                      "name": "basic_medicine",
+                      "score": 0.9053,
+                      "num": 19
+                    },
+                    {
+                      "name": "clinical_medicine",
+                      "score": 0.9273,
+                      "num": 22
+                    },
+                    {
+                      "name": "urban_and_rural_planner",
+                      "score": 0.813,
+                      "num": 46
+                    },
+                    {
+                      "name": "accountant",
+                      "score": 0.9184,
+                      "num": 49
+                    },
+                    {
+                      "name": "fire_engineer",
+                      "score": 0.9548,
+                      "num": 31
+                    },
+                    {
+                      "name": "environmental_impact_assessment_engineer",
+                      "score": 0.8387,
+                      "num": 31
+                    },
+                    {
+                      "name": "tax_accountant",
+                      "score": 0.9224,
+                      "num": 49
+                    },
+                    {
+                      "name": "physician",
+                      "score": 0.849,
+                      "num": 49
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "STEM"
+                  ],
+                  "num": 485,
+                  "score": 0.9028,
+                  "macro_score": 0.9028,
+                  "subsets": [
+                    {
+                      "name": "electrical_engineer",
+                      "score": 0.6703,
+                      "num": 37
+                    },
+                    {
+                      "name": "metrology_engineer",
+                      "score": 0.9583,
+                      "num": 24
+                    },
+                    {
+                      "name": "high_school_mathematics",
+                      "score": 0.9222,
+                      "num": 18
+                    },
+                    {
+                      "name": "high_school_physics",
+                      "score": 0.9895,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_chemistry",
+                      "score": 0.9895,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_biology",
+                      "score": 0.9789,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_mathematics",
+                      "score": 0.9895,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_biology",
+                      "score": 0.9048,
+                      "num": 21
+                    },
+                    {
+                      "name": "middle_school_physics",
+                      "score": 0.9895,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_chemistry",
+                      "score": 1,
+                      "num": 20
+                    },
+                    {
+                      "name": "veterinary_medicine",
+                      "score": 0.8783,
+                      "num": 23
+                    },
+                    {
+                      "name": "computer_network",
+                      "score": 0.9053,
+                      "num": 19
+                    },
+                    {
+                      "name": "operating_system",
+                      "score": 0.9368,
+                      "num": 19
+                    },
+                    {
+                      "name": "computer_architecture",
+                      "score": 0.9619,
+                      "num": 21
+                    },
+                    {
+                      "name": "college_programming",
+                      "score": 0.8919,
+                      "num": 37
+                    },
+                    {
+                      "name": "college_physics",
+                      "score": 0.9368,
+                      "num": 19
+                    },
+                    {
+                      "name": "college_chemistry",
+                      "score": 0.9583,
+                      "num": 24
+                    },
+                    {
+                      "name": "advanced_mathematics",
+                      "score": 0.9158,
+                      "num": 19
+                    },
+                    {
+                      "name": "probability_and_statistics",
+                      "score": 0.8667,
+                      "num": 18
+                    },
+                    {
+                      "name": "discrete_mathematics",
+                      "score": 0.7125,
+                      "num": 16
+                    },
+                    {
+                      "name": "college_economics",
+                      "score": 0.8509,
+                      "num": 55
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "Social Science"
+                  ],
+                  "num": 220,
+                  "score": 0.9598,
+                  "macro_score": 0.9598,
+                  "subsets": [
+                    {
+                      "name": "business_administration",
+                      "score": 0.8,
+                      "num": 33
+                    },
+                    {
+                      "name": "marxism",
+                      "score": 0.9474,
+                      "num": 19
+                    },
+                    {
+                      "name": "mao_zedong_thought",
+                      "score": 0.9667,
+                      "num": 24
+                    },
+                    {
+                      "name": "education_science",
+                      "score": 0.9448,
+                      "num": 29
+                    },
+                    {
+                      "name": "teacher_qualification",
+                      "score": 0.9773,
+                      "num": 44
+                    },
+                    {
+                      "name": "high_school_politics",
+                      "score": 0.9789,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_geography",
+                      "score": 1,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_politics",
+                      "score": 1,
+                      "num": 21
+                    },
+                    {
+                      "name": "middle_school_geography",
+                      "score": 0.9167,
+                      "num": 12
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "analysis": "N/A"
+        }
+      ],
+      "log_path": ""
+    }
+  ]
+}
+
+
+

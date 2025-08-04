@@ -1,0 +1,609 @@
+{
+  "project_id": "yyz_test_20250723_1000",
+  "timestamp": "2025-06-25T011:00:15.593620Z",
+  "model_name": "Qwen",
+  "run_mode": "acc-then-bench",
+  "base_info": {
+    "device": "AIBook-32G",
+    "model": "Qwen2.5-7B-bf-16",
+    "version": "0.6.25",
+    "software_version":"",
+    "software_url": "",
+    "vllm_image_harbor": {
+      "huoshan_harbor_url": "",
+      "shanghai_harbor_url": ""
+    }
+  },
+  "tests": [
+    {
+      "test_type": "benchmark",
+      "results": [
+        {
+          "timestamp": 0,
+          "concurrency": 1,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 9.47,
+          "req_throughput": 0.11,
+          "output_throughput": 3.38,
+          "total_throughput": 6.76,
+          "avg_ttft": 816.16,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 2,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 8.49,
+          "req_throughput": 0.24,
+          "output_throughput": 3.77,
+          "total_throughput": 7.54,
+          "avg_ttft": 935.65,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 3,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 3.94,
+          "req_throughput": 0.76,
+          "output_throughput": 8.12,
+          "total_throughput": 16.24,
+          "avg_ttft": 935.82,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 4,
+          "input_tokens": 32,
+          "output_tokens": 32,
+          "expected_input": 32,
+          "expected_output": 32,
+          "avg_input": 32,
+          "avg_output": 32,
+          "total_time": 2.77,
+          "req_throughput": 1.44,
+          "output_throughput": 11.55,
+          "total_throughput": 23.10,
+          "avg_ttft": 959.94,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 1,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 34.88,
+          "req_throughput": 0.03,
+          "output_throughput": 3.67,
+          "total_throughput": 7.34,
+          "avg_ttft": 1080.39,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 2,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 32.65,
+          "req_throughput": 0.06,
+          "output_throughput": 3.92,
+          "total_throughput": 7.84,
+          "avg_ttft": 1831.09,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 3,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 15.67,
+          "req_throughput": 0.19,
+          "output_throughput": 8.17,
+          "total_throughput": 16.34,
+          "avg_ttft": 2056.50,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 4,
+          "input_tokens": 128,
+          "output_tokens": 128,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128,
+          "avg_output": 128,
+          "total_time": 12.39,
+          "req_throughput": 0.32,
+          "output_throughput": 10.33,
+          "total_throughput": 20.66,
+          "avg_ttft": 8369.31,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 1,
+          "input_tokens": 512,
+          "output_tokens": 512,
+          "expected_input": 512,
+          "expected_output": 512,
+          "avg_input": 512,
+          "avg_output": 512,
+          "total_time": 141.83,
+          "req_throughput": 0.01,
+          "output_throughput": 3.61,
+          "total_throughput": 7.22,
+          "avg_ttft": 4728.65,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 2,
+          "input_tokens": 512,
+          "output_tokens": 512,
+          "expected_input": 512,
+          "expected_output": 512,
+          "avg_input": 512,
+          "avg_output": 512,
+          "total_time": 134.03,
+          "req_throughput": 0.01,
+          "output_throughput": 3.82,
+          "total_throughput": 7.64,
+          "avg_ttft": 8554.42,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 3,
+          "input_tokens": 512,
+          "output_tokens": 512,
+          "expected_input": 512,
+          "expected_output": 512,
+          "avg_input": 512,
+          "avg_output": 512,
+          "total_time": 67.02,
+          "req_throughput": 0.04,
+          "output_throughput": 7.64,
+          "total_throughput": 15.28,
+          "avg_ttft": 12470.14,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 4,
+          "input_tokens": 512,
+          "output_tokens": 512,
+          "expected_input": 512,
+          "expected_output": 512,
+          "avg_input": 512,
+          "avg_output": 512,
+          "total_time": 47.09,
+          "req_throughput": 0.08,
+          "output_throughput": 10.87,
+          "total_throughput": 21.75,
+          "avg_ttft": 13604.34,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 1,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 294.25,
+          "req_throughput": 0.003,
+          "output_throughput": 3.48,
+          "total_throughput": 6.96,
+          "avg_ttft": 13823.76,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 2,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 272.34,
+          "req_throughput": 0.007,
+          "output_throughput": 3.76,
+          "total_throughput": 7.52,
+          "avg_ttft": 26197.88,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 3,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 142.82,
+          "req_throughput": 0.021,
+          "output_throughput": 7.17,
+          "total_throughput": 14.34,
+          "avg_ttft": 37032.63,
+          "p99_ttft": 0
+        },
+        {
+          "timestamp": 0,
+          "concurrency": 4,
+          "input_tokens": 1024,
+          "output_tokens": 1024,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024,
+          "avg_output": 1024,
+          "total_time": 101.79,
+          "req_throughput": 0.039,
+          "output_throughput": 10.06,
+          "total_throughput": 20.12,
+          "avg_ttft": 39759.93,
+          "p99_ttft": 0
+        }
+      ],
+      "log_path": ""
+    },
+    {
+      "test_type": "accuracy",
+      "datasets": [
+        {
+          "name": "bf16",
+          "dataset_name": "ceval",
+          "dataset_pretty_name": "C-Eval",
+          "dataset_description": null,
+          "model_name": "ceval",
+          "score": 0.7869,
+          "metrics": [
+            {
+              "name": "AverageAccuracy",
+              "num": 1346,
+              "score": 0.7869,
+              "macro_score": 0.7845,
+              "categories": [
+                {
+                  "name": [
+                    "Humanities"
+                  ],
+                  "num": 257,
+                  "score": 0.7969,
+                  "macro_score": 0.7979,
+                  "subsets": [
+                    {
+                      "name": "modern_chinese_history",
+                      "score": 0.8783,
+                      "num": 23
+                    },
+                    {
+                      "name": "ideological_and_moral_cultivation",
+                      "score": 0.9053,
+                      "num": 19
+                    },
+                    {
+                      "name": "logic",
+                      "score": 0.7273,
+                      "num": 22
+                    },
+                    {
+                      "name": "law",
+                      "score": 0.7333,
+                      "num": 24
+                    },
+                    {
+                      "name": "chinese_language_and_literature",
+                      "score": 0.6,
+                      "num": 23
+                    },
+                    {
+                      "name": "art_studies",
+                      "score": 0.7394,
+                      "num": 33
+                    },
+                    {
+                      "name": "professional_tour_guide",
+                      "score": 0.9103,
+                      "num": 29
+                    },
+                    {
+                      "name": "legal_professional",
+                      "score": 0.7652,
+                      "num": 23
+                    },
+                    {
+                      "name": "high_school_chinese",
+                      "score": 0.6842,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_history",
+                      "score": 0.88,
+                      "num": 20
+                    },
+                    {
+                      "name": "middle_school_history",
+                      "score": 0.9545,
+                      "num": 22
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "Other"
+                  ],
+                  "num": 384,
+                  "score": 0.7632,
+                  "macro_score": 0.7615,
+                  "subsets": [
+                    {
+                      "name": "civil_servant",
+                      "score": 0.7489,
+                      "num": 47
+                    },
+                    {
+                      "name": "sports_science",
+                      "score": 0.8632,
+                      "num": 19
+                    },
+                    {
+                      "name": "plant_protection",
+                      "score": 0.8182,
+                      "num": 22
+                    },
+                    {
+                      "name": "basic_medicine",
+                      "score": 0.8842,
+                      "num": 19
+                    },
+                    {
+                      "name": "clinical_medicine",
+                      "score": 0.7727,
+                      "num": 22
+                    },
+                    {
+                      "name": "urban_and_rural_planner",
+                      "score": 0.7174,
+                      "num": 46
+                    },
+                    {
+                      "name": "accountant",
+                      "score": 0.8082,
+                      "num": 49
+                    },
+                    {
+                      "name": "fire_engineer",
+                      "score": 0.671,
+                      "num": 31
+                    },
+                    {
+                      "name": "environmental_impact_assessment_engineer",
+                      "score": 0.7742,
+                      "num": 31
+                    },
+                    {
+                      "name": "tax_accountant",
+                      "score": 0.8204,
+                      "num": 49
+                    },
+                    {
+                      "name": "physician",
+                      "score": 0.7184,
+                      "num": 49
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "STEM"
+                  ],
+                  "num": 485,
+                  "score": 0.7426,
+                  "macro_score": 0.7458,
+                  "subsets": [
+                    {
+                      "name": "electrical_engineer",
+                      "score": 0.6324,
+                      "num": 37
+                    },
+                    {
+                      "name": "metrology_engineer",
+                      "score": 0.8417,
+                      "num": 24
+                    },
+                    {
+                      "name": "high_school_mathematics",
+                      "score": 0.6222,
+                      "num": 18
+                    },
+                    {
+                      "name": "high_school_physics",
+                      "score": 0.7263,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_chemistry",
+                      "score": 0.7263,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_biology",
+                      "score": 0.9263,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_mathematics",
+                      "score": 0.8632,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_biology",
+                      "score": 0.9048,
+                      "num": 21
+                    },
+                    {
+                      "name": "middle_school_physics",
+                      "score": 0.9474,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_chemistry",
+                      "score": 0.92,
+                      "num": 20
+                    },
+                    {
+                      "name": "veterinary_medicine",
+                      "score": 0.8087,
+                      "num": 23
+                    },
+                    {
+                      "name": "computer_network",
+                      "score": 0.7053,
+                      "num": 19
+                    },
+                    {
+                      "name": "operating_system",
+                      "score": 0.7684,
+                      "num": 19
+                    },
+                    {
+                      "name": "computer_architecture",
+                      "score": 0.8,
+                      "num": 21
+                    },
+                    {
+                      "name": "college_programming",
+                      "score": 0.8919,
+                      "num": 37
+                    },
+                    {
+                      "name": "college_physics",
+                      "score": 0.6947,
+                      "num": 19
+                    },
+                    {
+                      "name": "college_chemistry",
+                      "score": 0.7,
+                      "num": 24
+                    },
+                    {
+                      "name": "advanced_mathematics",
+                      "score": 0.5895,
+                      "num": 19
+                    },
+                    {
+                      "name": "probability_and_statistics",
+                      "score": 0.6667,
+                      "num": 18
+                    },
+                    {
+                      "name": "discrete_mathematics",
+                      "score": 0.375,
+                      "num": 16
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "Social Science"
+                  ],
+                  "num": 220,
+                  "score": 0.8568,
+                  "macro_score": 0.8542,
+                  "subsets": [
+                    {
+                      "name": "college_economics",
+                      "score": 0.68,
+                      "num": 55
+                    },
+                    {
+                      "name": "business_administration",
+                      "score": 0.7818,
+                      "num": 33
+                    },
+                    {
+                      "name": "marxism",
+                      "score": 0.9474,
+                      "num": 19
+                    },
+                    {
+                      "name": "mao_zedong_thought",
+                      "score": 0.9167,
+                      "num": 24
+                    },
+                    {
+                      "name": "education_science",
+                      "score": 0.8483,
+                      "num": 29
+                    },
+                    {
+                      "name": "teacher_qualification",
+                      "score": 0.8727,
+                      "num": 44
+                    },
+                    {
+                      "name": "high_school_politics",
+                      "score": 0.8316,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_geography",
+                      "score": 0.8842,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_politics",
+                      "score": 0.981,
+                      "num": 21
+                    },
+                    {
+                      "name": "middle_school_geography",
+                      "score": 0.95,
+                      "num": 12
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "analysis": "N/A"
+        }
+      ],
+      "log_path": ""
+    }
+  ]
+}
+
+
+

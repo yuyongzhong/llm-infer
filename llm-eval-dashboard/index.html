@@ -2,32 +2,58 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net; object-src 'none';">
   <title>大模型测试 Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
   <script src="https://cdn.jsdelivr.net/npm/tinycolor2@1.6.0/dist/tinycolor-min.js"></script>
+  <!-- 在已有依赖后添加 -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
+  <script>
+  // 在第一个 script 标签开始处添加
+  document.addEventListener('DOMContentLoaded', () => {
+    // 确保 echarts 加载完成
+    if (!window.echarts) {
+      console.error('ECharts 未能正确加载');
+      return;
+    }
+    
+    // 检查 3D 组件
+    if (!echarts.getMap) {
+      console.error('ECharts 3D 组件未加载');
+    }
+    
+    console.log('ECharts 版本:', echarts.version);
+  });
+  </script>
   <style>
     body {
-      background: #f4f8fb;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
       font-family: "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
-      color: #222c38;
+      color: #1e293b;
       padding: 2em 0 3em 0;
+      min-height: 100vh;
     }
     .container {
-      background: #fff;
-      padding: 1.7em 2.1em 2.2em 2.1em;
-      border-radius: 16px;
-      box-shadow: 0 6px 36px 0 rgba(80,100,200,0.11);
-      max-width: 1180px;
+      background: #ffffff;
+      padding: 2em 2.5em 2.5em 2.5em;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 8px 25px rgba(0,0,0,0.06);
+      max-width: 1600px;
       margin: 38px auto 0 auto;
       text-align: center;
+      border: 1px solid rgba(255,255,255,0.8);
     }
     h1 {
-      font-size: 2.3em;
-      font-weight: 900;
-      color: #145cce;
-      letter-spacing: .01em;
-      margin-bottom: 0.35em;
+      font-size: 2.5em;
+      font-weight: 800;
+      background: linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #1d4ed8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5em;
       line-height: 1.2;
       text-align: center;
     }
@@ -81,28 +107,30 @@
       letter-spacing: .01em;
     }
     .chart-wrap {
-      margin: 1.2em 0 1.5em 0;
+      position: relative;
+      margin: 1.5em 0 2em 0;
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.1);
+      padding: 1.8em;
+      min-height: 500px;
       width: 100%;
-      max-width: none;
-      background: #f4f8fd;
-      border-radius: 12px;
-      box-shadow: 0 1px 6px rgba(56,56,80,0.06);
-      padding: 0.7em 1.4em 0.5em 1.4em;
+      overflow: visible;
+      border: 1px solid rgba(226, 232, 240, 0.8);
     }
-    .chart-wrap canvas {
+    .chart-wrap > div:not(.chart-title) {
       width: 100% !important;
-      max-width: none;
-      min-width: 320px;
-      height: 420px !important;
-      display: block;
-      margin: 0 auto;
+      height: 100% !important;
+      min-height: 450px;  /* 确保图表容器有足够高度 */
     }
     .chart-title {
-      font-size: 1.14em;
+      font-size: 1.3em;
       font-weight: 700;
-      margin: 0.2em 0 0.6em 0.4em;
-      color: #2757b6;
-      letter-spacing: .01em;
+      margin-bottom: 1.2em;
+      color: #1e40af;
+      text-align: left;
+      padding-bottom: 0.5em;
+      border-bottom: 2px solid #e2e8f0;
     }
     .version-section {
       border-top: 1px solid #e4eaf0;
@@ -165,6 +193,359 @@
       .container { padding: 0.7em 0.2em 1.1em 0.2em; }
       .summary-cards { flex-direction: column; gap: 0.7em; }
     }
+    
+    /* 在已有样式后添加 */
+    .chart-wrap {
+      position: relative;
+    }
+    
+    .chart-filter {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+    }
+    
+    select.token-filter {
+      background-color: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 4px 24px 4px 8px;
+      font-size: 0.9em;
+      color: #4a5568;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    select.token-filter:hover {
+      border-color: #cbd5e0;
+    }
+
+    /* 添加到现有样式中 */
+    .chart-filters select {
+      background-color: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 4px 24px 4px 8px;
+      font-size: 0.9em;
+      color: #4a5568;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chart-filters select:hover {
+      border-color: #cbd5e0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .chart-filters label {
+      font-size: 0.9em;
+      color: #4a5568;
+    }
+
+    /* 筛选器样式 */
+    .filter-container {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border: 1px solid #cbd5e0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    /* 图表配置器样式 */
+    .chart-config-container {
+      background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+      border: 2px solid #fb923c;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(251,146,60,0.15);
+    }
+
+    .chart-config-title {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #ea580c;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .chart-type-selector {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .chart-type-option {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #fed7aa;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .chart-type-option:hover {
+      border-color: #fb923c;
+      background: #fff7ed;
+    }
+
+    .chart-type-option.active {
+      border-color: #ea580c;
+      background: #fed7aa;
+      color: #ea580c;
+      font-weight: 600;
+    }
+
+    .axis-config {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .axis-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .axis-group label {
+      font-size: 0.9em;
+      color: #ea580c;
+      font-weight: 600;
+    }
+
+    .axis-group select {
+      background-color: white;
+      border: 2px solid #fed7aa;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.9em;
+      color: #374151;
+      cursor: pointer;
+    }
+
+    .axis-group select:focus {
+      outline: none;
+      border-color: #fb923c;
+    }
+
+    /* 维度配置样式 */
+    .dimension-config {
+      padding: 12px;
+      border: 2px solid #fed7aa;
+      border-radius: 8px;
+      background: white;
+      transition: all 0.2s ease;
+    }
+
+    .dimension-config.active {
+      border-color: #fb923c;
+      background: #fff7ed;
+    }
+
+    .dimension-config.disabled {
+      opacity: 0.6;
+      background: #f9fafb;
+    }
+
+    .dimension-header {
+      margin-bottom: 8px;
+      color: #ea580c;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+    }
+
+    .dimension-config select:disabled {
+      background-color: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    /* 图表容器样式优化 */
+    .chart-container {
+      width: 1000px !important;
+      height: 500px !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
+    }
+
+    .chart-wrap {
+      width: 100%;
+      margin-bottom: 20px;
+      padding: 0;
+    }
+
+    .chart-wrap .chart-container {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .filter-title {
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .filter-group {
+      position: relative;
+    }
+
+    .filter-group label {
+      font-size: 0.9em;
+      color: #4a5568;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .filter-group {
+      position: relative;
+    }
+
+    .filter-group select {
+      width: 100%;
+      background-color: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 32px 8px 12px;
+      font-size: 0.9em;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 8px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+      height: 40px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .filter-group select[multiple] {
+      height: auto;
+      min-height: 40px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: normal;
+    }
+
+    .filter-group select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      height: auto;
+      min-height: 120px;
+    }
+
+    .filter-group select:hover {
+      border-color: #cbd5e0;
+    }
+
+    .filter-group select option {
+      padding: 6px 12px;
+      margin: 1px 0;
+      background-color: white;
+      color: #374151;
+    }
+
+    .filter-group select option:checked {
+      background-color: #3b82f6 !important;
+      color: white !important;
+    }
+
+    .filter-group select option:hover {
+      background-color: #f3f4f6;
+    }
+
+    /* 选中项计数显示 */
+    .filter-group::after {
+      content: attr(data-selected-count);
+      position: absolute;
+      right: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #3b82f6;
+      color: white;
+      border-radius: 10px;
+      padding: 2px 6px;
+      font-size: 0.75em;
+      font-weight: 600;
+      pointer-events: none;
+      display: none;
+    }
+
+    .filter-group.has-selection::after {
+      display: block;
+    }
+
+    /* 表格样式 */
+    .data-table-container {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      color: #374151;
+      font-weight: 600;
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 2px solid #e5e7eb;
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 6px 12px;
+      border-bottom: 1px solid #f3f4f6;
+      color: #6b7280;
+    }
+
+    .data-table tbody tr:hover {
+      background-color: #f9fafb;
+    }
+
+    .data-table .number {
+      text-align: right;
+      font-family: 'Courier New', monospace;
+      color: #1f2937;
+    }
   </style>
 </head>
 <body>
@@ -200,12 +581,879 @@
       return 0;
     }
     function compareVersionAsc(a, b) {
-      const va = parseVersion(a), vb = parseVersion(b);
+      // 将版本号分解为数字部分和后缀部分
+      const [aBase, aSuffix=''] = a.split('_');
+      const [bBase, bSuffix=''] = b.split('_');
+
+      // 比较基础版本号
+      const va = parseVersion(aBase);
+      const vb = parseVersion(bBase);
+
+      // 先比较数字部分
       for (let i = 0; i < Math.max(va.length, vb.length); i++) {
-        const na = va[i] || 0, nb = vb[i] || 0;
+        const na = va[i] || 0;
+        const nb = vb[i] || 0;
         if (na !== nb) return na - nb;
       }
+
+      // 如果数字部分相同，有 beta 后缀的版本排在前面
+      if (aBase === bBase) {
+        if (aSuffix.includes('beta')) return -1;
+        if (bSuffix.includes('beta')) return 1;
+      }
+
       return 0;
+    }
+
+    // 创建图表配置器
+    function createChartConfigContainer(perfRows, device) {
+      const container = document.createElement('div');
+      container.className = 'chart-config-container';
+
+      container.innerHTML = `
+        <div class="chart-config-title">
+          📊 图表配置器 - 二维图表配置
+          <div style="font-size: 0.8em; color: #666; margin-top: 4px;">固定不需要的维度，选择要对比的维度</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px;">
+          <!-- 维度1 -->
+          <div class="dimension-config" id="dim1-config">
+            <div class="dimension-header">
+              <strong>📌 维度1 (固定)</strong>
+            </div>
+            <div class="axis-group">
+              <label>选择维度</label>
+              <select id="dim1-select">
+                <option value="">请选择...</option>
+                <option value="model">模型</option>
+                <option value="version">版本</option>
+                <option value="concurrency">并发数</option>
+                <option value="token_combination">输入/输出</option>
+              </select>
+            </div>
+            <div class="axis-group" id="dim1-value-group" style="display: none;">
+              <label>固定为</label>
+              <select id="dim1-value">
+                <option value="">选择值...</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 维度2 -->
+          <div class="dimension-config" id="dim2-config">
+            <div class="dimension-header">
+              <strong>📌 维度2 (固定)</strong>
+            </div>
+            <div class="axis-group">
+              <label>选择维度</label>
+              <select id="dim2-select" disabled>
+                <option value="">请选择...</option>
+                <option value="model">模型</option>
+                <option value="version">版本</option>
+                <option value="concurrency">并发数</option>
+                <option value="token_combination">输入/输出</option>
+              </select>
+            </div>
+            <div class="axis-group" id="dim2-value-group" style="display: none;">
+              <label>固定为</label>
+              <select id="dim2-value">
+                <option value="">选择值...</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 维度3 -->
+          <div class="dimension-config" id="dim3-config">
+            <div class="dimension-header">
+              <strong>📌 维度3 (可选固定)</strong>
+              <label style="margin-left: 8px; font-weight: normal;">
+                <input type="checkbox" id="dim3-enable"> 启用
+              </label>
+            </div>
+            <div class="axis-group">
+              <label>选择维度</label>
+              <select id="dim3-select" disabled>
+                <option value="">请选择...</option>
+                <option value="model">模型</option>
+                <option value="version">版本</option>
+                <option value="concurrency">并发数</option>
+                <option value="token_combination">输入/输出</option>
+              </select>
+            </div>
+            <div class="axis-group" id="dim3-value-group" style="display: none;">
+              <label>固定为</label>
+              <select id="dim3-value">
+                <option value="">选择值...</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- X轴选择 -->
+          <div class="dimension-config" id="x-axis-config">
+            <div class="dimension-header">
+              <strong>📊 X轴</strong>
+            </div>
+            <div class="axis-group">
+              <label>选择维度</label>
+              <select id="x-axis-select" disabled>
+                <option value="">请选择...</option>
+                <option value="model">模型</option>
+                <option value="version">版本</option>
+                <option value="concurrency">并发数</option>
+                <option value="token_combination">输入/输出</option>
+              </select>
+            </div>
+            <div id="legend-info" style="margin-top: 8px; padding: 8px; background: #f0f9ff; border-radius: 4px; font-size: 0.85em; display: none;">
+              <strong>图例分组:</strong> <span id="legend-dim"></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="chart-summary" style="padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6; display: none;">
+          <strong>📋 图表配置总结:</strong>
+          <div id="summary-content" style="margin-top: 8px; font-size: 0.9em;"></div>
+        </div>
+      `;
+
+      // 变量选项
+      const variableOptions = [
+        { value: 'model', label: '模型' },
+        { value: 'version', label: '版本' },
+        { value: 'concurrency', label: '并发数' },
+        { value: 'token_combination', label: '输入/输出' }
+      ];
+
+      // 获取已选择的维度
+      function getSelectedDimensions() {
+        const selected = [];
+        const dim1 = container.querySelector('#dim1-select').value;
+        const dim2 = container.querySelector('#dim2-select').value;
+        const dim3 = container.querySelector('#dim3-select').value;
+        const dim3Enabled = container.querySelector('#dim3-enable').checked;
+
+        if (dim1) selected.push(dim1);
+        if (dim2) selected.push(dim2);
+        if (dim3Enabled && dim3) selected.push(dim3);
+
+        return selected;
+      }
+
+      // 更新可选维度
+      function updateAvailableOptions() {
+        const selectedDims = getSelectedDimensions();
+        const selects = [
+          container.querySelector('#dim1-select'),
+          container.querySelector('#dim2-select'),
+          container.querySelector('#dim3-select'),
+          container.querySelector('#x-axis-select')
+        ];
+
+        selects.forEach(select => {
+          if (!select) return;
+
+          Array.from(select.options).forEach(option => {
+            if (option.value === '') return;
+
+            // 如果是当前选择器的值，保持可用
+            if (option.value === select.value) {
+              option.disabled = false;
+              return;
+            }
+
+            // 如果被其他选择器选中，禁用
+            option.disabled = selectedDims.includes(option.value);
+          });
+        });
+
+        // 更新X轴可选项
+        updateXAxisOptions();
+      }
+
+      // 更新X轴选项
+      function updateXAxisOptions() {
+        const selectedDims = getSelectedDimensions();
+        const xAxisSelect = container.querySelector('#x-axis-select');
+        const availableDims = variableOptions.filter(opt => !selectedDims.includes(opt.value));
+
+        // 清空并重新填充X轴选项
+        xAxisSelect.innerHTML = '<option value="">请选择...</option>' +
+          availableDims.map(dim => `<option value="${dim.value}">${dim.label}</option>`).join('');
+
+        // 启用X轴选择器（如果有可选项）
+        xAxisSelect.disabled = availableDims.length === 0;
+
+        // 更新图例信息
+        updateLegendInfo();
+      }
+
+      // 更新图例信息
+      function updateLegendInfo() {
+        const selectedDims = getSelectedDimensions();
+        const xAxis = container.querySelector('#x-axis-select').value;
+        const legendInfo = container.querySelector('#legend-info');
+        const legendDim = container.querySelector('#legend-dim');
+
+        if (xAxis) {
+          const allUsedDims = [...selectedDims, xAxis];
+          const remainingDims = variableOptions.filter(opt => !allUsedDims.includes(opt.value));
+
+          if (remainingDims.length === 1) {
+            legendDim.textContent = remainingDims[0].label;
+            legendInfo.style.display = 'block';
+          } else if (remainingDims.length > 1) {
+            legendDim.textContent = remainingDims.map(d => d.label).join('、');
+            legendInfo.style.display = 'block';
+          } else {
+            legendInfo.style.display = 'none';
+          }
+        } else {
+          legendInfo.style.display = 'none';
+        }
+
+        updateSummary();
+      }
+
+      // 更新配置总结
+      function updateSummary() {
+        const dim1 = container.querySelector('#dim1-select').value;
+        const dim1Value = container.querySelector('#dim1-value').value;
+        const dim2 = container.querySelector('#dim2-select').value;
+        const dim2Value = container.querySelector('#dim2-value').value;
+        const dim3 = container.querySelector('#dim3-select').value;
+        const dim3Value = container.querySelector('#dim3-value').value;
+        const dim3Enabled = container.querySelector('#dim3-enable').checked;
+        const xAxis = container.querySelector('#x-axis-select').value;
+
+        const summary = container.querySelector('#chart-summary');
+        const summaryContent = container.querySelector('#summary-content');
+
+        if (dim1 && dim2 && xAxis) {
+          let summaryText = '';
+
+          // 固定维度
+          const fixedDims = [];
+          if (dim1 && dim1Value) {
+            const label = variableOptions.find(opt => opt.value === dim1).label;
+            fixedDims.push(`${label}: ${dim1Value}`);
+          }
+          if (dim2 && dim2Value) {
+            const label = variableOptions.find(opt => opt.value === dim2).label;
+            fixedDims.push(`${label}: ${dim2Value}`);
+          }
+          if (dim3Enabled && dim3 && dim3Value) {
+            const label = variableOptions.find(opt => opt.value === dim3).label;
+            fixedDims.push(`${label}: ${dim3Value}`);
+          }
+
+          if (fixedDims.length > 0) {
+            summaryText += `<div><strong>固定维度:</strong> ${fixedDims.join('、')}</div>`;
+          }
+
+          // X轴
+          const xAxisLabel = variableOptions.find(opt => opt.value === xAxis).label;
+          summaryText += `<div><strong>X轴:</strong> ${xAxisLabel}</div>`;
+
+          // 图例
+          const selectedDims = getSelectedDimensions();
+          const allUsedDims = [...selectedDims, xAxis];
+          const legendDims = variableOptions.filter(opt => !allUsedDims.includes(opt.value));
+          if (legendDims.length > 0) {
+            summaryText += `<div><strong>图例分组:</strong> ${legendDims.map(d => d.label).join('、')}</div>`;
+          }
+
+          summaryContent.innerHTML = summaryText;
+          summary.style.display = 'block';
+        } else {
+          summary.style.display = 'none';
+        }
+      }
+
+      // 填充维度值选项
+      function populateDimensionValues(dimension, selectElement) {
+        const values = new Set();
+
+        // 使用当前设备的perfRows数据，不是全局数据
+        console.log('填充维度值选项:', dimension, '设备:', device, '数据量:', perfRows.length);
+
+        perfRows.forEach(row => {
+          let value;
+          switch (dimension) {
+            case 'model':
+              const remark = row.entry?.base_info?.remark?.trim() || '';
+              value = remark ? `${row.model} (${remark})` : row.model;
+              break;
+            case 'version':
+              value = row.version;
+              break;
+            case 'concurrency':
+              value = row.concurrency.toString();
+              break;
+            case 'token_combination':
+              const expectedIn = row.expected_input || row.input_tokens;
+              const expectedOut = row.expected_output || row.output_tokens;
+              value = `${expectedIn}/${expectedOut}`;
+              break;
+          }
+          if (value) {
+            values.add(value);
+            console.log(`添加${dimension}值:`, value);
+          }
+        });
+
+        console.log(`${dimension}的所有值:`, Array.from(values));
+        selectElement.innerHTML = '<option value="">选择值...</option>' +
+          Array.from(values).sort().map(value =>
+            `<option value="${value}">${value}</option>`
+          ).join('');
+      }
+
+      // 维度1选择事件
+      container.querySelector('#dim1-select').addEventListener('change', function() {
+        console.log('🎯 维度1选择变化:', this.value);
+        const valueGroup = container.querySelector('#dim1-value-group');
+        const valueSelect = container.querySelector('#dim1-value');
+        const dim2Select = container.querySelector('#dim2-select');
+
+        if (this.value) {
+          console.log('📊 开始填充维度1的值选项');
+          populateDimensionValues(this.value, valueSelect);
+          valueGroup.style.display = 'block';
+          dim2Select.disabled = false;
+          container.querySelector('#dim1-config').classList.add('active');
+          console.log('✅ 维度1配置完成');
+        } else {
+          valueGroup.style.display = 'none';
+          dim2Select.disabled = true;
+          container.querySelector('#dim1-config').classList.remove('active');
+        }
+
+        updateAvailableOptions();
+      });
+
+      // 维度2选择事件
+      container.querySelector('#dim2-select').addEventListener('change', function() {
+        const valueGroup = container.querySelector('#dim2-value-group');
+        const valueSelect = container.querySelector('#dim2-value');
+        const dim3Enable = container.querySelector('#dim3-enable');
+
+        if (this.value) {
+          populateDimensionValues(this.value, valueSelect);
+          valueGroup.style.display = 'block';
+          dim3Enable.disabled = false;
+          container.querySelector('#dim2-config').classList.add('active');
+        } else {
+          valueGroup.style.display = 'none';
+          dim3Enable.disabled = true;
+          container.querySelector('#dim2-config').classList.remove('active');
+        }
+
+        updateAvailableOptions();
+      });
+
+      // 维度3启用事件
+      container.querySelector('#dim3-enable').addEventListener('change', function() {
+        const dim3Select = container.querySelector('#dim3-select');
+        const dim3Config = container.querySelector('#dim3-config');
+
+        if (this.checked) {
+          dim3Select.disabled = false;
+          dim3Config.classList.remove('disabled');
+        } else {
+          dim3Select.disabled = true;
+          dim3Select.value = '';
+          container.querySelector('#dim3-value-group').style.display = 'none';
+          dim3Config.classList.add('disabled');
+          dim3Config.classList.remove('active');
+        }
+
+        updateAvailableOptions();
+      });
+
+      // 维度3选择事件
+      container.querySelector('#dim3-select').addEventListener('change', function() {
+        const valueGroup = container.querySelector('#dim3-value-group');
+        const valueSelect = container.querySelector('#dim3-value');
+
+        if (this.value) {
+          populateDimensionValues(this.value, valueSelect);
+          valueGroup.style.display = 'block';
+          container.querySelector('#dim3-config').classList.add('active');
+        } else {
+          valueGroup.style.display = 'none';
+          container.querySelector('#dim3-config').classList.remove('active');
+        }
+
+        updateAvailableOptions();
+      });
+
+      // X轴选择事件
+      container.querySelector('#x-axis-select').addEventListener('change', function() {
+        if (this.value) {
+          container.querySelector('#x-axis-config').classList.add('active');
+        } else {
+          container.querySelector('#x-axis-config').classList.remove('active');
+        }
+
+        updateLegendInfo();
+
+        // 直接触发图表更新
+        setTimeout(() => {
+          triggerChartUpdate();
+        }, 100);
+      });
+
+      // 值选择事件
+      ['#dim1-value', '#dim2-value', '#dim3-value'].forEach(selector => {
+        container.querySelector(selector).addEventListener('change', () => {
+          updateSummary();
+          // 直接触发图表更新
+          setTimeout(() => {
+            triggerChartUpdate();
+          }, 100);
+        });
+      });
+
+      // 直接触发图表更新的函数
+      function triggerChartUpdate() {
+        console.log('🔄 触发图表更新，设备:', device, '数据量:', perfRows.length);
+        const deviceKey = String(device).replace(/\s+/g, '-');
+        console.log('查找图表实例，deviceKey:', deviceKey);
+        console.log('可用的图表实例:', window.chartInstances);
+
+        const chartInstance = window.chartInstances?.[deviceKey]?.configurableChart;
+        if (chartInstance) {
+          console.log('✅ 找到图表实例，开始更新');
+          // 使用当前设备的perfRows，不是全局数据
+          updateConfigurableChart(chartInstance, perfRows, device, container);
+        } else {
+          console.error('❌ 未找到图表实例:', deviceKey);
+          console.log('尝试重新初始化图表...');
+          // 尝试重新找到图表容器并初始化
+          const chartContainer = container.querySelector('.chart-container');
+          if (chartContainer) {
+            const newChart = echarts.init(chartContainer);
+            if (!window.chartInstances) window.chartInstances = {};
+            if (!window.chartInstances[deviceKey]) window.chartInstances[deviceKey] = {};
+            window.chartInstances[deviceKey].configurableChart = newChart;
+            updateConfigurableChart(newChart, perfRows, device, container);
+          }
+        }
+      }
+
+      // 初始化状态
+      container.querySelector('#dim3-config').classList.add('disabled');
+
+      // 标记容器，稍后设置默认配置
+      container.dataset.device = device;
+      container.dataset.needsDefaultConfig = 'true';
+
+      return container;
+    }
+
+    // 设置默认配置
+    function setDefaultConfiguration(container, device, perfRows) {
+      console.log('🎯 设置默认配置，设备:', device);
+
+      // 获取设备的可用数据
+      const models = [...new Set(perfRows.map(r => r.model))].sort();
+      const versions = [...new Set(perfRows.map(r => r.version))].sort(compareVersionAsc);
+
+      console.log('可用模型:', models);
+      console.log('可用版本:', versions);
+
+      let defaultConfig = {};
+
+      // 根据设备设置不同的默认配置
+      if (device.includes('s4000')) {
+        // s4000设备：模型选择671b(6core)，版本选择最新版本，X轴选择并发数
+        const target671b = models.find(m => m.includes('671b') && m.includes('6core'));
+        if (target671b) {
+          defaultConfig = {
+            dim1: { dimension: 'model', value: target671b },
+            dim2: { dimension: 'version', value: versions[versions.length - 1] }, // 最新版本
+            xAxis: 'concurrency'
+          };
+        }
+      } else {
+        // 其他设备：选择第一个可用模型
+        if (models.length > 0) {
+          defaultConfig = {
+            dim1: { dimension: 'model', value: models[0] },
+            dim2: { dimension: 'version', value: versions[versions.length - 1] }, // 最新版本
+            xAxis: 'concurrency'
+          };
+        }
+      }
+
+      console.log('默认配置:', defaultConfig);
+
+      // 应用默认配置
+      if (defaultConfig.dim1) {
+        const dim1Select = container.querySelector('#dim1-select');
+        const dim1ValueSelect = container.querySelector('#dim1-value');
+
+        // 设置维度1
+        console.log('🔧 设置维度1:', defaultConfig.dim1.dimension);
+        dim1Select.value = defaultConfig.dim1.dimension;
+
+        // 手动触发change事件
+        const changeEvent = new Event('change', { bubbles: true });
+        dim1Select.dispatchEvent(changeEvent);
+        console.log('✅ 维度1事件已触发');
+
+        // 等待维度1的值选项加载完成
+        setTimeout(() => {
+          console.log('🔍 检查维度1值选项是否已加载');
+          console.log('可用选项:', Array.from(dim1ValueSelect.options).map(o => o.value));
+
+          if (dim1ValueSelect.querySelector(`option[value="${defaultConfig.dim1.value}"]`)) {
+            console.log('🔧 设置维度1值:', defaultConfig.dim1.value);
+            dim1ValueSelect.value = defaultConfig.dim1.value;
+
+            const valueChangeEvent = new Event('change', { bubbles: true });
+            dim1ValueSelect.dispatchEvent(valueChangeEvent);
+            console.log('✅ 维度1值已设置:', defaultConfig.dim1.value);
+          } else {
+            console.log('❌ 维度1值不存在:', defaultConfig.dim1.value);
+            console.log('尝试使用第一个可用值');
+            if (dim1ValueSelect.options.length > 1) {
+              dim1ValueSelect.value = dim1ValueSelect.options[1].value;
+              dim1ValueSelect.dispatchEvent(new Event('change', { bubbles: true }));
+              console.log('✅ 使用第一个可用值:', dim1ValueSelect.value);
+            }
+          }
+
+          // 设置维度2
+          if (defaultConfig.dim2) {
+            const dim2Select = container.querySelector('#dim2-select');
+            const dim2ValueSelect = container.querySelector('#dim2-value');
+
+            console.log('🔧 设置维度2:', defaultConfig.dim2.dimension);
+            dim2Select.value = defaultConfig.dim2.dimension;
+            dim2Select.dispatchEvent(new Event('change', { bubbles: true }));
+            console.log('✅ 维度2已设置:', defaultConfig.dim2.dimension);
+
+            setTimeout(() => {
+              console.log('🔍 检查维度2值选项');
+              if (dim2ValueSelect.querySelector(`option[value="${defaultConfig.dim2.value}"]`)) {
+                console.log('🔧 设置维度2值:', defaultConfig.dim2.value);
+                dim2ValueSelect.value = defaultConfig.dim2.value;
+                dim2ValueSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                console.log('✅ 维度2值已设置:', defaultConfig.dim2.value);
+              } else {
+                console.log('❌ 维度2值不存在:', defaultConfig.dim2.value);
+                if (dim2ValueSelect.options.length > 1) {
+                  dim2ValueSelect.value = dim2ValueSelect.options[1].value;
+                  dim2ValueSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                  console.log('✅ 使用第一个可用值:', dim2ValueSelect.value);
+                }
+              }
+
+              // 设置X轴
+              if (defaultConfig.xAxis) {
+                const xAxisSelect = container.querySelector('#x-axis-select');
+                setTimeout(() => {
+                  console.log('🔧 设置X轴:', defaultConfig.xAxis);
+                  if (xAxisSelect.querySelector(`option[value="${defaultConfig.xAxis}"]`)) {
+                    xAxisSelect.value = defaultConfig.xAxis;
+                    xAxisSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    console.log('✅ X轴已设置:', defaultConfig.xAxis);
+
+                    // 最后触发一次图表更新
+                    setTimeout(() => {
+                      console.log('🎯 触发最终图表更新');
+                      const deviceKey = String(device).replace(/\s+/g, '-');
+                      const chartInstance = window.chartInstances?.[deviceKey]?.configurableChart;
+                      const perfRows = window.devicePerfRows?.[deviceKey] || [];
+
+                      if (chartInstance && perfRows.length > 0) {
+                        updateConfigurableChart(chartInstance, perfRows, device, container);
+                        console.log('✅ 默认图表更新完成');
+                      } else {
+                        console.log('❌ 图表实例或数据不存在');
+                      }
+                    }, 200);
+                  } else {
+                    console.log('❌ X轴选项不存在:', defaultConfig.xAxis);
+                  }
+                }, 100);
+              }
+            }, 300);
+          }
+        }, 200);
+      }
+    }
+
+    // 创建性能测试筛选器容器
+    function createPerfFilterContainer(perfRows, device, allData) {
+      const container = document.createElement('div');
+      container.className = 'filter-container';
+
+      // 获取模型信息，包含备注，按model+remark组合分组
+      const modelCombinations = new Map();
+      perfRows.forEach(row => {
+        const model = row.model;
+        const remark = row.entry?.base_info?.remark?.trim() || '';
+        const combinationKey = remark ? `${model}_${remark}` : model;
+        const displayName = remark ? `${model} (${remark})` : model;
+
+        if (!modelCombinations.has(combinationKey)) {
+          modelCombinations.set(combinationKey, {
+            baseModel: model,
+            displayName: displayName,
+            remark: remark
+          });
+        }
+      });
+
+      // 获取所有唯一的模型组合
+      const models = Array.from(modelCombinations.keys()).sort();
+      const versions = [...new Set(perfRows.map(r => r.version))].sort(compareVersionAsc);
+      const concurrencies = [...new Set(perfRows.map(r => r.concurrency))].sort((a, b) => a - b);
+
+      // 合并输入输出tokens为组合 (使用expected_input和expected_output)
+      const tokenCombinations = [...new Set(perfRows.map(r =>
+        `${r.expected_input || r.input_tokens}/${r.expected_output || r.output_tokens}`
+      ))].sort((a, b) => {
+        const [aIn, aOut] = a.split('/').map(Number);
+        const [bIn, bOut] = b.split('/').map(Number);
+        return (aIn + aOut) - (bIn + bOut);
+      });
+
+      container.innerHTML = `
+        <div class="filter-title">
+          🔍 数据筛选器 <small style="color: #6b7280; font-weight: normal;">(点击展开多选)</small>
+        </div>
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label>模型</label>
+            <select multiple data-filter="model">
+              <option value="__ALL__" selected>🔘 全选</option>
+              ${models.map(modelKey => {
+                const modelInfo = modelCombinations.get(modelKey);
+                return `<option value="${modelKey}" selected>${modelInfo.displayName}</option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>版本</label>
+            <select multiple data-filter="version">
+              <option value="__ALL__" selected>🔘 全选</option>
+              ${versions.map(v => `<option value="${v}" selected>${v}</option>`).join('')}
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>并发数</label>
+            <select multiple data-filter="concurrency">
+              <option value="__ALL__" selected>🔘 全选</option>
+              ${concurrencies.map(c => `<option value="${c}" selected>${c}</option>`).join('')}
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>输入/输出 Tokens</label>
+            <select multiple data-filter="token_combination">
+              <option value="__ALL__" selected>🔘 全选</option>
+              ${tokenCombinations.map(combo => `<option value="${combo}" selected>${combo}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      `;
+
+      // 添加选中项计数功能和全选逻辑
+      const selects = container.querySelectorAll('select[multiple]');
+      selects.forEach(select => {
+        const updateCount = () => {
+          const selectedCount = select.selectedOptions.length;
+          const totalCount = select.options.length;
+          const group = select.closest('.filter-group');
+
+          if (selectedCount === totalCount) {
+            group.classList.remove('has-selection');
+          } else {
+            group.classList.add('has-selection');
+            group.setAttribute('data-selected-count', selectedCount);
+          }
+        };
+
+        // 全选逻辑处理
+        select.addEventListener('change', (e) => {
+          const allOption = select.querySelector('option[value="__ALL__"]');
+          const otherOptions = Array.from(select.options).filter(opt => opt.value !== '__ALL__');
+
+          if (e.target.value === '__ALL__') {
+            if (allOption.selected) {
+              // 选中全选时，选中所有其他选项
+              otherOptions.forEach(opt => opt.selected = true);
+            } else {
+              // 取消全选时，取消所有其他选项
+              otherOptions.forEach(opt => opt.selected = false);
+            }
+          } else {
+            // 选择具体选项时，检查是否需要更新全选状态
+            const allOthersSelected = otherOptions.every(opt => opt.selected);
+            const anyOtherSelected = otherOptions.some(opt => opt.selected);
+
+            if (allOthersSelected) {
+              allOption.selected = true;
+            } else if (!anyOtherSelected) {
+              allOption.selected = false;
+            }
+          }
+
+          updateCount();
+        });
+
+        updateCount(); // 初始化
+      });
+
+      return container;
+    }
+
+    // 创建精度测试筛选器容器
+    function createAccFilterContainer(accRows, device, allData) {
+      const container = document.createElement('div');
+      container.className = 'filter-container';
+
+      // 获取模型信息，包含备注，按model+remark组合分组
+      const modelCombinations = new Map();
+      accRows.forEach(row => {
+        const model = row.model;
+        const remark = row.entry?.base_info?.remark?.trim() || '';
+        const combinationKey = remark ? `${model}_${remark}` : model;
+        const displayName = remark ? `${model} (${remark})` : model;
+
+        if (!modelCombinations.has(combinationKey)) {
+          modelCombinations.set(combinationKey, {
+            baseModel: model,
+            displayName: displayName,
+            remark: remark
+          });
+        }
+      });
+
+      // 获取所有唯一的模型组合和版本
+      const models = Array.from(modelCombinations.keys()).sort();
+      const versions = [...new Set(accRows.map(r => r.version))].sort(compareVersionAsc);
+
+      container.innerHTML = `
+        <div class="filter-title">
+          🔍 精度测试筛选器 <small style="color: #6b7280; font-weight: normal;">(点击展开多选)</small>
+        </div>
+        <div class="filter-grid">
+          <div class="filter-group">
+            <label>模型</label>
+            <select multiple data-filter="model">
+              <option value="__ALL__" selected>🔘 全选</option>
+              ${models.map(modelKey => {
+                const modelInfo = modelCombinations.get(modelKey);
+                return `<option value="${modelKey}" selected>${modelInfo.displayName}</option>`;
+              }).join('')}
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>版本</label>
+            <select multiple data-filter="version">
+              <option value="__ALL__" selected>🔘 全选</option>
+              ${versions.map(v => `<option value="${v}" selected>${v}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      `;
+
+      // 添加选中项计数功能和全选逻辑
+      const selects = container.querySelectorAll('select[multiple]');
+      selects.forEach(select => {
+        const updateCount = () => {
+          const selectedCount = select.selectedOptions.length;
+          const totalCount = select.options.length;
+          const group = select.closest('.filter-group');
+
+          if (selectedCount === totalCount) {
+            group.classList.remove('has-selection');
+          } else {
+            group.classList.add('has-selection');
+            group.setAttribute('data-selected-count', selectedCount);
+          }
+        };
+
+        // 全选逻辑处理
+        select.addEventListener('change', (e) => {
+          const allOption = select.querySelector('option[value="__ALL__"]');
+          const otherOptions = Array.from(select.options).filter(opt => opt.value !== '__ALL__');
+
+          if (e.target.value === '__ALL__') {
+            if (allOption.selected) {
+              // 选中全选时，选中所有其他选项
+              otherOptions.forEach(opt => opt.selected = true);
+            } else {
+              // 取消全选时，取消所有其他选项
+              otherOptions.forEach(opt => opt.selected = false);
+            }
+          } else {
+            // 选择具体选项时，检查是否需要更新全选状态
+            const allOthersSelected = otherOptions.every(opt => opt.selected);
+            const anyOtherSelected = otherOptions.some(opt => opt.selected);
+
+            if (allOthersSelected) {
+              allOption.selected = true;
+            } else if (!anyOtherSelected) {
+              allOption.selected = false;
+            }
+          }
+
+          updateCount();
+        });
+
+        updateCount(); // 初始化
+      });
+
+      return container;
+    }
+
+    // 创建数据表格 (默认隐藏)
+    function createDataTable(perfRows, device) {
+      const container = document.createElement('div');
+      container.className = 'data-table-container';
+      container.id = `table-${device.replace(/\s+/g, '-')}`;
+      container.style.display = 'none'; // 默认隐藏表格
+
+      const table = document.createElement('table');
+      table.className = 'data-table';
+
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>模型</th>
+            <th>版本</th>
+            <th>并发数</th>
+            <th>输入Tokens</th>
+            <th>输出Tokens</th>
+            <th>吞吐率 (output)</th>
+            <th>总吞吐率</th>
+            <th>平均TTFT (ms)</th>
+            <th>P99 TTFT (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${perfRows.map(row => `
+            <tr>
+              <td>${row.model}</td>
+              <td>${row.version}</td>
+              <td class="number">${row.concurrency}</td>
+              <td class="number">${row.expected_input || row.input_tokens}</td>
+              <td class="number">${row.expected_output || row.output_tokens}</td>
+              <td class="number">${row.output_throughput?.toFixed(2) || '-'}</td>
+              <td class="number">${row.total_throughput?.toFixed(2) || '-'}</td>
+              <td class="number">${row.avg_ttft?.toFixed(2) || '-'}</td>
+              <td class="number">${row.p99_ttft?.toFixed(2) || '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+
+      container.appendChild(table);
+      return container;
     }
     async function fetchAllResults() {
       const now = Date.now();
@@ -235,6 +1483,14 @@
       }
       return { maxOutput, minTTFT, latestAcc };
     }
+    function getDevicePriority(device) {
+      const deviceLower = device.toLowerCase();
+      if (deviceLower.includes('000')) return 1;       // S系列优先
+      if (deviceLower.includes('tiansi')) return 2;  // 天思其次
+      if (deviceLower.includes('model')) return 3;   // Model第三
+      if (deviceLower.includes('book')) return 4;    // Book最后
+      return 5;                                      // 其他设备
+    }
     function renderGroupedResults(data) {
       const app = document.getElementById("app");
       app.innerHTML = "";
@@ -242,316 +1498,156 @@
       for (const entry of data) {
         const device = entry.base_info?.device || "未知设备";
         const version = entry.base_info?.version || "0.0.0";
-        const model = entry.base_info?.model || entry.model_name || "unknown";
+        const baseModel = entry.base_info?.model || entry.model_name || "unknown";
+        const remark = entry.base_info?.remark?.trim() || '';
+        // 使用模型+remark作为唯一标识
+        const model = remark ? `${baseModel}_${remark}` : baseModel;
+
         if (!grouped[device]) grouped[device] = {};
         if (!grouped[device][version]) grouped[device][version] = {};
         if (!grouped[device][version][model]) grouped[device][version][model] = [];
         grouped[device][version][model].push(entry);
       }
-      for (const [device, versions] of Object.entries(grouped)) {
+      // 按优先级排序设备
+      const sortedDevices = Object.keys(grouped).sort((a, b) => {
+        const priorityA = getDevicePriority(a);
+        const priorityB = getDevicePriority(b);
+        if (priorityA === priorityB) {
+          return a.localeCompare(b); // 同优先级按字母顺序
+        }
+        return priorityA - priorityB;
+      });
+      // 使用排序后的设备列表进行渲染
+      for (const device of sortedDevices) {
+        const versions = grouped[device];
         const groupDiv = document.createElement("div");
         groupDiv.className = "device-group";
         groupDiv.innerHTML = `<div class="device-title">🖥️ 设备: <code>${device}</code></div>`;
         let perfRows = [], accRows = [];
         for (const version of Object.keys(versions)) {
-          for (const model of Object.keys(versions[version])) {
-            for (const entry of versions[version][model]) {
+          for (const modelKey of Object.keys(versions[version])) {
+            for (const entry of versions[version][modelKey]) {
+              // 使用原始的baseModel，不是组合的modelKey
+              const baseModel = entry.base_info?.model || entry.model_name || "unknown";
+
               const bench = entry.tests?.find(t => t.test_type === "benchmark");
               if (bench) for (const r of bench.results || []) {
-                perfRows.push({ ...r, model, version });
+                perfRows.push({
+                  ...r,
+                  model: baseModel,  // 使用原始模型名
+                  version,
+                  entry: entry  // 保存完整的entry信息，用于获取remark和tokens信息
+                });
               }
               const acc = entry.tests?.find(t => t.test_type === "accuracy");
               if (acc && acc.datasets && acc.datasets[0]?.metrics?.[0]) {
+                const score = acc.datasets[0].metrics[0].score;
+                console.log('添加精度数据:', {
+                  model: baseModel,
+                  version,
+                  score,
+                  remark: entry.base_info?.remark
+                });
                 accRows.push({
-                  model, version,
-                  score: acc.datasets[0].metrics[0].score
+                  model: baseModel,  // 使用原始模型名
+                  version,
+                  score: score,
+                  entry: entry  // 保存完整的entry信息，用于获取remark
                 });
               }
             }
           }
         }
-        // 摘要卡片
-        const { maxOutput, minTTFT, latestAcc } = getSummaryData(perfRows, accRows);
-        const summaryDiv = document.createElement('div');
-        summaryDiv.className = 'summary-cards';
-        summaryDiv.innerHTML = `
-          <div class="summary-card">
-            <span class="card-title">最大吞吐 (output)</span>
-            <span class="card-value">${maxOutput !== null ? maxOutput.toFixed(2) : '-'}</span>
-          </div>
-          <div class="summary-card">
-            <span class="card-title">最低平均TTFT (ms)</span>
-            <span class="card-value">${minTTFT !== null ? minTTFT.toFixed(2) : '-'}</span>
-          </div>
-          <div class="summary-card">
-            <span class="card-title">最新精度 (%)</span>
-            <span class="card-value">${latestAcc !== null ? (latestAcc*100).toFixed(2) : '-'}</span>
-          </div>
-        `;
-        groupDiv.appendChild(summaryDiv);
+
+        console.log(`设备 ${device} 的性能数据:`, perfRows.length, '条');
+        console.log(`设备 ${device} 的精度数据:`, accRows.length, '条');
+
+        // 调试：显示所有模型组合
+        const uniqueModels = [...new Set(perfRows.map(r => {
+          const remark = r.entry?.base_info?.remark?.trim() || '';
+          return remark ? `${r.model} (${remark})` : r.model;
+        }))];
+        console.log(`设备 ${device} 的模型组合:`, uniqueModels);
+
+        // 调试：显示数据分布
+        const dataDistribution = {};
+        perfRows.forEach(r => {
+          const remark = r.entry?.base_info?.remark?.trim() || '';
+          const modelDisplay = remark ? `${r.model} (${remark})` : r.model;
+          const key = `${modelDisplay}-${r.version}-${r.concurrency}-${r.expected_input || r.input_tokens}/${r.expected_output || r.output_tokens}`;
+          dataDistribution[key] = (dataDistribution[key] || 0) + 1;
+        });
+        console.log(`设备 ${device} 的数据分布:`, dataDistribution);
+
+        // 汇总卡片已移除
 
         if (perfRows.length > 0) {
-          // 所有并发数
-          const allConcurrency = [...new Set(perfRows.map(r => r.concurrency))].sort((a,b)=>a-b);
-          // 所有模型
-          const allModels = [...new Set(perfRows.map(r=>r.model))];
-          // 每个模型下所有 input/output 组合
-          const modelComboMap = {};
-          allModels.forEach(model => {
-            modelComboMap[model] = [...new Set(perfRows.filter(r => r.model === model).map(r => `in${r.input_tokens}-out${r.output_tokens}`))];
-          });
-          // combo 列表
-          const allCombos = [];
-          allModels.forEach(model => {
-            modelComboMap[model].forEach(combo => {
-              allCombos.push({model, combo});
-            });
-          });
-          // --- X轴：每个并发下，所有模型/组合为一组
-          // 所有 xLabels 其实就是 allConcurrency.map(String)
-          // 但组间间隔可用 Chart.js 的 groupSpacing 参数（新v4+支持），老版本只能用 barPercentage/categoryPercentage 调间隔
-          // 这里通过调整 barPercentage/categoryPercentage 达到最佳分隔
+          // 创建配置化图表展示区域
+          const configuredChartDiv = document.createElement('div');
+          configuredChartDiv.className = 'chart-wrap';
+          configuredChartDiv.innerHTML = `<div class="chart-title">📈 性能对比图表</div>`;
+          groupDiv.appendChild(configuredChartDiv);
 
-          // === 生成 datasets ===
-          function getBarDatasets(metric, useGradient) {
-            return allCombos.map(({model, combo}, idx) => {
-              const comboIndex = modelComboMap[model].indexOf(combo);
-              const comboCount = modelComboMap[model].length;
-              const lightenAmt = comboCount > 1 ? 20 + (comboIndex * (40/(comboCount-1))) : 40;
-              const mainColor = COLOR_PALETTE[allModels.indexOf(model) % COLOR_PALETTE.length];
-              const color1 = tinycolor(mainColor).lighten(lightenAmt).toString();
-              const color2 = tinycolor(mainColor).darken(12).toString();
-              const [input, output] = combo.slice(2).split('-out').map(Number);
-              // 每个并发下都有数据
-              return {
-                label: `${model} (${input}-${output})`,
-                data: allConcurrency.map(conc => {
-                  const found = perfRows.find(r =>
-                    r.model === model &&
-                    r.concurrency === conc &&
-                    r.input_tokens === input &&
-                    r.output_tokens === output
-                  );
-                  return found && !isNaN(found[metric]) ? found[metric] : 0;
-                }),
-                backgroundColor: useGradient
-                  ? (ctx) => {
-                      const {chart} = ctx;
-                      if (!chart.chartArea) return color1;
-                      return getBarGradient(chart.ctx, chart.chartArea, color1, color2);
+          // 创建图表配置器（橙色）- 放在性能图表和性能测试图表之间
+          const chartConfigContainer = createChartConfigContainer(perfRows, device);
+          groupDiv.appendChild(chartConfigContainer);
+
+          // 创建数据表格
+          const tableContainer = createDataTable(perfRows, device);
+          groupDiv.appendChild(tableContainer);
+
+          // 初始化配置化图表
+          console.log('🚀 初始化配置化图表，设备:', device);
+          initConfigurableChart(perfRows, configuredChartDiv, null, device, chartConfigContainer);
+
+          // 设置全局更新函数
+          if (!window.updateConfigurableChartForDevice) {
+            window.updateConfigurableChartForDevice = function(targetDevice) {
+              console.log('全局更新函数被调用:', targetDevice);
+              // 找到所有设备的图表实例并更新对应的设备
+              if (window.chartInstances) {
+                Object.keys(window.chartInstances).forEach(deviceKey => {
+                  const deviceName = deviceKey.replace(/-/g, ' ');
+                  if (deviceName === String(targetDevice) || deviceKey === String(targetDevice).replace(/\s+/g, '-')) {
+                    const chartInstance = window.chartInstances[deviceKey]?.configurableChart;
+                    if (chartInstance) {
+                      console.log('更新设备图表:', deviceName);
+                      // 获取该设备的数据和配置容器
+                      const devicePerfRows = window.devicePerfRows?.[deviceKey] || window.currentPerfRows || [];
+                      const configContainer = document.querySelector(`[data-device="${deviceName}"] .chart-config-container`) ||
+                                            document.querySelector('.chart-config-container');
+                      updateConfigurableChart(chartInstance, devicePerfRows, deviceName, configContainer);
                     }
-                  : color1
-              };
-            });
+                  }
+                });
+              }
+            };
           }
-          let chartObj1 = null, chartObj2 = null, chartAcc = null;
-          // Output Tokens 先展示
-          const otDiv = document.createElement('div');
-          otDiv.className = 'chart-wrap';
-          otDiv.innerHTML = `<div class="chart-title">Output Tokens（分组柱状图）</div>`;
-          const canvas2 = document.createElement('canvas');
-          otDiv.appendChild(canvas2);
-          groupDiv.appendChild(otDiv);
-          // TTFT 后展示
-          const ttftDiv = document.createElement('div');
-          ttftDiv.className = 'chart-wrap';
-          ttftDiv.innerHTML = `<div class="chart-title">平均TTFT(ms)（分组柱状图）</div>`;
-          const canvas1 = document.createElement('canvas');
-          ttftDiv.appendChild(canvas1);
-          groupDiv.appendChild(ttftDiv);
-          // 精度
+
+          // 保存当前设备的数据
+          const deviceKey = String(device).replace(/\s+/g, '-');
+          if (!window.devicePerfRows) window.devicePerfRows = {};
+          window.devicePerfRows[deviceKey] = perfRows;
+
+        // 精度测试区域
+        if (accRows.length > 0) {
+          // 精度图表
           const accDiv = document.createElement('div');
           accDiv.className = 'chart-wrap';
-          accDiv.innerHTML = `<div class="chart-title">🎯 精度测试准确率 (%)</div>`;
+          accDiv.innerHTML = `<div class="chart-title">🎯 精度测试结果</div>`;
           const accuracyCanvas = document.createElement("canvas");
           accDiv.appendChild(accuracyCanvas);
           groupDiv.appendChild(accDiv);
-          // 柱状细、组间间隔大
-          const barOptions = {
-            categoryPercentage: 0.1,
-            barPercentage: 0.1
-          };
-          function drawBarChartsPure() {
-            if (chartObj1) chartObj1.destroy();
-            if (chartObj2) chartObj2.destroy();
-            chartObj2 = new Chart(canvas2, {
-              type: 'bar',
-              data: {
-                labels: allConcurrency.map(String),
-                datasets: getBarDatasets('output_tokens', false)
-              },
-              options: {
-                plugins: {
-                  legend: { position: 'top', maxHeight:80 },
-                  title: { display: false },
-                  datalabels: {
-                    color: "#166cbc",
-                    anchor: "end",
-                    align: "end",
-                    font: {weight:"bold",size:13},
-                    display: true,
-                    formatter: v => v ? v : ""
-                  }
-                },
-                responsive: true,
-                animation: false,
-                scales: {
-                  x: {
-                    title: { display: true, text: '并发数' },
-                    stacked: false,
-                    ...barOptions
-                  },
-                  y: { title: { display: true, text: 'Output Tokens' }, min: 0 }
-                }
-              },
-              plugins: [ChartDataLabels]
-            });
-            chartObj1 = new Chart(canvas1, {
-              type: 'bar',
-              data: {
-                labels: allConcurrency.map(String),
-                datasets: getBarDatasets('avg_ttft', false)
-              },
-              options: {
-                plugins: {
-                  legend: { position: 'top', maxHeight:80 },
-                  title: { display: false },
-                  datalabels: {
-                    color: "#214d97",
-                    anchor: "end",
-                    align: "end",
-                    font: {weight:"bold",size:13},
-                    display: true,
-                    formatter: v => v ? v : ""
-                  }
-                },
-                responsive: true,
-                animation: false,
-                scales: {
-                  x: {
-                    title: { display: true, text: '并发数' },
-                    stacked: false,
-                    ...barOptions
-                  },
-                  y: { title: { display: true, text: '平均TTFT(ms)' }, min: 0 }
-                }
-              },
-              plugins: [ChartDataLabels]
-            });
-          }
-          function drawBarChartsWithGradient() {
-            if (chartObj1) chartObj1.destroy();
-            if (chartObj2) chartObj2.destroy();
-            chartObj2 = new Chart(canvas2, {
-              type: 'bar',
-              data: {
-                labels: allConcurrency.map(String),
-                datasets: getBarDatasets('output_tokens', true)
-              },
-              options: {
-                plugins: {
-                  legend: { position: 'top', maxHeight:80 },
-                  title: { display: false },
-                  datalabels: {
-                    color: "#166cbc",
-                    anchor: "end",
-                    align: "end",
-                    font: {weight:"bold",size:13},
-                    display: true,
-                    formatter: v => v ? v : ""
-                  }
-                },
-                responsive: true,
-                animation: false,
-                scales: {
-                  x: {
-                    title: { display: true, text: '并发数' },
-                    stacked: false,
-                    ...barOptions
-                  },
-                  y: { title: { display: true, text: 'Output Tokens' }, min: 0 }
-                }
-              },
-              plugins: [ChartDataLabels]
-            });
-            chartObj1 = new Chart(canvas1, {
-              type: 'bar',
-              data: {
-                labels: allConcurrency.map(String),
-                datasets: getBarDatasets('avg_ttft', true)
-              },
-              options: {
-                plugins: {
-                  legend: { position: 'top', maxHeight:80 },
-                  title: { display: false },
-                  datalabels: {
-                    color: "#214d97",
-                    anchor: "end",
-                    align: "end",
-                    font: {weight:"bold",size:13},
-                    display: true,
-                    formatter: v => v ? v : ""
-                  }
-                },
-                responsive: true,
-                animation: false,
-                scales: {
-                  x: {
-                    title: { display: true, text: '并发数' },
-                    stacked: false,
-                    ...barOptions
-                  },
-                  y: { title: { display: true, text: '平均TTFT(ms)' }, min: 0 }
-                }
-              },
-              plugins: [ChartDataLabels]
-            });
-          }
-          drawBarChartsPure();
-          setTimeout(drawBarChartsWithGradient, 300);
 
-          // 精度图
-          const versionKeysAsc = Object.keys(versions).sort(compareVersionAsc);
-          const allModelsAcc = new Set();
-          for (const version of versionKeysAsc) {
-            for (const model of Object.keys(versions[version])) {
-              allModelsAcc.add(model);
-            }
-          }
-          const accDatasets = Array.from(allModelsAcc).map(model => {
-            const dataPoints = versionKeysAsc.map(version => {
-              const entry = versions[version][model]?.[0];
-              const accTest = entry?.tests?.find(t => t.test_type === "accuracy");
-              const score = accTest?.datasets?.[0]?.metrics?.[0]?.score;
-              return { x: version, y: score != null ? (score * 100).toFixed(2) : null };
-            });
-            return {
-              label: model,
-              data: dataPoints,
-              tension: 0.3,
-              borderColor: "#337be2",
-              backgroundColor: "#6fa5f2",
-              pointBackgroundColor: "#337be2"
-            };
-          });
-          chartAcc = new Chart(accuracyCanvas, {
-            type: 'line',
-            data: {
-              labels: versionKeysAsc,
-              datasets: accDatasets
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: { position: 'top' },
-                title: { display: false }
-              },
-              scales: {
-                x: { title: { display: true, text: '版本' } },
-                y: { title: { display: true, text: '准确率 (%)' }, min: 0, max: 100 }
-              }
-            }
-          });
+          // 精度测试筛选器（放在精度图表下面）
+          const accFilterContainer = createAccFilterContainer(accRows, device, data);
+          groupDiv.appendChild(accFilterContainer);
+
+          // 初始化精度图表
+          initAccuracyChart(accuracyCanvas, accRows, device, accFilterContainer);
+        }
+
+          // 精度图表已在上面初始化
         }
         // 明细表格
         for (const version of Object.keys(versions).sort(compareVersionDesc)) {
@@ -562,7 +1658,7 @@
             for (const entry of entries) {
               const modelDiv = document.createElement("div");
               modelDiv.className = "model-block";
-              modelDiv.innerHTML = `<h4>🤖 模型: <code>${model}</code></h4>`;
+              modelDiv.innerHTML = `<h4>🤖 模型: <code>${model} (${entry.base_info?.remark?.trim() || '6core'})</code></h4>`;
               const bench = entry.tests?.find(t => t.test_type === "benchmark");
               if (bench) {
                 let html = `<h5>🚀 性能测试</h5><table><tr>
@@ -571,7 +1667,7 @@
                 </tr>`;
                 for (const r of bench.results || []) {
                   html += `<tr>
-                    <td>${r.concurrency}</td><td>${r.input_tokens}</td><td>${r.output_tokens}</td>
+                    <td>${r.concurrency}</td><td>${r.expected_input || r.input_tokens}</td><td>${r.expected_output || r.output_tokens}</td>
                     <td>${r.output_throughput}</td><td>${r.total_throughput}</td><td>${r.avg_ttft}</td>
                   </tr>`;
                 }
@@ -602,9 +1698,2280 @@
         app.appendChild(groupDiv);
       }
     }
-    fetchAllResults().then(renderGroupedResults).catch(err => {
+    // 初始化配置化图表
+    function initConfigurableChart(perfRows, chartContainer, data, device, chartConfigContainer) {
+      console.log('📊 初始化配置化图表函数被调用');
+      console.log('参数:', { perfRows: perfRows.length, device, chartContainer: !!chartContainer, chartConfigContainer: !!chartConfigContainer });
+
+      // 保存当前数据到全局变量
+      window.currentPerfRows = perfRows;
+
+      // 创建图表容器
+      const chartDiv = document.createElement('div');
+      chartDiv.className = 'chart-container';
+      chartDiv.style.cssText = 'height: 500px; width: 1000px; min-width: 1000px;';
+      chartContainer.appendChild(chartDiv);
+
+      // 初始化ECharts实例
+      const chart = echarts.init(chartDiv);
+
+      // 保存图表实例和数据
+      const deviceKey = String(device).replace(/\s+/g, '-');
+      console.log('💾 保存图表实例，deviceKey:', deviceKey);
+      if (!window.chartInstances) window.chartInstances = {};
+      if (!window.chartInstances[deviceKey]) window.chartInstances[deviceKey] = {};
+      if (!window.devicePerfRows) window.devicePerfRows = {};
+
+      window.chartInstances[deviceKey].configurableChart = chart;
+      window.devicePerfRows[deviceKey] = perfRows;
+
+      console.log('✅ 图表实例和数据已保存:', {
+        chartInstances: Object.keys(window.chartInstances),
+        devicePerfRows: Object.keys(window.devicePerfRows)
+      });
+
+      // 初始渲染
+      updateConfigurableChart(chart, perfRows, device, chartConfigContainer);
+
+      // 延迟设置事件监听器，确保DOM已完全加载
+      setTimeout(() => {
+        setupConfigurableChartListeners(chart, perfRows, device, chartConfigContainer).then(() => {
+          // 设置默认配置
+          if (chartConfigContainer && chartConfigContainer.dataset.needsDefaultConfig === 'true') {
+            console.log('🎯 触发默认配置设置');
+            setTimeout(() => {
+              setDefaultConfiguration(chartConfigContainer, device, perfRows);
+              chartConfigContainer.dataset.needsDefaultConfig = 'false';
+            }, 300);
+          }
+        });
+      }, 100);
+    }
+
+    // 更新配置化图表
+    function updateConfigurableChart(chart, perfRows, device, configContainer = null) {
+      console.log('🔄 更新配置化图表', device, perfRows?.length || 0);
+
+      // 参数验证
+      if (!chart) {
+        console.error('❌ 图表实例不存在');
+        return;
+      }
+
+      if (!perfRows || perfRows.length === 0) {
+        console.error('❌ 性能数据为空');
+        return;
+      }
+
+      // 如果没有传入配置容器，尝试查找
+      if (!configContainer) {
+        configContainer = findConfigContainer(device);
+        if (!configContainer) {
+          console.error('❌ 找不到配置容器:', device);
+          return;
+        }
+      }
+
+      try {
+        // 获取图表配置
+        const config = getChartConfigFromContainer(device, configContainer);
+        console.log('📊 图表配置:', config);
+
+        // 防止重复更新
+        const deviceKey = String(device).replace(/\s+/g, '-');
+        const updateKey = `${deviceKey}_${Date.now()}`;
+
+        if (window.chartUpdateInProgress && window.chartUpdateInProgress[deviceKey]) {
+          console.log('⚠️ 图表更新进行中，跳过重复更新');
+          return;
+        }
+
+        if (!window.chartUpdateInProgress) window.chartUpdateInProgress = {};
+        window.chartUpdateInProgress[deviceKey] = updateKey;
+
+        if (!config.isValid) {
+        // 显示配置提示
+        console.log('❌ 配置不完整，显示提示信息');
+        chart.setOption({
+          backgroundColor: '#fff',
+          title: {
+            text: '请完成图表配置',
+            subtext: '按顺序选择固定维度和X轴',
+            left: 'center',
+            top: 'middle',
+            textStyle: {
+              color: '#666',
+              fontSize: 18
+            },
+            subtextStyle: {
+              color: '#999',
+              fontSize: 14
+            }
+          }
+        });
+        return;
+      }
+
+        console.log('✅ 配置完整，开始生成图表数据');
+
+        // 根据配置生成图表数据
+        const chartData = generateChartData(perfRows, config);
+        console.log('图表数据:', chartData);
+
+        // 生成图表选项
+        const option = generateChartOption(chartData, config);
+        console.log('图表选项:', option);
+
+        // 渲染图表
+        chart.setOption(option, true);
+        console.log('✅ 图表渲染完成');
+
+      } catch (error) {
+        console.error('❌ 图表更新失败:', error);
+
+        // 显示错误信息
+        if (chart && chart.setOption) {
+          chart.setOption({
+            backgroundColor: '#fff',
+            title: {
+              text: '图表更新失败',
+              subtext: error.message,
+              left: 'center',
+              top: 'middle',
+              textStyle: {
+                color: '#f56565',
+                fontSize: 16
+              }
+            }
+          });
+        }
+      } finally {
+        // 清除更新状态
+        const deviceKey = String(device).replace(/\s+/g, '-');
+        if (window.chartUpdateInProgress) {
+          delete window.chartUpdateInProgress[deviceKey];
+        }
+      }
+    }
+
+    // 查找配置容器
+    function findConfigContainer(device) {
+      const containers = document.querySelectorAll('.chart-config-container');
+      for (let container of containers) {
+        const parent = container.closest('.device-group');
+        if (parent) {
+          const deviceHeader = parent.querySelector('h2');
+          if (deviceHeader && deviceHeader.textContent.includes(device)) {
+            return container;
+          }
+        }
+      }
+      return null;
+    }
+
+    // 从配置容器获取图表配置
+    function getChartConfigFromContainer(device, configContainer = null) {
+      const deviceStr = String(device);
+
+      if (!configContainer) {
+        configContainer = findConfigContainer(deviceStr);
+      }
+
+      if (!configContainer) {
+        console.log('未找到配置容器，设备:', deviceStr);
+        return { isValid: false };
+      }
+
+      const dim1 = configContainer.querySelector('#dim1-select').value;
+      const dim1Value = configContainer.querySelector('#dim1-value').value;
+      const dim2 = configContainer.querySelector('#dim2-select').value;
+      const dim2Value = configContainer.querySelector('#dim2-value').value;
+      const dim3Enable = configContainer.querySelector('#dim3-enable').checked;
+      const dim3 = configContainer.querySelector('#dim3-select').value;
+      const dim3Value = configContainer.querySelector('#dim3-value').value;
+      const xAxis = configContainer.querySelector('#x-axis-select').value;
+
+      // 检查配置是否完整
+      const isValid = dim1 && dim1Value && dim2 && dim2Value && xAxis;
+      console.log('配置验证:', {
+        dim1, dim1Value, dim2, dim2Value, xAxis, isValid
+      });
+
+      return {
+        isValid,
+        fixedDimensions: [
+          { dimension: dim1, value: dim1Value },
+          { dimension: dim2, value: dim2Value },
+          ...(dim3Enable && dim3 && dim3Value ? [{ dimension: dim3, value: dim3Value }] : [])
+        ],
+        xAxis,
+        device: deviceStr
+      };
+    }
+
+    // 生成图表数据
+    function generateChartData(perfRows, config) {
+      console.log('=== 开始生成图表数据 ===');
+      console.log('原始数据量:', perfRows.length);
+      console.log('配置:', config);
+
+      // 打印前几行数据看看结构
+      if (perfRows.length > 0) {
+        console.log('数据示例:', perfRows[0]);
+      }
+
+      // 根据固定维度筛选数据
+      let filteredData = perfRows.filter(row => {
+        let allMatch = true;
+        for (const fixedDim of config.fixedDimensions) {
+          const rowValue = getRowValue(row, fixedDim.dimension);
+          const isMatch = rowValue === fixedDim.value;
+          console.log(`检查维度 ${fixedDim.dimension}: 期望="${fixedDim.value}", 实际="${rowValue}", 匹配=${isMatch}`);
+          if (!isMatch) {
+            allMatch = false;
+            break;
+          }
+        }
+        return allMatch;
+      });
+
+      console.log('筛选后数据量:', filteredData.length);
+
+      if (filteredData.length === 0) {
+        console.error('❌ 筛选后没有数据！请检查筛选条件');
+        return { xAxisValues: [], series: [], config };
+      }
+
+      // 获取X轴数据
+      const xAxisValues = [...new Set(filteredData.map(row => getRowValue(row, config.xAxis)))];
+
+      // 对X轴数据进行排序
+      if (config.xAxis === 'concurrency') {
+        xAxisValues.sort((a, b) => parseInt(a) - parseInt(b));
+      } else if (config.xAxis === 'version') {
+        xAxisValues.sort(compareVersionAsc);
+      } else if (config.xAxis === 'token_combination') {
+        // 对输入/输出进行自定义排序：先按输入数字大小，再按输出数字大小
+        xAxisValues.sort((a, b) => {
+          // 解析 "输入/输出" 格式，例如 "512/1024"
+          const parseTokens = (str) => {
+            const parts = str.split('/');
+            return {
+              input: parseInt(parts[0]) || 0,
+              output: parseInt(parts[1]) || 0
+            };
+          };
+
+          const tokensA = parseTokens(a);
+          const tokensB = parseTokens(b);
+
+          // 先按输入数字排序
+          if (tokensA.input !== tokensB.input) {
+            return tokensA.input - tokensB.input;
+          }
+
+          // 输入相等时，按输出数字排序
+          return tokensA.output - tokensB.output;
+        });
+      } else {
+        xAxisValues.sort();
+      }
+
+      console.log('X轴数据:', xAxisValues);
+
+      // 获取图例维度（剩余未使用的维度）
+      const allDimensions = ['model', 'version', 'concurrency', 'token_combination'];
+      const usedDimensions = [
+        ...config.fixedDimensions.map(d => d.dimension),
+        config.xAxis
+      ];
+      const legendDimensions = allDimensions.filter(dim => !usedDimensions.includes(dim));
+      console.log('图例维度:', legendDimensions);
+
+      // 生成系列数据
+      const series = [];
+      console.log('开始生成系列数据，图例维度数量:', legendDimensions.length);
+
+      if (legendDimensions.length === 0) {
+        // 没有图例维度，只有一条线
+        const seriesData = xAxisValues.map(xValue => {
+          const matchingRows = filteredData.filter(row =>
+            getRowValue(row, config.xAxis) === xValue
+          );
+
+          if (matchingRows.length > 0) {
+            const avgThroughput = matchingRows.reduce((sum, row) =>
+              sum + (row.output_throughput || 0), 0) / matchingRows.length;
+            return avgThroughput.toFixed(2);
+          }
+          return null;
+        });
+
+        series.push({
+          name: '吞吐量',
+          data: seriesData
+        });
+      } else if (legendDimensions.length === 1) {
+        // 单个图例维度
+        const legendDim = legendDimensions[0];
+        const legendValues = [...new Set(filteredData.map(row => getRowValue(row, legendDim)))].sort();
+        console.log('图例值:', legendValues);
+
+        legendValues.forEach(legendValue => {
+          const seriesData = xAxisValues.map(xValue => {
+            const matchingRows = filteredData.filter(row =>
+              getRowValue(row, config.xAxis) === xValue &&
+              getRowValue(row, legendDim) === legendValue
+            );
+
+            if (matchingRows.length > 0) {
+              const avgThroughput = matchingRows.reduce((sum, row) =>
+                sum + (row.output_throughput || 0), 0) / matchingRows.length;
+              return avgThroughput.toFixed(2);
+            }
+            return null;
+          });
+
+          series.push({
+            name: legendValue,
+            data: seriesData
+          });
+        });
+      } else {
+        // 多个图例维度，简化处理
+        console.log('多个图例维度，使用简化处理');
+        const seriesData = xAxisValues.map(xValue => {
+          const matchingRows = filteredData.filter(row =>
+            getRowValue(row, config.xAxis) === xValue
+          );
+
+          if (matchingRows.length > 0) {
+            const avgThroughput = matchingRows.reduce((sum, row) =>
+              sum + (row.output_throughput || 0), 0) / matchingRows.length;
+            return avgThroughput.toFixed(2);
+          }
+          return null;
+        });
+
+        series.push({
+          name: '平均吞吐量',
+          data: seriesData
+        });
+      }
+
+      console.log('生成的系列数据:', series);
+
+      return {
+        xAxisValues,
+        series,
+        config
+      };
+    }
+
+    // 获取行的维度值
+    function getRowValue(row, dimension) {
+      let value;
+      switch (dimension) {
+        case 'model':
+          const remark = row.entry?.base_info?.remark?.trim() || '';
+          value = remark ? `${row.model} (${remark})` : row.model;
+          break;
+        case 'version':
+          value = row.version;
+          break;
+        case 'concurrency':
+          value = row.concurrency.toString();
+          break;
+        case 'token_combination':
+          const expectedIn = row.expected_input || row.input_tokens;
+          const expectedOut = row.expected_output || row.output_tokens;
+          value = `${expectedIn}/${expectedOut}`;
+          break;
+        default:
+          value = '';
+      }
+      return value;
+    }
+
+    // 获取维度标签
+    function getDimensionLabel(dimension) {
+      const labels = {
+        'model': '模型',
+        'version': '版本',
+        'concurrency': '并发数',
+        'token_combination': '输入/输出'
+      };
+      return labels[dimension] || dimension;
+    }
+
+    // 获取唯一组合
+    function getUniqueCombinations(data, dimensions) {
+      const combinations = new Map();
+
+      data.forEach(row => {
+        const combination = {};
+        dimensions.forEach(dim => {
+          combination[dim] = getRowValue(row, dim);
+        });
+
+        const key = JSON.stringify(combination);
+        combinations.set(key, combination);
+      });
+
+      return Array.from(combinations.values());
+    }
+
+    // 初始化精度图表
+    function initAccuracyChart(canvas, accRows, device, accFilterContainer) {
+      console.log('初始化精度图表，设备:', device, '精度数据量:', accRows.length);
+
+      // 替换canvas为div容器
+      const chartDiv = document.createElement('div');
+      chartDiv.className = 'chart-container';
+      chartDiv.style.cssText = 'height: 500px; width: 1000px; min-width: 1000px;';
+      canvas.parentNode.replaceChild(chartDiv, canvas);
+
+      // 初始化ECharts实例
+      const chart = echarts.init(chartDiv);
+
+      // 保存图表实例
+      const deviceKey = String(device).replace(/\s+/g, '-');
+      if (!window.chartInstances) window.chartInstances = {};
+      if (!window.chartInstances[deviceKey]) window.chartInstances[deviceKey] = {};
+      window.chartInstances[deviceKey].accuracyChart = chart;
+
+      // 保存当前设备的精度数据
+      if (!window.deviceAccRows) window.deviceAccRows = {};
+      window.deviceAccRows[deviceKey] = accRows;
+
+      // 渲染精度图表
+      renderAccuracyChart(chart, accRows);
+
+      // 设置精度筛选器事件监听
+      if (accFilterContainer) {
+        setTimeout(() => {
+          setupAccuracyFilterListeners(chart, accRows, device, accFilterContainer);
+        }, 100);
+      }
+    }
+
+    // 渲染精度图表
+    function renderAccuracyChart(chart, accRows) {
+      console.log('=== 渲染精度图表 ===');
+      console.log('精度数据量:', accRows.length);
+
+      if (!accRows || accRows.length === 0) {
+        chart.setOption({
+          backgroundColor: '#fff',
+          title: {
+            text: '暂无精度测试数据',
+            left: 'center',
+            top: 'middle',
+            textStyle: {
+              color: '#999',
+              fontSize: 16
+            }
+          }
+        });
+        return;
+      }
+
+      // 打印精度数据结构
+      console.log('精度数据示例:', accRows[0]);
+
+      // 按模型分组数据
+      const seriesData = new Map();
+
+      accRows.forEach((row, index) => {
+        console.log(`处理精度数据 ${index}:`, {
+          model: row.model,
+          version: row.version,
+          score: row.score,
+          remark: row.entry?.base_info?.remark
+        });
+
+        const remark = row.entry?.base_info?.remark?.trim() || '';
+        const modelKey = remark ? `${row.model} (${remark})` : row.model;
+
+        if (!seriesData.has(modelKey)) {
+          seriesData.set(modelKey, new Map());
+        }
+
+        // 确保score是数字类型，并转换为百分比
+        let score = row.score;
+        if (typeof score === 'string') {
+          score = parseFloat(score);
+        }
+
+        // 如果分数小于等于1，认为是小数形式，转换为百分比
+        const scorePercent = score <= 1 ? score * 100 : score;
+
+        // 使用Map来避免版本重复
+        seriesData.get(modelKey).set(row.version, scorePercent);
+      });
+
+      console.log('分组后的精度数据:', seriesData);
+
+      // 获取所有版本并排序
+      const allVersions = [...new Set(accRows.map(r => r.version))].sort(compareVersionAsc);
+      console.log('所有版本:', allVersions);
+
+      // 生成系列数据
+      const series = [];
+      const colors = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4'];
+      let colorIndex = 0;
+
+      seriesData.forEach((versionScoreMap, modelKey) => {
+        console.log(`生成系列数据 - 模型: ${modelKey}`);
+
+        // 为每个版本填充数据
+        const seriesValues = allVersions.map(version => {
+          const score = versionScoreMap.get(version);
+          console.log(`  版本 ${version}: ${score}`);
+          return score !== undefined ? score : null;
+        });
+
+        console.log(`模型 ${modelKey} 的数据:`, seriesValues);
+
+        series.push({
+          name: modelKey,
+          type: 'line',
+          data: seriesValues,
+          connectNulls: false,
+          symbol: 'circle',
+          symbolSize: 8,
+          lineStyle: {
+            width: 3
+          },
+          itemStyle: {
+            color: colors[colorIndex % colors.length]
+          },
+          emphasis: {
+            focus: 'series'
+          }
+        });
+        colorIndex++;
+      });
+
+      console.log('最终系列数据:', series);
+
+      const option = {
+        backgroundColor: '#fff',
+        title: {
+          text: '精度测试准确率',
+          left: 'center',
+          top: 15,
+          textStyle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: '#333'
+          }
+        },
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: 'rgba(255,255,255,0.95)',
+          borderColor: '#ddd',
+          borderWidth: 1,
+          padding: [10, 15],
+          textStyle: {
+            fontSize: 13
+          },
+          formatter: function(params) {
+            let result = `<div style="font-weight:bold;margin-bottom:8px;color:#333;">版本: ${params[0].axisValue}</div>`;
+            params.forEach(param => {
+              if (param.value !== null && param.value !== undefined) {
+                result += `<div style="margin:4px 0;display:flex;align-items:center;">
+                  <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${param.color};margin-right:8px;"></span>
+                  <span>${param.seriesName}: <strong>${Number(param.value).toFixed(1)}%</strong></span>
+                </div>`;
+              }
+            });
+            return result;
+          }
+        },
+        legend: {
+          data: series.map(s => s.name),
+          top: 50,
+          type: 'scroll',
+          textStyle: {
+            fontSize: 13
+          },
+          itemGap: 20
+        },
+        grid: {
+          left: '8%',
+          right: '5%',
+          bottom: '12%',
+          top: '15%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: allVersions,
+          name: '版本',
+          nameLocation: 'middle',
+          nameGap: 25,
+          nameTextStyle: {
+            fontSize: 14,
+            fontWeight: 'bold'
+          },
+          axisLabel: {
+            interval: 0,
+            rotate: allVersions.length > 6 ? 30 : 0,
+            fontSize: 12
+          },
+          axisLine: {
+            lineStyle: {
+              color: '#666'
+            }
+          }
+        },
+        yAxis: {
+          type: 'value',
+          name: '准确率 (%)',
+          min: 0,
+          max: 100,
+          axisLabel: {
+            formatter: '{value}%'
+          }
+        },
+        series: series
+      };
+
+      chart.setOption(option);
+    }
+
+    // 设置精度筛选器事件监听
+    function setupAccuracyFilterListeners(chart, accRows, device, accFilterContainer) {
+      console.log('设置精度筛选器监听，设备:', device);
+      const filterSelects = accFilterContainer.querySelectorAll('select[data-filter]');
+      filterSelects.forEach(select => {
+        select.addEventListener('change', () => {
+          console.log('精度筛选器变化，设备:', device);
+          // 使用当前设备的精度数据
+          const deviceKey = String(device).replace(/\s+/g, '-');
+          const deviceAccRows = window.deviceAccRows?.[deviceKey] || accRows;
+          const filteredData = getFilteredAccuracyData(deviceAccRows, accFilterContainer);
+          renderAccuracyChart(chart, filteredData);
+        });
+      });
+    }
+
+    // 获取筛选后的精度数据
+    function getFilteredAccuracyData(accRows, accFilterContainer) {
+      const filterSelects = accFilterContainer.querySelectorAll('select[data-filter]');
+
+      // 收集筛选条件
+      const filters = {};
+      filterSelects.forEach(select => {
+        const filterType = select.dataset.filter;
+        const selectedValues = Array.from(select.selectedOptions)
+          .map(option => option.value)
+          .filter(value => value !== '__ALL__');
+        if (selectedValues.length > 0) {
+          filters[filterType] = selectedValues;
+        }
+      });
+
+      return accRows.filter(row => {
+        for (const [filterType, selectedValues] of Object.entries(filters)) {
+          let match = false;
+
+          switch (filterType) {
+            case 'model':
+              const rowRemark = row.entry?.base_info?.remark?.trim() || '';
+              const rowModelKey = rowRemark ? `${row.model}_${rowRemark}` : row.model;
+              match = selectedValues.includes(rowModelKey);
+              break;
+            case 'version':
+              match = selectedValues.includes(row.version);
+              break;
+          }
+
+          if (!match) return false;
+        }
+        return true;
+      });
+    }
+
+    // 设置配置化图表的事件监听器
+    function setupConfigurableChartListeners(chart, perfRows, device, chartConfigContainer) {
+      console.log('🎧 设置图表事件监听器');
+
+      // 只为图表更新相关的元素添加监听器，不破坏原有的维度选择功能
+      if (chartConfigContainer && !chartConfigContainer.dataset.chartListenersSet) {
+        // 只监听值选择器的变化，不监听维度选择器
+        const valueSelects = chartConfigContainer.querySelectorAll('#dim1-value, #dim2-value, #dim3-value, #x-axis-select');
+        console.log('找到值选择器数量:', valueSelects.length);
+
+        valueSelects.forEach(element => {
+          element.addEventListener('change', () => {
+            console.log('值选择器变化，触发图表更新:', element.id);
+
+            // 获取最新的图表实例
+            const deviceKey = String(device).replace(/\s+/g, '-');
+            const currentChart = window.chartInstances?.[deviceKey]?.configurableChart;
+            const currentPerfRows = window.devicePerfRows?.[deviceKey] || perfRows;
+
+            if (currentChart && currentPerfRows) {
+              updateConfigurableChart(currentChart, currentPerfRows, device, chartConfigContainer);
+            } else {
+              console.error('❌ 图表实例或数据丢失:', { currentChart: !!currentChart, currentPerfRows: currentPerfRows?.length });
+            }
+          });
+        });
+
+        // 标记监听器已设置
+        chartConfigContainer.dataset.chartListenersSet = 'true';
+        console.log('✅ 图表更新监听器设置完成');
+      } else if (chartConfigContainer) {
+        console.log('⚠️ 图表更新监听器已存在，跳过设置');
+      } else {
+        console.log('❌ 未找到图表配置容器');
+      }
+
+      console.log('✅ 图表事件监听器设置完成');
+      return Promise.resolve();
+    }
+
+    // 获取指定设备的筛选后数据
+    function getFilteredDataForDevice(device) {
+      // 这里需要根据设备找到对应的筛选器和数据
+      // 暂时返回原始数据，后续可以完善
+      return window.currentPerfRows || [];
+    }
+
+    // 生成图表选项
+    function generateChartOption(chartData, config) {
+      const fixedInfo = config.fixedDimensions.map(fd =>
+        `${getDimensionLabel(fd.dimension)}: ${fd.value}`
+      ).join('、');
+
+      return {
+        backgroundColor: '#fff',
+        title: {
+          text: '性能对比图表',
+          subtext: `固定条件: ${fixedInfo}`,
+          left: 'center',
+          top: 20,
+          textStyle: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: '#333'
+          },
+          subtextStyle: {
+            fontSize: 12,
+            color: '#666'
+          }
+        },
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: 'rgba(255,255,255,0.98)',
+          borderColor: '#e2e8f0',
+          borderWidth: 1,
+          padding: [8, 12],
+          formatter: function(params) {
+            let result = `<div style="font-weight:bold;margin-bottom:6px;">${getDimensionLabel(config.xAxis)}: ${params[0].axisValue}</div>`;
+            params.forEach(param => {
+              if (param.value !== null && param.value !== undefined) {
+                // 确保value是数字类型
+                const value = typeof param.value === 'number' ? param.value : parseFloat(param.value);
+                const displayValue = isNaN(value) ? param.value : value.toFixed(2);
+
+                result += `<div style="margin:2px 0;">
+                  <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${param.color};margin-right:6px;"></span>
+                  ${param.seriesName}: <strong>${displayValue} tokens/s</strong>
+                </div>`;
+              }
+            });
+            return result;
+          }
+        },
+        legend: {
+          data: chartData.series.map(s => s.name),
+          top: 55,
+          type: 'scroll',
+          textStyle: {
+            fontSize: 12
+          }
+        },
+        grid: {
+          left: '8%',
+          right: '5%',
+          bottom: '12%',
+          top: '18%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          data: chartData.xAxisValues,
+          name: getDimensionLabel(config.xAxis),
+          nameLocation: 'middle',
+          nameGap: 30,
+          nameTextStyle: {
+            fontSize: 13
+          },
+          axisLabel: {
+            rotate: 0,
+            fontSize: 11,
+            interval: 0
+          }
+        },
+        yAxis: {
+          type: 'value',
+          name: '吞吐量 (tokens/s)'
+        },
+        series: chartData.series.map(seriesData => ({
+          name: seriesData.name,
+          type: 'line',
+          data: seriesData.data,
+          connectNulls: false,
+          symbol: 'circle',
+          symbolSize: 8,
+          lineStyle: {
+            width: 3
+          },
+          emphasis: {
+            focus: 'series'
+          }
+        }))
+      };
+    }
+
+    function drawBarChartsPure(perfRows, canvas1, canvas2, accuracyCanvas, data, device, chartConfigContainer, filterContainer, tableContainer, accRows, heatmapDiv, accFilterContainer) {
+      try {
+        // 添加必要的变量定义
+        const models = Array.from(new Set(perfRows.map(r => r.model)));
+        const concurrencies = Array.from(new Set(perfRows.map(r => r.concurrency))).sort((a, b) => a - b);
+        const versions = Array.from(new Set(perfRows.map(r => r.version))).sort(compareVersionAsc);
+
+        // 创建设备特定的图表实例存储
+        const deviceKey = device.replace(/\s+/g, '-');
+        if (!window.chartInstances) {
+          window.chartInstances = {};
+        }
+        
+        // 修改容器创建和替换部分
+        const ttft3dDiv = document.createElement('div');
+        ttft3dDiv.className = 'chart-wrap';
+        ttft3dDiv.style.cssText = 'height: 500px; width: 100%;';
+        ttft3dDiv.innerHTML = '<div class="chart-title">TTFT 3D展示</div>';
+        
+        const output3dDiv = document.createElement('div');
+        output3dDiv.className = 'chart-wrap';
+        output3dDiv.style.cssText = 'height: 500px; width: 100%;';
+        output3dDiv.innerHTML = '<div class="chart-title">吞吐量 3D展示</div>';
+
+        // 替换原有canvas
+        canvas1.parentNode.replaceWith(ttft3dDiv);
+        canvas2.parentNode.replaceWith(output3dDiv);
+
+        // 创建精度图表容器
+        const accuracy2dDiv = document.createElement('div');
+        accuracy2dDiv.className = 'chart-container';
+        accuracy2dDiv.style.cssText = 'height: 400px; width: 100%;';
+
+        // 将精度图表容器添加到精度图表区域
+        const accDiv = accuracyCanvas.parentNode;
+        accDiv.appendChild(accuracy2dDiv);
+
+        // 创建热力图容器
+        const heatmap2dDiv = document.createElement('div');
+        heatmap2dDiv.className = 'chart-container';
+        heatmap2dDiv.style.cssText = 'height: 500px; width: 100%;';
+        heatmapDiv.appendChild(heatmap2dDiv);
+
+        // 生成3D数据函数定义
+        function generate3DData(type = 'ttft') {
+          const data = [];
+          models.forEach((model, modelIndex) => {
+            concurrencies.forEach((concurrency, j) => {
+              versions.forEach((version, k) => {
+                const row = perfRows.find(r => 
+                  r.model === model && 
+                  r.concurrency === concurrency && 
+                  r.version === version
+                );
+                if (row) {
+                  const value = type === 'ttft' ? row.avg_ttft : row.output_throughput;
+                  data.push([
+                    j,                    // X: 并发数索引
+                    k,                    // Y: 版本索引
+                    value,                // Z: 性能值
+                    model,                // 模型名
+                    concurrency,          // 原始并发数
+                    version,              // 原始版本号
+                    COLOR_PALETTE[modelIndex % COLOR_PALETTE.length]  // 颜色
+                  ]);
+                }
+              });
+            });
+          });
+          return data;
+        }
+
+        // 精度图表配置函数
+        function getAccuracyChartOption() {
+          if (!accRows || accRows.length === 0) {
+            return {
+              backgroundColor: '#fff',
+              title: {
+                text: '暂无精度测试数据',
+                left: 'center',
+                top: 'middle',
+                textStyle: {
+                  color: '#999',
+                  fontSize: 16
+                }
+              }
+            };
+          }
+
+          // 获取所有版本并排序
+          const versions = [...new Set(accRows.map(row => row.version))].sort(compareVersionAsc);
+
+          // 按模型分组，每个模型一个系列
+          const modelGroups = new Map();
+          accRows.forEach(row => {
+            // 从entry中获取remark信息
+            const model = row.model;
+            const remark = row.entry?.base_info?.remark?.trim() || '';
+            const modelDisplayName = remark ? `${model} (${remark})` : model;
+
+            if (!modelGroups.has(modelDisplayName)) {
+              modelGroups.set(modelDisplayName, new Map());
+            }
+            modelGroups.get(modelDisplayName).set(row.version, row.score * 100);
+          });
+
+          // 创建系列数据
+          const series = Array.from(modelGroups.entries()).map(([modelName, versionScores], index) => {
+            const data = versions.map(version => versionScores.get(version) || null);
+
+            return {
+              name: modelName,
+              type: 'line',
+              data: data,
+              lineStyle: {
+                color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+                width: 3
+              },
+              itemStyle: {
+                color: COLOR_PALETTE[index % COLOR_PALETTE.length],
+                borderWidth: 2,
+                borderColor: '#fff'
+              },
+              symbol: 'circle',
+              symbolSize: 8,
+              label: {
+                show: true,
+                position: 'top',
+                formatter: function(params) {
+                  return params.value ? `${params.value.toFixed(1)}%` : '';
+                },
+                textStyle: {
+                  fontSize: 11,
+                  fontWeight: 'bold'
+                }
+              },
+              emphasis: {
+                focus: 'series',
+                lineStyle: {
+                  width: 4
+                },
+                itemStyle: {
+                  borderWidth: 3,
+                  shadowBlur: 10,
+                  shadowColor: 'rgba(0,0,0,0.3)'
+                }
+              }
+            };
+          });
+
+          return {
+            backgroundColor: '#fff',
+            tooltip: {
+              trigger: 'axis',
+              backgroundColor: 'rgba(255,255,255,0.98)',
+              borderColor: '#e2e8f0',
+              borderWidth: 1,
+              padding: [12, 16],
+              textStyle: {
+                color: '#334155',
+                fontSize: 12
+              },
+              formatter: function(params) {
+                let result = `<div style="font-weight:bold;margin-bottom:6px;">版本: ${params[0].axisValue}</div>`;
+                params.forEach(param => {
+                  if (param.value !== null) {
+                    const color = param.color;
+                    result += `<div style="margin:2px 0;">
+                      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};margin-right:6px;"></span>
+                      ${param.seriesName}: <strong>${param.value.toFixed(2)}%</strong>
+                    </div>`;
+                  }
+                });
+                return result;
+              }
+            },
+            legend: {
+              data: series.map(s => s.name),
+              top: 15,
+              type: 'scroll',
+              textStyle: {
+                fontSize: 12
+              }
+            },
+            grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '8%',
+              top: '15%',
+              containLabel: true
+            },
+            xAxis: {
+              type: 'category',
+              data: versions,
+              name: '版本',
+              nameLocation: 'middle',
+              nameGap: 25,
+              nameTextStyle: {
+                fontSize: 13,
+                fontWeight: 'bold',
+                color: '#333'
+              },
+              axisLabel: {
+                rotate: versions.length > 5 ? 45 : 0,
+                interval: 0,
+                fontSize: 12,
+                fontWeight: 'normal',
+                color: '#666'
+              },
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: '#333',
+                  width: 1
+                }
+              },
+              axisTick: {
+                show: true,
+                lineStyle: {
+                  color: '#333'
+                }
+              }
+            },
+            yAxis: {
+              type: 'value',
+              name: '准确率 (%)',
+              nameLocation: 'middle',
+              nameGap: 40,
+              nameTextStyle: {
+                fontSize: 13,
+                fontWeight: 'bold',
+                color: '#333'
+              },
+              min: function(value) {
+                return Math.max(0, value.min - 5); // 动态最小值，但不低于0
+              },
+              max: 100,
+              axisLabel: {
+                formatter: '{value}%',
+                fontSize: 12,
+                fontWeight: 'normal',
+                color: '#666'
+              },
+              axisLine: {
+                show: true,
+                lineStyle: {
+                  color: '#333',
+                  width: 1
+                }
+              },
+              axisTick: {
+                show: true,
+                lineStyle: {
+                  color: '#333'
+                }
+              },
+              splitLine: {
+                show: true,
+                lineStyle: {
+                  color: '#e8e8e8',
+                  width: 1,
+                  type: 'dashed'
+                }
+              }
+            },
+            series: series
+          };
+        }
+
+        // 热力图配置函数
+        function getHeatmapChartOption() {
+          if (!perfRows || perfRows.length === 0) {
+            return {
+              backgroundColor: '#fff',
+              title: {
+                text: '暂无性能测试数据',
+                left: 'center',
+                top: 'middle',
+                textStyle: {
+                  color: '#999',
+                  fontSize: 16
+                }
+              }
+            };
+          }
+
+          // 获取所有唯一的模型组合
+          const modelCombinations = [...new Set(perfRows.map(r => {
+            const remark = r.entry?.base_info?.remark?.trim() || '';
+            return remark ? `${r.model} (${remark})` : r.model;
+          }))].sort();
+
+          // 获取所有版本和并发数
+          const versions = [...new Set(perfRows.map(r => r.version))].sort(compareVersionAsc);
+          const concurrencies = [...new Set(perfRows.map(r => r.concurrency))].sort((a, b) => a - b);
+
+          // 生成热力图数据 - 版本 x 并发数
+          const heatmapData = [];
+          const maxValue = Math.max(...perfRows.map(r => r.output_throughput || 0));
+
+          versions.forEach((version, vIndex) => {
+            concurrencies.forEach((concurrency, cIndex) => {
+              // 找到所有匹配的数据行，计算平均值
+              const matchingRows = perfRows.filter(r =>
+                r.version === version && r.concurrency === concurrency
+              );
+
+              if (matchingRows.length > 0) {
+                const avgThroughput = matchingRows.reduce((sum, r) =>
+                  sum + (r.output_throughput || 0), 0) / matchingRows.length;
+
+                heatmapData.push([cIndex, vIndex, avgThroughput]);
+              }
+            });
+          });
+
+          return {
+            backgroundColor: '#fff',
+            title: {
+              text: '性能热力图 - 吞吐量 (tokens/s)',
+              left: 'center',
+              top: 10,
+              textStyle: {
+                fontSize: 16,
+                fontWeight: 'bold'
+              }
+            },
+            tooltip: {
+              position: 'top',
+              backgroundColor: 'rgba(255,255,255,0.98)',
+              borderColor: '#e2e8f0',
+              borderWidth: 1,
+              padding: [8, 12],
+              formatter: function(params) {
+                const [cIndex, vIndex, value] = params.data;
+                const concurrency = concurrencies[cIndex];
+                const version = versions[vIndex];
+                return `
+                  <div style="font-size:12px;">
+                    <div><strong>版本:</strong> ${version}</div>
+                    <div><strong>并发数:</strong> ${concurrency}</div>
+                    <div><strong>平均吞吐量:</strong> ${value.toFixed(2)} tokens/s</div>
+                  </div>
+                `;
+              }
+            },
+            grid: {
+              height: '60%',
+              top: '15%',
+              left: '10%',
+              right: '10%'
+            },
+            xAxis: {
+              type: 'category',
+              data: concurrencies,
+              name: '并发数',
+              nameLocation: 'middle',
+              nameGap: 30,
+              splitArea: {
+                show: true
+              }
+            },
+            yAxis: {
+              type: 'category',
+              data: versions,
+              name: '版本',
+              nameLocation: 'middle',
+              nameGap: 50,
+              splitArea: {
+                show: true
+              }
+            },
+            visualMap: {
+              min: 0,
+              max: maxValue,
+              calculable: true,
+              orient: 'horizontal',
+              left: 'center',
+              bottom: '5%',
+              inRange: {
+                color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+              }
+            },
+            series: [{
+              name: '吞吐量',
+              type: 'heatmap',
+              data: heatmapData,
+              label: {
+                show: true,
+                formatter: function(params) {
+                  return params.data[2].toFixed(0);
+                },
+                fontSize: 10
+              },
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            }]
+          };
+        }
+
+        // 图表配置函数定义
+
+        function get3DChartOption(type) {
+          const data = generate3DData(type);
+          
+          return {
+            backgroundColor: '#fff',
+            tooltip: {
+              backgroundColor: 'rgba(255,255,255,0.98)',
+              borderColor: '#e2e8f0',
+              borderWidth: 1,
+              padding: [2, 4],  // 进一步减小内边距
+              textStyle: {
+                color: '#334155',
+                fontSize: 10,
+                lineHeight: 12  // 更紧凑的行高
+              },
+              formatter: function(params) {
+                if (!params || !params.data) {
+                  return '<div style="font-size:10px;line-height:12px;margin:0;padding:0;">数据不完整</div>';
+                }
+
+                try {
+                  // 从数据数组中获取值
+                  const [_, __, rawValue, model, concurrency, version] = params.data;
+
+                  // 格式化显示的值
+                  const value = type === 'ttft'
+                    ? `${Number(rawValue).toFixed(2)} ms`
+                    : `${Number(rawValue).toFixed(2)} tokens/s`;
+
+                  // 使用单行紧凑布局，用 | 分隔
+                  return `<div style="font-size:10px;line-height:12px;margin:0;padding:0;white-space:nowrap;">
+<span style="color:#64748b;">模型:</span><span style="color:#1e40af;font-weight:600;">${model}</span> |
+<span style="color:#64748b;">并发:</span><span style="color:#1e40af;font-weight:600;">${concurrency}</span><br>
+<span style="color:#64748b;">版本:</span><span style="color:#1e40af;font-weight:600;">${version}</span> |
+<span style="color:#64748b;">${type === 'ttft' ? 'TTFT' : '吞吐量'}:</span><span style="color:#1e40af;font-weight:600;">${value}</span>
+</div>`;
+                } catch (error) {
+                  console.error('Tooltip 格式化错误:', error);
+                  return '<div style="font-size:10px;line-height:12px;margin:0;padding:0;">数据格式错误</div>';
+                }
+              },
+              extraCssText: 'max-width:220px; white-space:normal; word-wrap:break-word; line-height:12px; height:auto;'
+            },
+            visualMap: {
+              max: type === 'ttft' ? 2000 : 50,
+              inRange: {
+                color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8']
+              }
+            },
+            xAxis3D: {
+              type: 'category',
+              name: '并发数',
+              data: concurrencies,
+              nameGap: 25,
+              axisLine: {
+                lineStyle: {
+                  width: 2
+                }
+              },
+              axisLabel: {
+                margin: 8,
+                interval: 0  // 显示所有标签
+              }
+            },
+            yAxis3D: {
+              type: 'category',
+              name: '版本',
+              data: versions,
+              nameGap: 25,
+              axisLine: {
+                lineStyle: {
+                  width: 2
+                }
+              },
+              axisLabel: {
+                margin: 8,
+                interval: 0  // 显示所有标签
+              }
+            },
+            zAxis3D: {
+              type: 'value',
+              name: type === 'ttft' ? 'TTFT (ms)' : '吞吐量 (tokens/s)',
+              nameGap: 25,
+              axisLine: {
+                lineStyle: {
+                  width: 2
+                }
+              }
+            },
+            grid3D: {
+              boxWidth: 180,    // 减小盒子宽度
+              boxHeight: 100,   // 减小盒子高度
+              boxDepth: 100,    // 减小盒子深度
+              top: 10,          // 减小顶部间距
+              bottom: 10,       // 减小底部间距
+              left: 10,         // 减小左侧间距
+              right: 10,        // 减小右侧间距
+              viewControl: {
+                distance: 200,   // 减小视距
+                alpha: 25,      // 调整水平旋转角度
+                beta: 35,       // 调整垂直旋转角度
+                rotateSensitivity: 1.5,
+                zoomSensitivity: 1.5,
+                panSensitivity: 1.5,
+                autoRotate: true,
+                autoRotateSpeed: 8
+              }
+            },
+            series: [{
+              type: 'bar3D',
+              data: data,
+              shading: 'realistic',
+              itemStyle: {
+                opacity: 0.8,
+                borderWidth: 0.5,  // 减小边框宽度
+                borderColor: '#fff'
+              },
+              barSize: 4,         // 减小柱子大小
+              minHeight: 1,       // 减小最小高度
+              label: {
+                show: false
+              }
+            }]
+          };
+        }
+
+        // 初始化图表函数
+        function initCharts() {
+          if (!ttft3dDiv.isConnected || !output3dDiv.isConnected || !accuracy2dDiv.isConnected || !heatmap2dDiv.isConnected) {
+            console.error('图表容器未添加到DOM');
+            return;
+          }
+
+          try {
+            console.log('开始初始化图表');
+
+            // 确保容器尺寸
+            ttft3dDiv.style.height = '500px';
+            output3dDiv.style.height = '500px';
+            accuracy2dDiv.style.height = '400px';
+            heatmap2dDiv.style.height = '500px';
+
+            // 初始化 ECharts 实例
+            const ttftChart = echarts.init(ttft3dDiv, null, {
+              renderer: 'canvas',
+              devicePixelRatio: window.devicePixelRatio || 1
+            });
+            const outputChart = echarts.init(output3dDiv, null, {
+              renderer: 'canvas',
+              devicePixelRatio: window.devicePixelRatio || 1
+            });
+            const accuracyChart = echarts.init(accuracy2dDiv, null, {
+              renderer: 'canvas',
+              devicePixelRatio: window.devicePixelRatio || 1
+            });
+            const heatmapChart = echarts.init(heatmap2dDiv, null, {
+              renderer: 'canvas',
+              devicePixelRatio: window.devicePixelRatio || 1
+            });
+
+            console.log('图表实例创建完成');
+
+            // 配置和渲染图表
+            const ttftOption = get3DChartOption('ttft');
+            const outputOption = get3DChartOption('output');
+            const accuracyOption = getAccuracyChartOption();
+            const heatmapOption = getHeatmapChartOption();
+
+            console.log('图表配置生成完成');
+
+            // 设置选项
+            ttftChart.setOption(ttftOption);
+            outputChart.setOption(outputOption);
+            accuracyChart.setOption(accuracyOption);
+            heatmapChart.setOption(heatmapOption);
+
+            console.log('图表渲染完成');
+
+            // 保存图表实例到设备特定的存储
+            window.chartInstances[deviceKey] = {
+              ttftChart: ttftChart,
+              outputChart: outputChart,
+              accuracyChart: accuracyChart,
+              heatmapChart: heatmapChart
+            };
+
+            // 添加事件监听
+            const resizeObserver = new ResizeObserver(() => {
+              ttftChart?.resize();
+              outputChart?.resize();
+            });
+
+            resizeObserver.observe(ttft3dDiv);
+            resizeObserver.observe(output3dDiv);
+
+            return () => {
+              resizeObserver.disconnect();
+              ttftChart?.dispose();
+              outputChart?.dispose();
+            };
+          } catch (error) {
+            console.error('3D图表初始化失败:', error);
+            console.error('错误堆栈:', error.stack);
+          }
+        }
+
+        // 添加图表配置器事件监听
+        function setupChartConfigListeners(chart, perfRows, device) {
+          const configSelects = chartConfigContainer.querySelectorAll('select, input');
+          configSelects.forEach(element => {
+            element.addEventListener('change', () => {
+              updateConfigurableChart(chart, perfRows, device);
+            });
+          });
+        }
+
+        // 添加性能测试筛选器事件监听
+        function setupFilterListeners(chart, perfRows, device) {
+          const filterSelects = filterContainer.querySelectorAll('select[data-filter]');
+          filterSelects.forEach(select => {
+            select.addEventListener('change', () => {
+              // 获取筛选后的数据
+              const filteredData = getFilteredData();
+              updateConfigurableChart(chart, filteredData, device);
+            });
+          });
+        }
+
+        // 添加精度测试筛选器事件监听
+        function setupAccFilterListeners() {
+          if (!accFilterContainer) return;
+
+          const filterSelects = accFilterContainer.querySelectorAll('select[data-filter]');
+          console.log('精度筛选器数量:', filterSelects.length);
+          filterSelects.forEach(select => {
+            select.addEventListener('change', () => {
+              console.log('精度筛选器变化:', select.dataset.filter, select.selectedOptions.length);
+              updateAccuracyChart(device);
+            });
+          });
+        }
+
+        // 判断是否需要使用2D图表
+        function shouldUse2D(models, concurrencies, versions, tokenCombinations = []) {
+          // 如果版本数或并发数只有1个，使用2D图表
+          if (versions.length === 1 || concurrencies.length === 1) {
+            return true;
+          }
+
+          // 考虑所有维度：模型、并发、版本、输入输出组合
+          const dimensions = [models.length, concurrencies.length, versions.length, tokenCombinations.length];
+          const nonSingleDimensions = dimensions.filter(d => d > 1);
+
+          // 如果有3个或以上维度有多个值，强制使用3D（但实际上3D只能显示3个维度）
+          // 如果只有1-2个维度有多个值，使用2D
+          return nonSingleDimensions.length <= 2;
+        }
+
+        // 获取图表配置
+        function getChartConfig() {
+          const activeType = chartConfigContainer.querySelector('.chart-type-option.active');
+          const chartType = activeType.dataset.type;
+
+          if (chartType === '2d') {
+            return {
+              type: '2d',
+              xAxis: chartConfigContainer.querySelector('#x-axis-select').value,
+              series: chartConfigContainer.querySelector('#series-select').value
+            };
+          } else {
+            return {
+              type: '3d',
+              xAxis: chartConfigContainer.querySelector('#x-axis-3d-select').value,
+              yAxis: chartConfigContainer.querySelector('#y-axis-3d-select').value,
+              zAxis: chartConfigContainer.querySelector('#z-axis-3d-select').value
+            };
+          }
+        }
+
+        // 更新图表和表格
+        function updateChartsAndTable(currentDevice) {
+          const filteredData = getFilteredData();
+          const chartConfig = getChartConfig();
+
+          console.log('筛选后数据量:', filteredData.length);
+          console.log('图表配置:', chartConfig);
+
+          // 更新表格
+          updateTable(filteredData);
+
+          // 根据配置生成图表数据
+          const dimensionData = {
+            model: [...new Set(filteredData.map(r => {
+              const remark = r.entry?.base_info?.remark?.trim() || '';
+              return remark ? `${r.model} (${remark})` : r.model;
+            }))].sort(),
+            version: [...new Set(filteredData.map(r => r.version))].sort(compareVersionAsc),
+            concurrency: [...new Set(filteredData.map(r => r.concurrency))].sort((a, b) => a - b),
+            token_combination: [...new Set(filteredData.map(r => {
+              const expectedIn = r.expected_input || r.input_tokens;
+              const expectedOut = r.expected_output || r.output_tokens;
+              return `${expectedIn}/${expectedOut}`;
+            }))].sort()
+          };
+
+          console.log('维度数据:', dimensionData);
+
+          // 更新3D图表数据
+          function generateFilteredData(type = 'ttft') {
+            const data = [];
+            console.log(`生成${type}数据，模型:`, newModels, '并发:', newConcurrencies, '版本:', newVersions, '输入输出组合:', newTokenCombinations);
+
+            // 如果有多个输入输出组合，需要为每个组合生成数据点
+            if (newTokenCombinations.length > 1) {
+              // 使用输入输出组合作为第三维度
+              newModels.forEach((model, modelIndex) => {
+                newConcurrencies.forEach((concurrency, j) => {
+                  newTokenCombinations.forEach((tokenCombo, k) => {
+                    const [expectedIn, expectedOut] = tokenCombo.split('/').map(Number);
+                    const rows = filteredData.filter(r =>
+                      r.model === model &&
+                      r.concurrency === concurrency &&
+                      (r.expected_input || r.input_tokens) === expectedIn &&
+                      (r.expected_output || r.output_tokens) === expectedOut
+                    );
+
+                    // 如果有多个版本，取平均值或最新版本
+                    if (rows.length > 0) {
+                      const latestRow = rows.sort((a, b) => compareVersionAsc(a.version, b.version)).pop();
+                      const value = type === 'ttft' ? latestRow.avg_ttft : latestRow.output_throughput;
+                      data.push([
+                        j, k, value, model, concurrency, tokenCombo,
+                        COLOR_PALETTE[modelIndex % COLOR_PALETTE.length]
+                      ]);
+                      console.log(`添加数据点: ${model}-${tokenCombo}-${concurrency} = ${value}`);
+                    }
+                  });
+                });
+              });
+            } else {
+              // 原有逻辑：使用版本作为第三维度
+              newModels.forEach((model, modelIndex) => {
+                newConcurrencies.forEach((concurrency, j) => {
+                  newVersions.forEach((version, k) => {
+                    const rows = filteredData.filter(r =>
+                      r.model === model &&
+                      r.concurrency === concurrency &&
+                      r.version === version
+                    );
+
+                    // 如果有多个输入输出组合，取平均值
+                    if (rows.length > 0) {
+                      const avgValue = rows.reduce((sum, r) => {
+                        const val = type === 'ttft' ? r.avg_ttft : r.output_throughput;
+                        return sum + val;
+                      }, 0) / rows.length;
+
+                      data.push([
+                        j, k, avgValue, model, concurrency, version,
+                        COLOR_PALETTE[modelIndex % COLOR_PALETTE.length]
+                      ]);
+                      console.log(`添加数据点: ${model}-${version}-${concurrency} = ${avgValue} (${rows.length}条数据平均)`);
+                    }
+                  });
+                });
+              });
+            }
+
+            console.log(`${type}数据生成完成，共${data.length}个数据点`);
+            return data;
+          }
+
+          // 创建2D图表配置
+          function create2DChartOption(type) {
+            const data = [];
+            const categories = [];
+            const series = [];
+
+            // 确定X轴类别和系列，优先使用并发数作为X轴
+            if (newConcurrencies.length > 1) {
+              // 以并发数为X轴
+              categories.push(...newConcurrencies);
+              newModels.forEach((model, modelIndex) => {
+                newVersions.forEach(version => {
+                  const seriesData = newConcurrencies.map(concurrency => {
+                    const rows = filteredData.filter(r =>
+                      r.model === model &&
+                      r.concurrency === concurrency &&
+                      r.version === version
+                    );
+                    if (rows.length > 0) {
+                      const avgValue = rows.reduce((sum, r) => {
+                        const val = type === 'ttft' ? r.avg_ttft : r.output_throughput;
+                        return sum + val;
+                      }, 0) / rows.length;
+                      return avgValue;
+                    }
+                    return null;
+                  });
+
+                  if (seriesData.some(val => val !== null)) {
+                    const remark = filteredData.find(r => r.model === model)?.entry?.base_info?.remark?.trim() || '';
+                    const modelDisplay = remark ? `${model} (${remark})` : model;
+
+                    series.push({
+                      name: `${modelDisplay}-${version}`,
+                      type: 'bar',
+                      data: seriesData,
+                      itemStyle: {
+                        color: COLOR_PALETTE[modelIndex % COLOR_PALETTE.length]
+                      }
+                    });
+                  }
+                });
+              });
+            } else if (newVersions.length > 1) {
+              // 以版本为X轴
+              categories.push(...newVersions);
+              newModels.forEach((model, modelIndex) => {
+                const seriesData = newVersions.map(version => {
+                  const rows = filteredData.filter(r =>
+                    r.model === model &&
+                    r.version === version
+                  );
+                  if (rows.length > 0) {
+                    const avgValue = rows.reduce((sum, r) => {
+                      const val = type === 'ttft' ? r.avg_ttft : r.output_throughput;
+                      return sum + val;
+                    }, 0) / rows.length;
+                    return avgValue;
+                  }
+                  return null;
+                });
+
+                if (seriesData.some(val => val !== null)) {
+                  const remark = filteredData.find(r => r.model === model)?.entry?.base_info?.remark?.trim() || '';
+                  const modelDisplay = remark ? `${model} (${remark})` : model;
+
+                  series.push({
+                    name: modelDisplay,
+                    type: 'bar',
+                    data: seriesData,
+                    itemStyle: {
+                      color: COLOR_PALETTE[modelIndex % COLOR_PALETTE.length]
+                    }
+                  });
+                }
+              });
+            } else {
+              // 以模型为X轴
+              const modelDisplayNames = newModels.map(model => {
+                const remark = filteredData.find(r => r.model === model)?.entry?.base_info?.remark?.trim() || '';
+                return remark ? `${model} (${remark})` : model;
+              });
+              categories.push(...modelDisplayNames);
+
+              const seriesData = newModels.map(model => {
+                const rows = filteredData.filter(r => r.model === model);
+                if (rows.length > 0) {
+                  const avgValue = rows.reduce((sum, r) => {
+                    const val = type === 'ttft' ? r.avg_ttft : r.output_throughput;
+                    return sum + val;
+                  }, 0) / rows.length;
+                  return avgValue;
+                }
+                return null;
+              });
+
+              series.push({
+                name: type === 'ttft' ? 'TTFT (ms)' : '吞吐量 (tokens/s)',
+                type: 'bar',
+                data: seriesData,
+                itemStyle: {
+                  color: COLOR_PALETTE[0]
+                }
+              });
+            }
+
+            return {
+              backgroundColor: '#fff',
+              tooltip: {
+                trigger: 'axis',
+                backgroundColor: 'rgba(255,255,255,0.98)',
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                padding: [8, 12],
+                textStyle: {
+                  color: '#334155',
+                  fontSize: 12
+                },
+                formatter: function(params) {
+                  let result = `<div style="font-weight:bold;margin-bottom:6px;">${params[0].axisValue}</div>`;
+                  params.forEach(param => {
+                    if (param.value !== null) {
+                      // 解析系列名称获取模型和版本信息
+                      const seriesName = param.seriesName;
+                      const color = param.color;
+
+                      // 查找对应的数据行获取tokens信息
+                      const matchingRow = filteredData.find(r => {
+                        if (newConcurrencies.length > 1) {
+                          return seriesName.includes(r.model) && seriesName.includes(r.version) && r.concurrency == param.axisValue;
+                        } else if (newVersions.length > 1) {
+                          return seriesName.includes(r.model) && r.version == param.axisValue;
+                        } else {
+                          return r.model == param.axisValue;
+                        }
+                      });
+
+                      const inputTokens = matchingRow?.expected_input || matchingRow?.input_tokens || '-';
+                      const outputTokens = matchingRow?.expected_output || matchingRow?.output_tokens || '-';
+                      const remark = matchingRow?.entry?.base_info?.remark?.trim() || '';
+                      const modelDisplayName = remark ? `${matchingRow?.model} (${remark})` : (matchingRow?.model || seriesName);
+
+                      result += `<div style="margin:2px 0;">
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};margin-right:6px;"></span>
+                        ${modelDisplayName}: <strong>${param.value.toFixed(2)}</strong><br>
+                        <span style="margin-left:16px;color:#666;font-size:11px;">输入/输出: ${inputTokens}/${outputTokens}</span>
+                      </div>`;
+                    }
+                  });
+                  return result;
+                }
+              },
+              legend: {
+                data: series.map(s => s.name),
+                top: 10
+              },
+              xAxis: {
+                type: 'category',
+                data: categories,
+                axisLabel: {
+                  rotate: categories.length > 5 ? 45 : 0
+                }
+              },
+              yAxis: {
+                type: 'value',
+                name: type === 'ttft' ? 'TTFT (ms)' : '吞吐量 (tokens/s)'
+              },
+              series: series
+            };
+          }
+
+          // 创建完整的3D图表配置
+          function createFilteredChartOption(type) {
+            const data = generateFilteredData(type);
+            console.log(`创建${type}图表配置，数据点数量:`, data.length);
+
+            return {
+              backgroundColor: '#fff',
+              tooltip: {
+                backgroundColor: 'rgba(255,255,255,0.98)',
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                padding: [2, 4],
+                textStyle: {
+                  color: '#334155',
+                  fontSize: 10,
+                  lineHeight: 12
+                },
+                formatter: function(params) {
+                  if (!params || !params.data) {
+                    return '<div style="font-size:10px;line-height:12px;margin:0;padding:0;">数据不完整</div>';
+                  }
+
+                  try {
+                    const [_, __, rawValue, model, concurrency, version] = params.data;
+
+                    // 查找完整的数据行以获取模型显示名称和tokens信息
+                    const fullRow = filteredData.find(r =>
+                      r.model === model &&
+                      r.concurrency === concurrency &&
+                      r.version === version
+                    );
+
+                    // 获取模型显示名称（包含remark）
+                    const remark = fullRow?.entry?.base_info?.remark?.trim() || '';
+                    const modelDisplayName = remark ? `${model} (${remark})` : model;
+
+                    // 获取输入输出tokens
+                    const inputTokens = fullRow?.expected_input || fullRow?.input_tokens || '-';
+                    const outputTokens = fullRow?.expected_output || fullRow?.output_tokens || '-';
+
+                    const value = type === 'ttft'
+                      ? `${Number(rawValue).toFixed(2)} ms`
+                      : `${Number(rawValue).toFixed(2)} tokens/s`;
+
+                    return `<div style="font-size:10px;line-height:12px;margin:0;padding:0;white-space:nowrap;">
+<span style="color:#64748b;">模型:</span><span style="color:#1e40af;font-weight:600;">${modelDisplayName}</span><br>
+<span style="color:#64748b;">版本:</span><span style="color:#1e40af;font-weight:600;">${version}</span> |
+<span style="color:#64748b;">并发:</span><span style="color:#1e40af;font-weight:600;">${concurrency}</span><br>
+<span style="color:#64748b;">输入/输出:</span><span style="color:#1e40af;font-weight:600;">${inputTokens}/${outputTokens}</span> |
+<span style="color:#64748b;">${type === 'ttft' ? 'TTFT' : '吞吐量'}:</span><span style="color:#1e40af;font-weight:600;">${value}</span>
+</div>`;
+                  } catch (error) {
+                    console.error('Tooltip 格式化错误:', error);
+                    return '<div style="font-size:10px;line-height:12px;margin:0;padding:0;">数据格式错误</div>';
+                  }
+                },
+                extraCssText: 'max-width:220px; white-space:normal; word-wrap:break-word; line-height:12px; height:auto;'
+              },
+              visualMap: {
+                max: type === 'ttft' ? 2000 : 50,
+                inRange: {
+                  color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8']
+                }
+              },
+              xAxis3D: {
+                type: 'category',
+                name: '并发数',
+                data: newConcurrencies,
+                nameGap: 25,
+                axisLine: { lineStyle: { width: 2 } },
+                axisLabel: { margin: 8, interval: 0 }
+              },
+              yAxis3D: {
+                type: 'category',
+                name: newTokenCombinations.length > 1 ? '输入/输出' : '版本',
+                data: newTokenCombinations.length > 1 ? newTokenCombinations : newVersions,
+                nameGap: 25,
+                axisLine: { lineStyle: { width: 2 } },
+                axisLabel: { margin: 8, interval: 0 }
+              },
+              zAxis3D: {
+                type: 'value',
+                name: type === 'ttft' ? 'TTFT (ms)' : '吞吐量 (tokens/s)',
+                nameGap: 25,
+                axisLine: { lineStyle: { width: 2 } }
+              },
+              grid3D: {
+                boxWidth: 180,
+                boxHeight: 100,
+                boxDepth: 100,
+                top: 10,
+                bottom: 10,
+                left: 10,
+                right: 10,
+                viewControl: {
+                  distance: 200,
+                  alpha: 25,
+                  beta: 35,
+                  rotateSensitivity: 1.5,
+                  zoomSensitivity: 1.5,
+                  panSensitivity: 1.5,
+                  autoRotate: false,  // 默认不自动旋转
+                  autoRotateSpeed: 2  // 如果需要旋转，速度很慢
+                }
+              },
+              series: [{
+                type: 'bar3D',
+                data: data,
+                shading: 'realistic',
+                itemStyle: {
+                  opacity: 0.8,
+                  borderWidth: 0.5,
+                  borderColor: '#fff'
+                },
+                barSize: 4,
+                minHeight: 1,
+                label: { show: false }
+              }]
+            };
+          }
+
+          // 重新设置图表选项
+          const deviceKey = currentDevice.replace(/\s+/g, '-');
+          const chartInstances = window.chartInstances && window.chartInstances[deviceKey];
+
+          if (chartInstances && chartInstances.ttftChart && chartInstances.outputChart) {
+            console.log('开始更新图表...', deviceKey);
+            try {
+              let ttftOption, outputOption;
+
+              if (use2D) {
+                console.log('使用2D图表配置');
+                ttftOption = create2DChartOption('ttft');
+                outputOption = create2DChartOption('output');
+              } else {
+                console.log('使用3D图表配置');
+                ttftOption = createFilteredChartOption('ttft');
+                outputOption = createFilteredChartOption('output');
+                console.log('TTFT图表数据点数量:', ttftOption.series[0].data.length);
+                console.log('输出图表数据点数量:', outputOption.series[0].data.length);
+              }
+
+              chartInstances.ttftChart.setOption(ttftOption, true);
+              chartInstances.outputChart.setOption(outputOption, true);
+
+              // 更新精度图表
+              if (chartInstances.accuracyChart) {
+                // 筛选精度数据
+                const filteredAccRows = accRows.filter(row => {
+                  return filteredData.some(perfRow =>
+                    perfRow.model === row.model && perfRow.version === row.version
+                  );
+                });
+
+                console.log('原始精度数据量:', accRows.length);
+                console.log('筛选后精度数据量:', filteredAccRows.length);
+                console.log('筛选后精度数据:', filteredAccRows.map(r => ({
+                  model: r.model,
+                  version: r.version,
+                  remark: r.entry?.base_info?.remark,
+                  score: r.score
+                })));
+
+                // 临时保存原始accRows，用筛选后的数据生成图表
+                const originalAccRows = accRows;
+                accRows = filteredAccRows;
+                const accuracyOption = getAccuracyChartOption();
+                accRows = originalAccRows; // 恢复原始数据
+
+                chartInstances.accuracyChart.setOption(accuracyOption, true);
+                console.log('精度图表更新完成');
+              }
+
+              console.log('图表更新完成');
+            } catch (error) {
+              console.error('图表更新失败:', error);
+            }
+          } else {
+            console.error('图表实例不存在，无法更新', deviceKey, chartInstances);
+          }
+        }
+
+        // 更新精度图表
+        function updateAccuracyChart(currentDevice) {
+          const filteredAccData = getFilteredAccData();
+          console.log('筛选后精度数据量:', filteredAccData.length);
+
+          const deviceKey = currentDevice.replace(/\s+/g, '-');
+          const chartInstances = window.chartInstances && window.chartInstances[deviceKey];
+
+          if (chartInstances && chartInstances.accuracyChart) {
+            console.log('开始更新精度图表...', deviceKey);
+            try {
+              // 临时保存原始accRows，用筛选后的数据生成图表
+              const originalAccRows = accRows;
+              accRows = filteredAccData;
+              const accuracyOption = getAccuracyChartOption();
+              accRows = originalAccRows; // 恢复原始数据
+
+              chartInstances.accuracyChart.setOption(accuracyOption, true);
+              console.log('精度图表更新完成');
+            } catch (error) {
+              console.error('精度图表更新失败:', error);
+            }
+          } else {
+            console.error('精度图表实例不存在，无法更新', deviceKey, chartInstances);
+          }
+        }
+
+        // 获取筛选后的精度数据
+        function getFilteredAccData() {
+          if (!accFilterContainer) {
+            console.log('精度筛选器容器不存在，返回原始数据');
+            return accRows;
+          }
+
+          const filterSelects = accFilterContainer.querySelectorAll('select[data-filter]');
+          console.log('精度筛选器数量:', filterSelects.length);
+
+          // 收集所有筛选条件
+          const filters = {};
+          filterSelects.forEach(select => {
+            const filterType = select.dataset.filter;
+            const selectedValues = Array.from(select.selectedOptions)
+              .map(option => option.value)
+              .filter(value => value !== '__ALL__'); // 过滤掉全选选项
+            if (selectedValues.length > 0) {
+              filters[filterType] = selectedValues;
+            }
+          });
+
+          console.log('当前精度筛选条件:', filters);
+
+          const filtered = accRows.filter(row => {
+            // 检查每个筛选条件
+            for (const [filterType, selectedValues] of Object.entries(filters)) {
+              let match = false;
+
+              // 根据筛选类型进行匹配
+              switch (filterType) {
+                case 'model':
+                  // 构建当前行的模型组合键
+                  const rowRemark = row.entry?.base_info?.remark?.trim() || '';
+                  const rowModelKey = rowRemark ? `${row.model}_${rowRemark}` : row.model;
+                  match = selectedValues.includes(rowModelKey);
+                  break;
+                case 'version':
+                  match = selectedValues.includes(row.version);
+                  break;
+              }
+
+              // 如果任何一个筛选条件不匹配，则排除该行
+              if (!match) return false;
+            }
+            return true;
+          });
+
+          console.log('精度筛选结果:', filtered.length, '/', accRows.length);
+          return filtered;
+        }
+
+        // 获取筛选后的数据
+        function getFilteredData() {
+          const filterSelects = filterContainer.querySelectorAll('select[data-filter]');
+          console.log('筛选器数量:', filterSelects.length);
+
+          // 收集所有筛选条件
+          const filters = {};
+          filterSelects.forEach(select => {
+            const filterType = select.dataset.filter;
+            const selectedValues = Array.from(select.selectedOptions)
+              .map(option => option.value)
+              .filter(value => value !== '__ALL__'); // 过滤掉全选选项
+            if (selectedValues.length > 0) {
+              filters[filterType] = selectedValues;
+            }
+          });
+
+          console.log('当前筛选条件:', filters);
+
+          const filtered = perfRows.filter(row => {
+            // 检查每个筛选条件
+            for (const [filterType, selectedValues] of Object.entries(filters)) {
+              let match = false;
+
+              // 根据筛选类型进行匹配
+              switch (filterType) {
+                case 'model':
+                  // 构建当前行的模型组合键
+                  const rowRemark = row.entry?.base_info?.remark?.trim() || '';
+                  const rowModelKey = rowRemark ? `${row.model}_${rowRemark}` : row.model;
+                  match = selectedValues.includes(rowModelKey);
+                  break;
+                case 'version':
+                  match = selectedValues.includes(row.version);
+                  break;
+                case 'concurrency':
+                  match = selectedValues.includes(row.concurrency.toString());
+                  break;
+                case 'token_combination':
+                  const expectedIn = row.expected_input || row.input_tokens;
+                  const expectedOut = row.expected_output || row.output_tokens;
+                  const combination = `${expectedIn}/${expectedOut}`;
+                  match = selectedValues.includes(combination);
+                  break;
+              }
+
+              // 如果任何一个筛选条件不匹配，则排除该行
+              if (!match) return false;
+            }
+            return true;
+          });
+
+          console.log('筛选结果:', filtered.length, '/', perfRows.length);
+          return filtered;
+        }
+
+        // 更新表格 (虽然隐藏了，但保持数据同步)
+        function updateTable(filteredData) {
+          const tbody = tableContainer.querySelector('tbody');
+          tbody.innerHTML = filteredData.map(row => `
+            <tr>
+              <td>${row.model}</td>
+              <td>${row.version}</td>
+              <td class="number">${row.concurrency}</td>
+              <td class="number">${row.expected_input || row.input_tokens}</td>
+              <td class="number">${row.expected_output || row.output_tokens}</td>
+              <td class="number">${row.output_throughput?.toFixed(2) || '-'}</td>
+              <td class="number">${row.total_throughput?.toFixed(2) || '-'}</td>
+              <td class="number">${row.avg_ttft?.toFixed(2) || '-'}</td>
+              <td class="number">${row.p99_ttft?.toFixed(2) || '-'}</td>
+            </tr>
+          `).join('');
+        }
+
+        // 使用 requestAnimationFrame 确保DOM已更新
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            if (ttft3dDiv.isConnected && output3dDiv.isConnected) {
+              const cleanup = initCharts();
+
+              // 设置图表配置器监听
+              setupChartConfigListeners();
+
+              // 设置性能测试筛选器监听
+              setupFilterListeners();
+
+              // 设置精度测试筛选器监听
+              if (accFilterContainer) {
+                setupAccFilterListeners();
+              }
+            } else {
+              console.error('容器尚未添加到DOM');
+            }
+          }, 100);
+        });
+
+      } catch (error) {
+        console.error('整体渲染失败:', error);
+        console.error('错误堆栈:', error.stack);
+      }
+    }
+
+    function drawBarChartsWithGradient() {
+      // 由于渐变需要 canvas context,这个函数可以留空
+      // 或者之后再添加渐变效果
+    }
+    fetchAllResults().then(renderGroupedResults).then(() => {
+      // 等待所有图表初始化完成后，手动触发默认配置
+      setTimeout(() => {
+        console.log('🔄 手动触发所有默认配置');
+        // 查找所有配置容器并检查需要默认配置的
+        const allConfigContainers = document.querySelectorAll('.chart-config-container');
+        console.log('所有配置容器数量:', allConfigContainers.length);
+
+        const configContainers = Array.from(allConfigContainers).filter(container => {
+          const needsConfig = container.dataset.needsDefaultConfig === 'true';
+          console.log('容器设备:', container.dataset.device, '需要默认配置:', needsConfig);
+          return needsConfig;
+        });
+        console.log('找到需要默认配置的容器数量:', configContainers.length);
+
+        configContainers.forEach(container => {
+          const device = container.dataset.device;
+          console.log('🎯 为设备设置默认配置:', device);
+
+          // 获取该设备的数据
+          const deviceKey = String(device).replace(/\s+/g, '-');
+          const perfRows = window.devicePerfRows?.[deviceKey] || window.currentPerfRows || [];
+
+          if (perfRows.length > 0) {
+            setDefaultConfiguration(container, device, perfRows);
+            container.dataset.needsDefaultConfig = 'false';
+          } else {
+            console.log('❌ 没有找到设备数据:', device);
+          }
+        });
+      }, 1500);
+
+      // 额外的备用触发机制
+      setTimeout(() => {
+        console.log('🔄 备用默认配置触发');
+        const allContainers = document.querySelectorAll('.chart-config-container');
+        console.log('备用机制找到容器数量:', allContainers.length);
+        allContainers.forEach(container => {
+          const device = container.dataset.device;
+          console.log('检查设备:', device);
+          if (device && device.includes('s4000')) {
+            console.log('🎯 为S4000设备强制设置默认配置');
+            const deviceKey = String(device).replace(/\s+/g, '-');
+            const perfRows = window.devicePerfRows?.[deviceKey] || [];
+            console.log('S4000数据量:', perfRows.length);
+
+            if (perfRows.length > 0) {
+              // 直接设置配置
+              const dim1Select = container.querySelector('#dim1-select');
+              const dim2Select = container.querySelector('#dim2-select');
+              const xAxisSelect = container.querySelector('#x-axis-select');
+
+              console.log('找到选择器: dim1=', !!dim1Select, 'dim2=', !!dim2Select, 'xAxis=', !!xAxisSelect);
+
+              if (dim1Select && dim2Select && xAxisSelect) {
+                console.log('🔧 直接设置S4000默认配置');
+
+                // 设置模型维度
+                console.log('设置维度1为model');
+                dim1Select.value = 'model';
+                dim1Select.dispatchEvent(new Event('change', { bubbles: true }));
+
+                setTimeout(() => {
+                  const dim1ValueSelect = container.querySelector('#dim1-value');
+                  console.log('找到dim1ValueSelect:', !!dim1ValueSelect);
+
+                  if (dim1ValueSelect) {
+                    const models = Array.from(dim1ValueSelect.options).map(o => o.value).filter(v => v);
+                    console.log('可用模型:', models.join(', '));
+                    const target671b = models.find(m => m.toLowerCase().includes('671b') && m.includes('6core'));
+                    console.log('找到671B模型:', target671b);
+
+                    if (target671b) {
+                      dim1ValueSelect.value = target671b;
+                      dim1ValueSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                      console.log('✅ S4000模型已设置:', target671b);
+
+                      // 设置版本维度
+                      setTimeout(() => {
+                        dim2Select.value = 'version';
+                        dim2Select.dispatchEvent(new Event('change', { bubbles: true }));
+
+                        setTimeout(() => {
+                          const dim2ValueSelect = container.querySelector('#dim2-value');
+                          if (dim2ValueSelect && dim2ValueSelect.options.length > 1) {
+                            dim2ValueSelect.value = dim2ValueSelect.options[dim2ValueSelect.options.length - 1].value;
+                            dim2ValueSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+                            // 设置X轴
+                            setTimeout(() => {
+                              xAxisSelect.value = 'concurrency';
+                              xAxisSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                              console.log('✅ S4000默认配置完成');
+                            }, 100);
+                          }
+                        }, 200);
+                      }, 200);
+                    }
+                  }
+                }, 300);
+              }
+            }
+          }
+        });
+      }, 3000);
+    }).catch(err => {
       document.getElementById("app").innerHTML = `<p style="color:red;">❌ 加载失败: ${err.message}</p>`;
       console.error(err);
+    });
+  </script>
+  <script>
+    // 检查 ECharts 版本
+    window.addEventListener('load', () => {
+      if (echarts) {
+        console.log('ECharts 版本:', echarts.version);
+      } else {
+        console.error('ECharts 未加载');
+      }
     });
   </script>
 </body>

@@ -1,8 +1,15 @@
 [
-  "test_results_20250722_0305.json",
-  "test_results_20250722_1211.json",
-  "test_results_20250722_1400.json",
-  "test_results_20250722_1500.json",
-  "test_results_20250723_0308.json",
-  "test_results_20250723_0309.json"
+  "AITiansi_v1.0.1.json",
+  "AIbook_0625_bf-16.json",
+  "AIbook_0625_gptq.json",
+  "AImodel_0705.json",
+  "AImodel_v1.0.1.json",
+  "AImodel_v1.0.json",
+  "v1.1_QWen_32B_6core_0610.json",
+  "v1.1_QWen_32B_7core_0701.json",
+  "v1.1_beta.json",
+  "v1.1_deepseek_671B_6core_0701.json",
+  "v1.1_deepseek_671B_7core_0610.json",
+  "v1.1_deepseek_70B_6core_0610.json",
+  "v1.1_deepseek_70B_7core_0701.json"
 ]

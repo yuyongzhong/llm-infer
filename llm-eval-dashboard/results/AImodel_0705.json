@@ -1,0 +1,345 @@
+{
+  "project_id": "yyz_test_20250723_1000",
+  "timestamp": "2025-07-15T019:00:15.593620Z",
+  "model_name": "Qwen",
+  "run_mode": "acc",
+  "base_info": {
+    "device": "AIBook-32G",
+    "model": "Qwen2.5-7B-Instruc",
+    "version": "0.7.5",
+    "software_version":"",
+    "software_url": "",
+    "vllm_image_harbor": {
+      "huoshan_harbor_url": "",
+      "shanghai_harbor_url": ""
+    }
+  },
+  "tests": [
+    {
+      "test_type": "accuracy",
+      "datasets": [
+        {
+          "name": "AIModel_0705",
+          "dataset_name": "ceval",
+          "dataset_pretty_name": "C-Eval",
+          "dataset_description": null,
+          "model_name": "ceval",
+          "score": 0.7874,
+          "metrics": [
+            {
+              "name": "AverageAccuracy",
+              "num": 1346,
+              "score": 0.7874,
+              "macro_score": 0.7852,
+              "categories": [
+                {
+                  "name": [
+                    "Humanities"
+                  ],
+                  "num": 257,
+                  "score": 0.7986,
+                  "macro_score": 0.7986,
+                  "subsets": [
+                    {
+                      "name": "modern_chinese_history",
+                      "score": 0.8696,
+                      "num": 23
+                    },
+                    {
+                      "name": "ideological_and_moral_cultivation",
+                      "score": 0.9158,
+                      "num": 19
+                    },
+                    {
+                      "name": "logic",
+                      "score": 0.7,
+                      "num": 22
+                    },
+                    {
+                      "name": "law",
+                      "score": 0.7167,
+                      "num": 24
+                    },
+                    {
+                      "name": "chinese_language_and_literature",
+                      "score": 0.6261,
+                      "num": 23
+                    },
+                    {
+                      "name": "art_studies",
+                      "score": 0.7455,
+                      "num": 33
+                    },
+                    {
+                      "name": "professional_tour_guide",
+                      "score": 0.8966,
+                      "num": 29
+                    },
+                    {
+                      "name": "legal_professional",
+                      "score": 0.7913,
+                      "num": 23
+                    },
+                    {
+                      "name": "high_school_chinese",
+                      "score": 0.6842,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_history",
+                      "score": 0.87,
+                      "num": 20
+                    },
+                    {
+                      "name": "middle_school_history",
+                      "score": 0.9545,
+                      "num": 22
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "Other"
+                  ],
+                  "num": 384,
+                  "score": 0.7721,
+                  "macro_score": 0.7721,
+                  "subsets": [
+                    {
+                      "name": "civil_servant",
+                      "score": 0.7362,
+                      "num": 47
+                    },
+                    {
+                      "name": "sports_science",
+                      "score": 0.8526,
+                      "num": 19
+                    },
+                    {
+                      "name": "plant_protection",
+                      "score": 0.8273,
+                      "num": 22
+                    },
+                    {
+                      "name": "basic_medicine",
+                      "score": 0.8842,
+                      "num": 19
+                    },
+                    {
+                      "name": "clinical_medicine",
+                      "score": 0.8,
+                      "num": 22
+                    },
+                    {
+                      "name": "urban_and_rural_planner",
+                      "score": 0.7261,
+                      "num": 46
+                    },
+                    {
+                      "name": "accountant",
+                      "score": 0.8327,
+                      "num": 49
+                    },
+                    {
+                      "name": "fire_engineer",
+                      "score": 0.6581,
+                      "num": 31
+                    },
+                    {
+                      "name": "environmental_impact_assessment_engineer",
+                      "score": 0.7806,
+                      "num": 31
+                    },
+                    {
+                      "name": "tax_accountant",
+                      "score": 0.8245,
+                      "num": 49
+                    },
+                    {
+                      "name": "physician",
+                      "score": 0.7429,
+                      "num": 49
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "STEM"
+                  ],
+                  "num": 485,
+                  "score": 0.7612,
+                  "macro_score": 0.7612,
+                  "subsets": [
+                    {
+                      "name": "electrical_engineer",
+                      "score": 0.6162,
+                      "num": 37
+                    },
+                    {
+                      "name": "metrology_engineer",
+                      "score": 0.85,
+                      "num": 24
+                    },
+                    {
+                      "name": "high_school_mathematics",
+                      "score": 0.6333,
+                      "num": 18
+                    },
+                    {
+                      "name": "high_school_physics",
+                      "score": 0.7895,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_chemistry",
+                      "score": 0.7158,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_biology",
+                      "score": 0.9053,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_mathematics",
+                      "score": 0.8632,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_biology",
+                      "score": 0.9048,
+                      "num": 21
+                    },
+                    {
+                      "name": "middle_school_physics",
+                      "score": 0.9474,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_chemistry",
+                      "score": 0.94,
+                      "num": 20
+                    },
+                    {
+                      "name": "veterinary_medicine",
+                      "score": 0.8348,
+                      "num": 23
+                    },
+                    {
+                      "name": "computer_network",
+                      "score": 0.6947,
+                      "num": 19
+                    },
+                    {
+                      "name": "operating_system",
+                      "score": 0.7684,
+                      "num": 19
+                    },
+                    {
+                      "name": "computer_architecture",
+                      "score": 0.8286,
+                      "num": 21
+                    },
+                    {
+                      "name": "college_programming",
+                      "score": 0.8541,
+                      "num": 37
+                    },
+                    {
+                      "name": "college_physics",
+                      "score": 0.6316,
+                      "num": 19
+                    },
+                    {
+                      "name": "college_chemistry",
+                      "score": 0.6833,
+                      "num": 24
+                    },
+                    {
+                      "name": "advanced_mathematics",
+                      "score": 0.5474,
+                      "num": 19
+                    },
+                    {
+                      "name": "probability_and_statistics",
+                      "score": 0.7111,
+                      "num": 18
+                    },
+                    {
+                      "name": "discrete_mathematics",
+                      "score": 0.3625,
+                      "num": 16
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "Social Science"
+                  ],
+                  "num": 220,
+                  "score": 0.8573,
+                  "macro_score": 0.8573,
+                  "subsets": [
+                    {
+                      "name": "college_economics",
+                      "score": 0.6509,
+                      "num": 55
+                    },
+                    {
+                      "name": "business_administration",
+                      "score": 0.7879,
+                      "num": 33
+                    },
+                    {
+                      "name": "marxism",
+                      "score": 0.9368,
+                      "num": 19
+                    },
+                    {
+                      "name": "mao_zedong_thought",
+                      "score": 0.9167,
+                      "num": 24
+                    },
+                    {
+                      "name": "education_science",
+                      "score": 0.8414,
+                      "num": 29
+                    },
+                    {
+                      "name": "teacher_qualification",
+                      "score": 0.85,
+                      "num": 44
+                    },
+                    {
+                      "name": "high_school_politics",
+                      "score": 0.8947,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_geography",
+                      "score": 0.9158,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_politics",
+                      "score": 0.9905,
+                      "num": 21
+                    },
+                    {
+                      "name": "middle_school_geography",
+                      "score": 0.9667,
+                      "num": 12
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "analysis": "N/A"
+        }
+      ],
+      "log_path": ""
+    }
+  ]
+}
+

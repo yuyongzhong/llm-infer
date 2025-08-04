@@ -1,0 +1,751 @@
+{
+  "project_id": "yyz_test_20250723_1000",
+  "timestamp": "2025-06-27T03:05:15.593620Z",
+  "model_name": "QWen",
+  "run_mode": "acc-then-bench",
+  "base_info": {
+    "device": "s4000",
+    "model": "qw-32B",
+    "version": "1.1",
+    "remark": "7core",
+    "software_version":"0701",
+    "software_url": "https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjAvMjAyNS0wNy0wMS8=",
+    "vllm_image_harbor": {
+      "huoshan_harbor_url": "registry.mthreads.com/mcconline/vllm-musa-qy2-py310:v0.8.4-release",
+      "shanghai_harbor_url": "sh-harbor.mthreads.com/vllm-images/vllm-musa-qy2-py310:v0.8.4-release"
+    }
+  },
+  "tests": [
+    {
+      "test_type": "benchmark",
+      "results": [
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 1,
+          "input_tokens": 25600,
+          "output_tokens": 25600,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128.0,
+          "avg_output": 128.0,
+          "total_time": 999.21,
+          "req_throughput": 0.20,
+          "output_throughput": 25.62,
+          "total_throughput": 51.24,
+          "avg_ttft": 326.58,
+          "p99_ttft": 3570.30
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 1,
+          "input_tokens": 51200,
+          "output_tokens": 51200,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256.0,
+          "avg_output": 256.0,
+          "total_time": 2064.10,
+          "req_throughput": 0.10,
+          "output_throughput": 24.80,
+          "total_throughput": 49.61,
+          "avg_ttft": 432.75,
+          "p99_ttft": 3656.19
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 1,
+          "input_tokens": 204800,
+          "output_tokens": 204800,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024.0,
+          "avg_output": 1024.0,
+          "total_time": 8246.05,
+          "req_throughput": 0.02,
+          "output_throughput": 24.84,
+          "total_throughput": 49.67,
+          "avg_ttft": 1347.59,
+          "p99_ttft": 4482.61
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 1,
+          "input_tokens": 409600,
+          "output_tokens": 204800,
+          "expected_input": 2048,
+          "expected_output": 1024,
+          "avg_input": 2048.0,
+          "avg_output": 1024.0,
+          "total_time": 8632.19,
+          "req_throughput": 0.02,
+          "output_throughput": 23.73,
+          "total_throughput": 71.18,
+          "avg_ttft": 3206.12,
+          "p99_ttft": 3229.49
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 1,
+          "input_tokens": 409600,
+          "output_tokens": 40000,
+          "expected_input": 2048,
+          "expected_output": 200,
+          "avg_input": 2048.0,
+          "avg_output": 200.0,
+          "total_time": 2252.86,
+          "req_throughput": 0.09,
+          "output_throughput": 17.76,
+          "total_throughput": 199.57,
+          "avg_ttft": 3504.69,
+          "p99_ttft": 6495.97
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 4,
+          "input_tokens": 25600,
+          "output_tokens": 25600,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128.0,
+          "avg_output": 128.0,
+          "total_time": 329.27,
+          "req_throughput": 0.61,
+          "output_throughput": 77.75,
+          "total_throughput": 155.49,
+          "avg_ttft": 545.45,
+          "p99_ttft": 588.79
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 4,
+          "input_tokens": 51200,
+          "output_tokens": 51200,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256.0,
+          "avg_output": 256.0,
+          "total_time": 677.99,
+          "req_throughput": 0.29,
+          "output_throughput": 75.52,
+          "total_throughput": 151.04,
+          "avg_ttft": 911.87,
+          "p99_ttft": 939.78
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 4,
+          "input_tokens": 204800,
+          "output_tokens": 204800,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024.0,
+          "avg_output": 1024.0,
+          "total_time": 2726.43,
+          "req_throughput": 0.07,
+          "output_throughput": 75.12,
+          "total_throughput": 150.23,
+          "avg_ttft": 3702.44,
+          "p99_ttft": 3737.53
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 4,
+          "input_tokens": 409600,
+          "output_tokens": 204800,
+          "expected_input": 2048,
+          "expected_output": 1024,
+          "avg_input": 2048.0,
+          "avg_output": 1024.0,
+          "total_time": 3118.72,
+          "req_throughput": 0.06,
+          "output_throughput": 65.67,
+          "total_throughput": 197.00,
+          "avg_ttft": 11431.55,
+          "p99_ttft": 11523.42
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 4,
+          "input_tokens": 409600,
+          "output_tokens": 40000,
+          "expected_input": 2048,
+          "expected_output": 200,
+          "avg_input": 2048.0,
+          "avg_output": 200.0,
+          "total_time": 1064.49,
+          "req_throughput": 0.19,
+          "output_throughput": 37.58,
+          "total_throughput": 422.36,
+          "avg_ttft": 11432.85,
+          "p99_ttft": 11531.83
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 8,
+          "input_tokens": 25600,
+          "output_tokens": 25600,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128.0,
+          "avg_output": 128.0,
+          "total_time": 201.87,
+          "req_throughput": 0.99,
+          "output_throughput": 126.82,
+          "total_throughput": 253.63,
+          "avg_ttft": 766.33,
+          "p99_ttft": 833.66
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 8,
+          "input_tokens": 51200,
+          "output_tokens": 51200,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256.0,
+          "avg_output": 256.0,
+          "total_time": 407.77,
+          "req_throughput": 0.49,
+          "output_throughput": 125.56,
+          "total_throughput": 251.12,
+          "avg_ttft": 1212.69,
+          "p99_ttft": 1275.04
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 8,
+          "input_tokens": 204800,
+          "output_tokens": 204800,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024.0,
+          "avg_output": 1024.0,
+          "total_time": 1699.97,
+          "req_throughput": 0.12,
+          "output_throughput": 120.47,
+          "total_throughput": 240.94,
+          "avg_ttft": 6587.14,
+          "p99_ttft": 6634.92
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 8,
+          "input_tokens": 409600,
+          "output_tokens": 204800,
+          "expected_input": 2048,
+          "expected_output": 1024,
+          "avg_input": 2048.0,
+          "avg_output": 1024.0,
+          "total_time": 2116.94,
+          "req_throughput": 0.09,
+          "output_throughput": 96.74,
+          "total_throughput": 290.23,
+          "avg_ttft": 20214.84,
+          "p99_ttft": 22961.88
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 8,
+          "input_tokens": 409600,
+          "output_tokens": 40000,
+          "expected_input": 2048,
+          "expected_output": 200,
+          "avg_input": 2048.0,
+          "avg_output": 200.0,
+          "total_time": 870.39,
+          "req_throughput": 0.23,
+          "output_throughput": 45.96,
+          "total_throughput": 516.55,
+          "avg_ttft": 20209.03,
+          "p99_ttft": 22958.57
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 16,
+          "input_tokens": 25600,
+          "output_tokens": 25600,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128.0,
+          "avg_output": 128.0,
+          "total_time": 123.83,
+          "req_throughput": 1.62,
+          "output_throughput": 206.74,
+          "total_throughput": 413.48,
+          "avg_ttft": 1001.99,
+          "p99_ttft": 1088.55
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 16,
+          "input_tokens": 51200,
+          "output_tokens": 51200,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256.0,
+          "avg_output": 256.0,
+          "total_time": 252.03,
+          "req_throughput": 0.79,
+          "output_throughput": 203.15,
+          "total_throughput": 406.29,
+          "avg_ttft": 1828.21,
+          "p99_ttft": 2010.17
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 16,
+          "input_tokens": 204800,
+          "output_tokens": 204800,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024.0,
+          "avg_output": 1024.0,
+          "total_time": 1102.77,
+          "req_throughput": 0.18,
+          "output_throughput": 185.71,
+          "total_throughput": 371.43,
+          "avg_ttft": 11975.73,
+          "p99_ttft": 13188.88
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 16,
+          "input_tokens": 409600,
+          "output_tokens": 204800,
+          "expected_input": 2048,
+          "expected_output": 1024,
+          "avg_input": 2048.0,
+          "avg_output": 1024.0,
+          "total_time": 1548.71,
+          "req_throughput": 0.13,
+          "output_throughput": 132.24,
+          "total_throughput": 396.72,
+          "avg_ttft": 32510.66,
+          "p99_ttft": 44559.66
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 16,
+          "input_tokens": 409600,
+          "output_tokens": 40000,
+          "expected_input": 2048,
+          "expected_output": 200,
+          "avg_input": 2048.0,
+          "avg_output": 200.0,
+          "total_time": 741.13,
+          "req_throughput": 0.27,
+          "output_throughput": 53.97,
+          "total_throughput": 606.64,
+          "avg_ttft": 32499.71,
+          "p99_ttft": 44571.39
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 32,
+          "input_tokens": 25600,
+          "output_tokens": 25600,
+          "expected_input": 128,
+          "expected_output": 128,
+          "avg_input": 128.0,
+          "avg_output": 128.0,
+          "total_time": 66.96,
+          "req_throughput": 2.99,
+          "output_throughput": 382.34,
+          "total_throughput": 764.68,
+          "avg_ttft": 1510.11,
+          "p99_ttft": 1574.46
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 32,
+          "input_tokens": 51200,
+          "output_tokens": 51200,
+          "expected_input": 256,
+          "expected_output": 256,
+          "avg_input": 256.0,
+          "avg_output": 256.0,
+          "total_time": 138.60,
+          "req_throughput": 1.44,
+          "output_throughput": 369.41,
+          "total_throughput": 738.81,
+          "avg_ttft": 3162.28,
+          "p99_ttft": 3316.58
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 32,
+          "input_tokens": 204800,
+          "output_tokens": 204800,
+          "expected_input": 1024,
+          "expected_output": 1024,
+          "avg_input": 1024.0,
+          "avg_output": 1024.0,
+          "total_time": 686.21,
+          "req_throughput": 0.29,
+          "output_throughput": 298.45,
+          "total_throughput": 596.90,
+          "avg_ttft": 19114.31,
+          "p99_ttft": 25681.65
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 32,
+          "input_tokens": 409600,
+          "output_tokens": 204800,
+          "expected_input": 2048,
+          "expected_output": 1024,
+          "avg_input": 2048.0,
+          "avg_output": 1024.0,
+          "total_time": 1120.24,
+          "req_throughput": 0.18,
+          "output_throughput": 182.82,
+          "total_throughput": 548.45,
+          "avg_ttft": 54376.32,
+          "p99_ttft": 88862.85
+        },
+        {
+          "timestamp": "2025-07-09",
+          "concurrency": 32,
+          "input_tokens": 409600,
+          "output_tokens": 40000,
+          "expected_input": 2048,
+          "expected_output": 200,
+          "avg_input": 2048.0,
+          "avg_output": 200.0,
+          "total_time": 660.78,
+          "req_throughput": 0.30,
+          "output_throughput": 60.53,
+          "total_throughput": 680.41,
+          "avg_ttft": 54346.26,
+          "p99_ttft": 88915.19
+        }
+      ],
+      "log_path": ""
+    },
+    {
+      "test_type": "accuracy",
+      "datasets": [
+        {
+          "name": "qw-32B（7core）软件：0701版本",
+          "dataset_name": "ceval",
+          "dataset_pretty_name": "C-Eval",
+          "dataset_description": null,
+          "model_name": "qw-32B",
+          "score": 0.8792,
+          "metrics": [
+            {
+              "name": "AverageAccuracy",
+              "num": 1346,
+              "score": 0.8792,
+              "macro_score": 0.8768,
+              "categories": [
+                {
+                  "name": [
+                    "Humanities"
+                  ],
+                  "num": 257,
+                  "score": 0.8554,
+                  "macro_score": 0.8554,
+                  "subsets": [
+                    {
+                      "name": "modern_chinese_history",
+                      "score": 0.8696,
+                      "num": 23
+                    },
+                    {
+                      "name": "ideological_and_moral_cultivation",
+                      "score": 0.9053,
+                      "num": 19
+                    },
+                    {
+                      "name": "logic",
+                      "score": 0.9091,
+                      "num": 22
+                    },
+                    {
+                      "name": "law",
+                      "score": 0.825,
+                      "num": 24
+                    },
+                    {
+                      "name": "chinese_language_and_literature",
+                      "score": 0.8522,
+                      "num": 23
+                    },
+                    {
+                      "name": "art_studies",
+                      "score": 0.8242,
+                      "num": 33
+                    },
+                    {
+                      "name": "professional_tour_guide",
+                      "score": 0.9517,
+                      "num": 29
+                    },
+                    {
+                      "name": "legal_professional",
+                      "score": 0.7565,
+                      "num": 23
+                    },
+                    {
+                      "name": "high_school_chinese",
+                      "score": 0.7684,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_history",
+                      "score": 0.93,
+                      "num": 20
+                    },
+                    {
+                      "name": "middle_school_history",
+                      "score": 0.9545,
+                      "num": 22
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "STEM"
+                  ],
+                  "num": 485,
+                  "score": 0.8828,
+                  "macro_score": 0.8828,
+                  "subsets": [
+                    {
+                      "name": "electrical_engineer",
+                      "score": 0.6649,
+                      "num": 37
+                    },
+                    {
+                      "name": "metrology_engineer",
+                      "score": 0.8917,
+                      "num": 24
+                    },
+                    {
+                      "name": "high_school_mathematics",
+                      "score": 0.8778,
+                      "num": 18
+                    },
+                    {
+                      "name": "high_school_physics",
+                      "score": 0.9053,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_chemistry",
+                      "score": 0.9474,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_biology",
+                      "score": 0.9474,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_mathematics",
+                      "score": 1,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_biology",
+                      "score": 0.8571,
+                      "num": 21
+                    },
+                    {
+                      "name": "middle_school_physics",
+                      "score": 1,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_chemistry",
+                      "score": 1,
+                      "num": 20
+                    },
+                    {
+                      "name": "veterinary_medicine",
+                      "score": 0.913,
+                      "num": 23
+                    },
+                    {
+                      "name": "computer_network",
+                      "score": 0.8421,
+                      "num": 19
+                    },
+                    {
+                      "name": "operating_system",
+                      "score": 0.8632,
+                      "num": 19
+                    },
+                    {
+                      "name": "computer_architecture",
+                      "score": 0.9238,
+                      "num": 21
+                    },
+                    {
+                      "name": "college_programming",
+                      "score": 0.8757,
+                      "num": 37
+                    },
+                    {
+                      "name": "college_physics",
+                      "score": 0.7789,
+                      "num": 19
+                    },
+                    {
+                      "name": "college_chemistry",
+                      "score": 0.85,
+                      "num": 24
+                    },
+                    {
+                      "name": "advanced_mathematics",
+                      "score": 0.8947,
+                      "num": 19
+                    },
+                    {
+                      "name": "probability_and_statistics",
+                      "score": 0.8333,
+                      "num": 18
+                    },
+                    {
+                      "name": "discrete_mathematics",
+                      "score": 0.6375,
+                      "num": 16
+                    },
+                    {
+                      "name": "college_economics",
+                      "score": 0.8327,
+                      "num": 55
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "Other"
+                  ],
+                  "num": 384,
+                  "score": 0.8615,
+                  "macro_score": 0.8615,
+                  "subsets": [
+                    {
+                      "name": "civil_servant",
+                      "score": 0.8723,
+                      "num": 47
+                    },
+                    {
+                      "name": "sports_science",
+                      "score": 0.8947,
+                      "num": 19
+                    },
+                    {
+                      "name": "plant_protection",
+                      "score": 0.9273,
+                      "num": 22
+                    },
+                    {
+                      "name": "basic_medicine",
+                      "score": 0.8632,
+                      "num": 19
+                    },
+                    {
+                      "name": "clinical_medicine",
+                      "score": 0.8727,
+                      "num": 22
+                    },
+                    {
+                      "name": "urban_and_rural_planner",
+                      "score": 0.8652,
+                      "num": 46
+                    },
+                    {
+                      "name": "accountant",
+                      "score": 0.8776,
+                      "num": 49
+                    },
+                    {
+                      "name": "fire_engineer",
+                      "score": 0.9032,
+                      "num": 31
+                    },
+                    {
+                      "name": "environmental_impact_assessment_engineer",
+                      "score": 0.7935,
+                      "num": 31
+                    },
+                    {
+                      "name": "tax_accountant",
+                      "score": 0.9143,
+                      "num": 49
+                    },
+                    {
+                      "name": "physician",
+                      "score": 0.8776,
+                      "num": 49
+                    }
+                  ]
+                },
+                {
+                  "name": [
+                    "Social Science"
+                  ],
+                  "num": 220,
+                  "score": 0.9206,
+                  "macro_score": 0.9206,
+                  "subsets": [
+                    {
+                      "name": "business_administration",
+                      "score": 0.8485,
+                      "num": 33
+                    },
+                    {
+                      "name": "marxism",
+                      "score": 0.9158,
+                      "num": 19
+                    },
+                    {
+                      "name": "mao_zedong_thought",
+                      "score": 0.9417,
+                      "num": 24
+                    },
+                    {
+                      "name": "education_science",
+                      "score": 0.8966,
+                      "num": 29
+                    },
+                    {
+                      "name": "teacher_qualification",
+                      "score": 0.9409,
+                      "num": 44
+                    },
+                    {
+                      "name": "high_school_politics",
+                      "score": 0.9895,
+                      "num": 19
+                    },
+                    {
+                      "name": "high_school_geography",
+                      "score": 0.9474,
+                      "num": 19
+                    },
+                    {
+                      "name": "middle_school_politics",
+                      "score": 0.9905,
+                      "num": 21
+                    },
+                    {
+                      "name": "middle_school_geography",
+                      "score": 0.9,
+                      "num": 12
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "analysis": "N/A"
+        }
+      ],
+      "log_path": ""
+    }
+  ]
+}
