@@ -1,0 +1,97 @@
+# Run vLLM Launcher Script
+
+该脚本用于在本地或多机环境中启动基于 vLLM 的大模型推理服务，支持如下特性：
+
+* 支持张量并行（TP）与流水并行（PP）配置
+* 支持本地单机或多机分布式部署
+* 支持模型服务名称、服务端口、可见设备、层级划分等参数化配置
+* 自动处理环境变量导出、缓存清理、Ray 集群初始化等流程
+
+---
+
+## 📌 使用方式
+
+```bash
+bash run.sh --tp <TP_SIZE> \
+            --pp <PP_SIZE> \
+            --model-path <MODEL_PATH> \
+            [--model-name <MODEL_NAME>] \
+            [--port <PORT>] \
+            [--visible-devices <GPUs>] \
+            [--hostfile <HOSTFILE>] \
+            [--partition <LAYER_PARTITION>]
+```
+
+### 🔧 必选参数
+
+| 参数             | 说明                          |
+| -------------- | --------------------------- |
+| `--tp`         | Tensor Parallel 并行度，如 `2`   |
+| `--pp`         | Pipeline Parallel 并行度，如 `4` |
+| `--model-path` | 模型路径，如 `/models/qwen`       |
+
+### 🧩 可选参数（有默认值）
+
+| 参数                  | 默认值               | 说明                           |
+| ------------------- | ----------------- | ---------------------------- |
+| `--model-name`      | `deepseek`        | 启动服务时注册的模型名称                 |
+| `--port`            | `8000`            | 启动 HTTP 服务的端口                |
+| `--visible-devices` | `0,1,2,3,4,5,6,7` | 多卡训练可见卡编号                    |
+| `--hostfile`        | *空*               | 多机部署时提供的主机列表文件（省略则为单机）       |
+| `--partition`       | *空*               | PP 层级划分方案，如 `13,12,12,12,12` |
+
+---
+
+## 🧠 使用示例
+
+### 单机 2TP+1PP 部署
+
+```bash
+bash run.sh --tp 2 --pp 1 --model-path /models/qwen
+```
+
+### 多机 2TP+4PP 部署（含层划分）
+
+```bash
+bash run.sh \
+  --tp 2 \
+  --pp 4 \
+  --model-path /models/qwen \
+  --model-name qwen-1.5b \
+  --port 8600 \
+  --visible-devices 0,1,2,3,4,5,6,7 \
+  --hostfile ./hosts.txt \
+  --partition 13,12,12,12,12
+```
+
+其中 `hosts.txt` 格式如下：
+
+```
+192.168.1.11
+192.168.1.12
+192.168.1.13
+```
+
+---
+
+## 📂 输出日志
+
+运行日志默认输出到：
+
+```bash
+./output/<时间戳>/ppX_tpY_gpusZ.log
+```
+
+---
+
+## ⚙️ 环境变量配置项
+
+以下变量会自动注入运行环境中（可根据需求在脚本中微调）：
+
+* `MCCL_PROTOS`、`MUSA_HOME`、`VLLM_NCCL_SO_PATH` 等 MUSA 与通信栈相关变量
+* `MTHREADS_VISIBLE_DEVICES` 显卡可见性控制
+* `TRITON_CACHE_DIR`、`LD_LIBRARY_PATH` 等运行时配置
+
+---
+
+如需增加对 MCP、Prometheus、Feishu 等组件的对接支持，或集成测试逻辑，可进一步扩展此脚本。

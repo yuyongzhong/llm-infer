@@ -1,0 +1,105 @@
+FROM ubuntu:22.04
+
+ARG default_musa_arch=22
+ARG py_wheels_path=/root/py_wheels/mp_${default_musa_arch}
+ENV build_date="$(date +%Y_%m_%d_%H%M)"
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list
+
+RUN apt-get update && \
+    apt-get install -y bash \
+    ssh vim git dkms libdrm2 \
+    infiniband-diags ibutils libibverbs-dev librdmacm-dev \
+    libstdc++-12-dev libopenblas-base libopenmpi-dev libomp-dev \
+    python3.10 python3-distutils python3-pip
+
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+RUN git config --global url."https://hgithub.xyz".insteadOf "https://github.com"
+
+RUN ln -s /usr/bin/python3.10 /usr/bin/python && \
+    echo "export PATH=/usr/local/musa/bin:${PATH}" >> ~/.bashrc && \
+    echo "export LD_LIBRARY_PATH=/usr/local/musa/lib:${LD_LIBRARY_PATH}" >> ~/.bashrc && \
+    ssh-keygen -t rsa -b 4096 -f /root/.ssh/id_rsa -N "" && \
+    cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#Port 22/Port 62262/' /etc/ssh/sshd_config && \
+    sed -i 's/#   Port 22/    Port 62262/' /etc/ssh/ssh_config && \
+    sed -i 's/#   StrictHostKeyChecking ask/    StrictHostKeyChecking no/' /etc/ssh/ssh_config && \
+    echo 'root:123456' | chpasswd && \
+    service ssh start && \
+    mkdir -p ${py_wheels_path}
+
+ENV MTHREADS_VISIBLE_DEVICES=all
+ENV MUSA_HOME=/usr/local/musa
+ENV LD_LIBRARY_PATH=$MUSA_HOME/lib:/usr/local/openmpi/lib:$MUSA_HOME/mudnn/lib:$LD_LIBRARY_PATH
+ENV PATH=$MUSA_HOME/bin:$MUSA_HOME/mudnn/bin:$MUSA_HOME/mudnn/mudnn_bench/bin:/usr/local/openmpi/bin:$PATH
+
+WORKDIR /root/
+
+ADD . /root/
+RUN echo "=========================================================Install MUSA TOOLKITS=========================================================" && \
+    mkdir /tmp/musa_toolkits && \
+    tar -zxvf /root/musa_toolkits_rc4.1.0.tar.gz -C /tmp/musa_toolkits && \
+    cd /tmp/musa_toolkits/musa_toolkits_install && \
+    bash ./install.sh && \
+    echo "==============================================================Install MCCL=============================================================" && \
+    mkdir /tmp/mccl && \
+    tar -zxvf /root/mccl_rc1.9.0.tar.gz -C /tmp/mccl && \
+    cd /tmp/mccl/mccl && \
+    bash ./install.sh && \
+    echo "=============================================================Install MUDNN=============================================================" && \
+    mkdir /tmp/mudnn && \
+    tar -zxvf /root/mudnn_rc2.9.0.tar.gz -C /tmp/mudnn && \
+    cd /tmp/mudnn/mudnn && \
+    bash ./install_mudnn.sh && \
+    echo "=============================================================Install MUAlg=============================================================" && \
+    apt install cmake -y && \
+    cp -r /root/muAlg /tmp && \
+    cd /tmp/muAlg && \
+    rm -r build && \
+    bash mt_build.sh -i && \
+    echo "============================================================Install MUThrust===========================================================" && \
+    cp -r /root/muThrust /tmp && \
+    cd /tmp/muThrust && \
+    rm -r build && \
+    bash mt_build.sh -i && \
+    echo "======================================================Install TORCH & TORCH MUSA=======================================================" && \
+    cp /root/*.whl /tmp && \
+    cd /tmp && \
+    pip install numpy==1.26.4  && \
+    pip install "setuptools-scm<8.0.0" && \
+    cd /usr/local/musa/lib && \
+    ln -s libmusa.so libmusa.so.4.0 && \
+    ln -s libmusart.so libmusart.so.4.0 && \
+    pip install /tmp/torch-2.5.0-cp310-cp310-linux_x86_64.whl && \
+    pip install /tmp/torch_musa-2.0.0-cp310-cp310-linux_x86_64.whl && \
+    echo "========================================================Hack TORCH & TORCH_MUSA========================================================" && \
+    cp /root/impl.py /usr/local/lib/python3.10/dist-packages/torch/_custom_op/impl.py && \
+    echo "=============================================================Install TRITON============================================================" && \
+    # pip uninstall triton -y && \
+    pip install /tmp/triton-3.1.0-cp310-cp310-linux_x86_64.date0417commitfe4eaa.whl && \
+    rm -rf /usr/local/lib/python3.10/dist-packages/triton/backends/nvidia && \
+    echo "==============================================================Install RAY==============================================================" && \
+    pip install ray==2.43.0 && \
+    echo "========================================================Install FALSH ATTENTION========================================================" && \
+    pip install /tmp/flash_attn-2.6.3-py3-none-any.whl && \
+    echo "==============================================================Install VLLM=============================================================" && \
+    # cp -r /root/vllm /tmp/ && \
+    # cd /tmp/vllm && \
+    # python3 use_existing_torch.py && \
+    # VLLM_TARGET_DEVICE=empty pip install . --no-build-isolation -v && \
+    pip install /tmp/vllm-0.8.5.dev1+g3423e33e6.empty-py3-none-any.whl &&  \
+    sed -i 's/torch._inductor.config.compile_threads = 1/import torch_musa/' /usr/local/lib/python3.10/dist-packages/vllm/env_override.py && \
+    sed -i '/_unregister_process_group/d' /usr/local/lib/python3.10/dist-packages/vllm/distributed/utils.py && \
+    sed -i '87s/.*return.*/        return [torch.half, torch.bfloat16]/' /usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/quantization/gptq.py && \
+    sed -i '/apply_bnb_4bit = torch.ops.vllm.apply_bnb_4bit/d' /usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/quantization/bitsandbytes.py && \
+    sed -i 's/(torch\.Tag\.needs_fixed_stride_order, )/[]/g' /usr/local/lib/python3.10/dist-packages/vllm/model_executor/layers/fused_moe/fused_moe.py && \
+    sed -i '393,399 s/^/# /' /usr/local/lib/python3.10/dist-packages/vllm/attention/layer.py && \
+    echo "============================================================Install VLLM MUSA===========================================================" && \
+    pip install /tmp/vllm_musa-0.8.4.dev0-cp310-cp310-linux_x86_64.whl && \
+    echo "============================================================Clear TEMP FILE============================================================" && \
+    rm -rf /tmp/*
+
+    # pip install torch numpy==1.26.4 
+    # pip install "setuptools-scm<8.0.0"
