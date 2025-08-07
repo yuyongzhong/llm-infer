@@ -16,16 +16,6 @@ if [ ! -f "$CONFIG_FILE" ]; then
   exit 1
 fi
 
-# 检查 yq 是否安装（用于解析 YAML）
-if ! command -v yq &> /dev/null; then
-  echo "⚠️ yq 未安装，正在自动安装（需要 sudo 权限）..."
-  sudo apt update && sudo apt install -y yq
-  if ! command -v yq &> /dev/null; then
-    echo "❌ yq 安装失败。请手动安装 yq (e.g., sudo apt install yq) 并重试。"
-    exit 1
-  fi
-  echo "✅ yq 已安装。"
-fi
 
 # 从 YAML 加载配置并导出为环境变量
 export model_name=$(yq e '.basic.model_name' "$CONFIG_FILE")
