@@ -9,6 +9,11 @@ PORT=8000
 MUSA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
 HOSTFILE=""
 VLLM_PP_LAYER_PARTITION=""
+MAX_MODEL_LEN=12000
+BATCH_SIZE=128
+SSH_PORT=62262
+RAY_PORT=62379
+GPU_MEMORY_UTILIZATION=0.8
 
 # Parse named arguments
 while [[ $# -gt 0 ]]; do
@@ -29,8 +34,25 @@ while [[ $# -gt 0 ]]; do
       HOSTFILE="$2"; shift 2;;
     --partition)
       VLLM_PP_LAYER_PARTITION="$2"; shift 2;;
+    --max-model-len)
+      MAX_MODEL_LEN="$2"; shift 2;;
+    --batch-size)
+      BATCH_SIZE="$2"; shift 2;;
+    --ssh-port)
+      SSH_PORT="$2"; shift 2;;
+    --ray-port)
+      RAY_PORT="$2"; shift 2;;
+    --gpu-memory-utilization)
+      GPU_MEMORY_UTILIZATION="$2"; shift 2;;
     --help)
-      echo "Usage: run.sh --tp <TP_SIZE> --pp <PP_SIZE> --model-path <MODEL_PATH> [--model-name <MODEL_NAME>] [--port <PORT>] [--visible-devices <GPUs>] [--hostfile <HOSTFILE>] [--partition <PP_LAYER_PARTITION>]";
+      echo "Usage: run.sh --tp <TP_SIZE> --pp <PP_SIZE> --model-path <MODEL_PATH> [--model-name <MODEL_NAME>] [--port <PORT>] [--visible-devices <GPUs>] [--hostfile <HOSTFILE>] [--partition <PP_LAYER_PARTITION>] [--max-model-len <MAX_MODEL_LEN>] [--batch-size <BATCH_SIZE>] [--ssh-port <SSH_PORT>] [--ray-port <RAY_PORT>] [--gpu-memory-utilization <GPU_MEMORY_UTILIZATION>]"
+      echo ""
+      echo "Default values:"
+      echo "  --max-model-len: 12000"
+      echo "  --batch-size: 128"
+      echo "  --ssh-port: 62262"
+      echo "  --ray-port: 62379"
+      echo "  --gpu-memory-utilization: 0.8"
       exit 0;;
     *)
       echo "❌ Unknown argument: $1"; exit 1;;
@@ -43,13 +65,9 @@ if [[ -z "$TP_SIZE" || -z "$PP_SIZE" || -z "$MODEL_PATH" ]]; then
   exit 1
 fi
 
-MAX_MODEL_LEN=12000
-BATCH_SIZE=128
 NUM_GPU_BLOACKS=$(( MAX_MODEL_LEN * BATCH_SIZE ))
-GPU_MEMORY_UTILIZATION=0.8
 WORLD_SIZE=$((PP_SIZE * TP_SIZE))
-SSH_PORT=62262
-RAY_PORT=62379
+
 
 if [[ -z "$HOSTFILE" || ! -f "$HOSTFILE" ]]; then
   echo "💻 未传入 hostfile，默认进入单机模式"
