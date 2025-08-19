@@ -1,2 +1,4 @@
 vllm-musa-ci/logs/
 *.log
+vllm-server/output/
+.nfs*
