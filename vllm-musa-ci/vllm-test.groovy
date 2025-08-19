@@ -357,7 +357,7 @@ pipeline {
 
                                 // 执行启动脚本
                                 sh """
-                                    sudo docker exec -e LOG_NAME=${LOG_NAME} ${containerName} bash /mnt/vllm/yuyongzhong/vllm-musa-ci/test.sh
+                                    sudo docker exec -e LOG_NAME=${LOG_NAME} ${containerName} bash /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/test.sh
                                 """
 
                                 // 日志监控
@@ -368,9 +368,9 @@ pipeline {
                                         while [ \$CURRENT_TIME -lt \$END_TIME ]; do
                                             REMAINING=\$((END_TIME - CURRENT_TIME))
                                             echo "=== 日志监控 (\$REMAINING 秒剩余) ==="
-                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/vllm-musa-ci/logs/test-logs/deepseek-${LOG_NAME}.log 2>/dev/null || echo "DeepSeek日志文件不存在"
-                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/vllm-musa-ci/logs/test-logs/qwen-${LOG_NAME}.log 2>/dev/null || echo "Qwen日志文件不存在"
-                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/vllm-musa-ci/logs/test-logs/monitor-${LOG_NAME}.log 2>/dev/null || echo "监控日志文件不存在"
+                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/logs/test-logs/deepseek-${LOG_NAME}.log 2>/dev/null || echo "DeepSeek日志文件不存在"
+                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/logs/test-logs/qwen-${LOG_NAME}.log 2>/dev/null || echo "Qwen日志文件不存在"
+                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/logs/test-logs/monitor-${LOG_NAME}.log 2>/dev/null || echo "监控日志文件不存在"
                                             sleep 30
                                             CURRENT_TIME=\$(date +%s)
                                         done
