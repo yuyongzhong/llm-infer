@@ -1,0 +1,65 @@
+analysis_report: false
+api_key: KEY
+api_url: http://127.0.0.1:8000/v1
+chat_template: null
+dataset_args:
+  ceval:
+    dataset_id: modelscope/ceval-exam
+    description: null
+    eval_split: val
+    extra_params: {}
+    few_shot_num: 0
+    few_shot_random: false
+    filters: null
+    metric_list:
+    - AverageAccuracy
+    model_adapter: generation
+    name: ceval
+    output_types:
+    - multiple_choice_logits
+    - generation
+    pretty_name: C-Eval
+    prompt_template: '以下是中国关于{subset_name}考试的单项选择题，请选出其中的正确答案。你的回答的最后一行应该是这样的格式：“答案是：LETTER”（不带引号），其中
+      LETTER 是 A、B、C、D 中的一个。
+
+      {query}'
+    query_template: null
+    subset_list:
+      ceval:
+      - high_school_mathematics
+      - logic
+    system_prompt: null
+    train_split: dev
+dataset_dir: /root/.cache/modelscope/hub/datasets
+dataset_hub: modelscope
+datasets:
+- ceval
+debug: false
+dry_run: false
+eval_backend: Native
+eval_batch_size: 10
+eval_config: null
+eval_type: service
+generation_config:
+  max_tokens: 3000
+  n: 1
+  temperature: 0.6
+  top_p: 0.95
+ignore_errors: false
+judge_model_args: {}
+judge_strategy: auto
+judge_worker_num: 1
+limit: null
+mem_cache: false
+model: deepseek
+model_args: {}
+model_id: deepseek
+model_task: text_generation
+outputs: null
+seed: 42
+stage: all
+stream: true
+template_type: null
+timeout: null
+use_cache: null
+work_dir: ./outputs/20250819_111610/20250819_115039

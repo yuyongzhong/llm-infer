@@ -1,0 +1,34 @@
+{
+    "name": "deepseek@ceval",
+    "dataset_name": "ceval",
+    "dataset_pretty_name": "C-Eval",
+    "dataset_description": null,
+    "model_name": "deepseek",
+    "score": 0.2222,
+    "metrics": [
+        {
+            "name": "AverageAccuracy",
+            "num": 18,
+            "score": 0.2222,
+            "macro_score": 0.2222,
+            "categories": [
+                {
+                    "name": [
+                        "STEM"
+                    ],
+                    "num": 18,
+                    "score": 0.2222,
+                    "macro_score": 0.2222,
+                    "subsets": [
+                        {
+                            "name": "high_school_mathematics",
+                            "score": 0.2222,
+                            "num": 18
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "analysis": "N/A"
+}

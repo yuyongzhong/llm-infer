@@ -1,14 +1,14 @@
 # ========== 基本配置 ==========
 basic:
   model_name: qwen                         # 模型名称，用于日志命名、推理调用等
-  home_path: /home/yuyongzhong             # 代码根目录，用于构造路径
+  home_path: /mnt/vllm/yuyongzhong         # 代码根目录，用于构造路径
   log_info: yyz_test_qwen2_20250807_1300   # 当前测试任务标识，会用于输出日志文件夹命名
-  run_mode: acc-then-bench                 # 控制主运行流程：accuracy | benchmark | acc-then-bench | bench-then-acc | skip
+  run_mode: accuracy                 # 控制主运行流程：accuracy | benchmark | acc-then-bench | bench-then-acc | skip
   base_info:                               
     device: s4000
     model: Qwen2.5-7B-Instruct
-    version: v1.0.1
-    remark: 72机器 Qwen测试
+    version: CICD
+    remark: 22机器 Qwen测试
     software_version: "0807"  # 添加双引号（或 '0807'），强制为字符串
     software_url: https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjA=
     vllm_image_harbor:
@@ -27,16 +27,22 @@ accuracy:
   data_mode: subset                        # 数据集加载模式：subset（只测试一部分）或 all（全量）
   answer_num: 1                            # 每个问题生成答案的次数
   eval_batch_size: 10                      # 精度测试请求时的批处理大小
+  # 数据集缓存配置
+  dataset_cache:
+    enable: true                           # 是否启用数据集缓存优化
+    cache_dir: "/root/.cache/modelscope/hub/datasets"  # 数据集缓存目录
+    dataset_hub: "modelscope"              # 数据集来源Hub（modelscope或huggingface）
+    mem_cache: true                        # 是否启用内存缓存
 
 # ========== 飞书通知相关 ==========
 notification:
   webhook_url: https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49  # 钉钉机器人 webhook
-  check_interval: 60                       # 精度测试运行中监控间隔（秒）
+  check_interval: 10                       # 精度测试运行中监控间隔（秒）
 
 # ========== 性能评估配置 ==========
 benchmark:
   base_url: http://127.0.0.1:8001           # 推理服务基地址（无 /v1 后缀，Qwen使用8001端口）
-  tokenizer_path: /home/yuyongzhong/models/Qwen2.5-7B-Instruct  # tokenizer 路径（传给性能测试脚本）
+  tokenizer_path: /mnt/models/Qwen2.5-7B-Instruct  # tokenizer 路径（传给性能测试脚本）
   batch_sizes:                             # 并发请求设置：支持多组 batch size
     - 1
     - 4

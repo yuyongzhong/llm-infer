@@ -1,0 +1,80 @@
+{
+    "project_id": "yyz_test_20250723_1000",
+    "timestamp": "2025-08-20T03:55:13.041180Z",
+    "model_name": "deepseek",
+    "run_mode": "skip",
+    "base_info": {
+        "device": "s4000",
+        "model": "Qwen-1.5B",
+        "version": "v1.0.0",
+        "remark": "72机器",
+        "software_version": "0701",
+        "software_url": "https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjA=",
+        "vllm_image_harbor": {
+            "huoshan_harbor_url": "registry.mthreads.com/mcconline/vllm-musa-qy2-py310:v0.8.4-release",
+            "shanghai_harbor_url": "sh-harbor.mthreads.com/vllm-images/vllm-musa-qy2-py310:v0.8.4-release"
+        }
+    },
+    "tests": [
+        {
+            "test_type": "benchmark",
+            "results": [],
+            "log_path": "/mnt/vllm/yuyongzhong/llm-infer/test/output/yyz_test_dsv2_20250807_1200/benchmark/result/summary_result_20250820_1118.md"
+        },
+        {
+            "test_type": "accuracy",
+            "datasets": [
+                {
+                    "name": "deepseek@ceval",
+                    "dataset_name": "ceval",
+                    "dataset_pretty_name": "C-Eval",
+                    "dataset_description": null,
+                    "model_name": "deepseek",
+                    "score": 0.2,
+                    "metrics": [
+                        {
+                            "name": "AverageAccuracy",
+                            "num": 40,
+                            "score": 0.2,
+                            "macro_score": 0.197,
+                            "categories": [
+                                {
+                                    "name": [
+                                        "Humanities"
+                                    ],
+                                    "num": 22,
+                                    "score": 0.2273,
+                                    "macro_score": 0.2273,
+                                    "subsets": [
+                                        {
+                                            "name": "logic",
+                                            "score": 0.2273,
+                                            "num": 22
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": [
+                                        "STEM"
+                                    ],
+                                    "num": 18,
+                                    "score": 0.1667,
+                                    "macro_score": 0.1667,
+                                    "subsets": [
+                                        {
+                                            "name": "high_school_mathematics",
+                                            "score": 0.1667,
+                                            "num": 18
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "analysis": "N/A"
+                }
+            ],
+            "log_path": "/mnt/vllm/yuyongzhong/llm-infer/test/output/yyz_test_dsv2_20250807_1200/Accuracy_Test/20250820_1142_acc_test.log"
+        }
+    ]
+}

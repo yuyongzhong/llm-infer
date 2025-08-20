@@ -18,6 +18,20 @@ fi
 
 
 # 从 YAML 加载配置并导出为环境变量
+
+# ========= 设置数据集缓存环境变量 ========= #
+if [ "$DATASET_CACHE_ENABLE" = "true" ]; then
+    echo "🚀 设置evalscope数据集缓存优化..."
+    export MODELSCOPE_CACHE="/root/.cache/modelscope"
+    export HF_HOME="/root/.cache/huggingface"
+    mkdir -p "$DATASET_CACHE_DIR"
+    mkdir -p /root/.cache/huggingface
+    echo "✅ 缓存环境设置完成: DATASET_CACHE_DIR=$DATASET_CACHE_DIR"
+    echo "   Hub来源: $DATASET_HUB, 内存缓存: $MEM_CACHE"
+else
+    echo "⚠️ 数据集缓存优化已禁用"
+fi
+
 export model_name=$(yq e '.basic.model_name' "$CONFIG_FILE")
 export HOME_PATH=$(yq e '.basic.home_path' "$CONFIG_FILE")
 export LOG_INFO=$(yq e '.basic.log_info' "$CONFIG_FILE")
@@ -34,6 +48,12 @@ export datasets=$(yq e '.accuracy.datasets' "$CONFIG_FILE")
 export data_mode=$(yq e '.accuracy.data_mode' "$CONFIG_FILE")
 export answer_num=$(yq e '.accuracy.answer_num' "$CONFIG_FILE")
 export eval_batch_size=$(yq e '.accuracy.eval_batch_size' "$CONFIG_FILE")
+
+# 数据集缓存配置
+export DATASET_CACHE_ENABLE=$(yq e '.accuracy.dataset_cache.enable // true' "$CONFIG_FILE")
+export DATASET_CACHE_DIR=$(yq e '.accuracy.dataset_cache.cache_dir // "/root/.cache/modelscope/hub/datasets"' "$CONFIG_FILE")
+export DATASET_HUB=$(yq e '.accuracy.dataset_cache.dataset_hub // "modelscope"' "$CONFIG_FILE")
+export MEM_CACHE=$(yq e '.accuracy.dataset_cache.mem_cache // true' "$CONFIG_FILE")
 
 export webhook_url=$(yq e '.notification.webhook_url' "$CONFIG_FILE")
 export CHECK_INTERVAL=$(yq e '.notification.check_interval' "$CONFIG_FILE")
@@ -103,7 +123,11 @@ run_accuracy() {
     --webhook_url "$webhook_url" \
     --CHECK_INTERVAL "$CHECK_INTERVAL" \
     --base_info "$BASE_INFO" \
-    --data_mode "$data_mode" 2>&1 | tee "$ACC_LOG_FILE"
+    --data_mode "$data_mode" \
+    --dataset_cache_enable "$DATASET_CACHE_ENABLE" \
+    --dataset_cache_dir "$DATASET_CACHE_DIR" \
+    --dataset_hub "$DATASET_HUB" \
+    --mem_cache "$MEM_CACHE" 2>&1 | tee "$ACC_LOG_FILE"
 
   # 记录结束时间
   end_time=$(date +%s)
@@ -191,14 +215,20 @@ esac
 if [ "$ENABLE_JSON_OUTPUT" = "true" ]; then
   echo "🚀 生成标准化测试结果 JSON..."
 
-  # 确保日志文件存在（从函数中获取）
-  # 注意：ACC_LOG_FILE 和 BENCHMARK_MD 需要在函数中 export 或全局定义；这里假设已定义
+  # 确保变量已定义，如果没有则查找最新的文件
+  if [ -z "$BENCHMARK_MD" ]; then
+    BENCHMARK_MD=$(ls -t "$OUTPUT_DIR/benchmark/result/"*.md 2>/dev/null | head -n 1)
+  fi
+  
+  if [ -z "$ACC_LOG_FILE" ]; then
+    ACC_LOG_FILE=$(ls -t "$OUTPUT_DIR/Accuracy_Test/"*.log 2>/dev/null | head -n 1)
+  fi
 
-
+  # 生成 JSON 结果，如果文件不存在则传递空字符串
   python3 "$HOME_PATH/llm-infer/test/acc_test/scripts/generate_test_results.py" \
     --output-dir "$OUTPUT_DIR" \
-    --acc-log "$ACC_LOG_FILE" \
-    --benchmark-md "$BENCHMARK_MD" \
+    --acc-log "${ACC_LOG_FILE:-}" \
+    --benchmark-md "${BENCHMARK_MD:-}" \
     --config "$HOME_PATH/llm-infer/test/config.yaml"
 
   echo "✅ JSON 生成完成"

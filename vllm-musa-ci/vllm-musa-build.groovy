@@ -18,6 +18,7 @@ pipeline {
         booleanParam(name: 'skip_base', defaultValue: true, description: 'Skip the base step')
         booleanParam(name: 'skip_vllm_musa_build', defaultValue: false, description: 'Skip the base step')
         booleanParam(name: 'build_only', defaultValue: true, description: 'skip start test service if it is true')
+        booleanParam(name: 'VERBOSE', defaultValue: false, description: '是否启用详细调试输出（显示更多日志信息）')
     }
     options {
         ansiColor('xterm') // 启用 ANSI 颜色支持，选择颜色主题
@@ -91,6 +92,7 @@ pipeline {
                         build job: "VLLM-MUSA-SERVER-CI", parameters: [
                             string(name: "SERVICE_HARBOR_IMAGE_URL", value: "sh-harbor.mthreads.com/mcctest/vllm-musa-${env.GPU_TYPE}"), 
                             string(name: "SERVICE_IMAGE_TAG", value: "${env.TAG}"),
+                            booleanParam(name: "VERBOSE", value: params.VERBOSE)
                         ], wait: true
                     }
                 }

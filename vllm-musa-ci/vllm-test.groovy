@@ -33,6 +33,11 @@ pipeline {
             defaultValue: '3000',
             description: '日志监控持续时间（秒），0表示不监控，建议300-600秒'
         )
+        booleanParam(
+            name: 'VERBOSE',
+            defaultValue: false,
+            description: '是否启用详细调试输出（显示更多日志信息）'
+        )
     }
 
     environment {
@@ -44,6 +49,7 @@ pipeline {
         NODE_LABELS = "${params.NODE_LABELS}"
         RECREATE_CONTAINER = "${params.RECREATE_CONTAINER}"
         LOG_MONITOR_DURATION = "${params.LOG_MONITOR_DURATION}"
+        VERBOSE = "${params.VERBOSE}"
     }
 
     stages {
@@ -341,6 +347,8 @@ pipeline {
                                             --pid host \\
                                             -v /mnt/vllm:/mnt/vllm \\
                                             -v /mnt/models:/mnt/models \\
+                                            -v /etc/localtime:/etc/localtime:ro \\
+                                            -e TZ=Asia/Shanghai \\
                                             -e LOG_NAME=${LOG_NAME} \\
                                             --name      ${containerName} \\
                                             ${imageUrl} \\
@@ -356,24 +364,81 @@ pipeline {
                                 }
 
                                 // 执行启动脚本
-                                sh """
-                                    sudo docker exec -e LOG_NAME=${LOG_NAME} ${containerName} bash /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/test.sh
-                                """
+                                def testResult = sh(
+                                    script: """
+                                        sudo docker exec -e LOG_NAME=${LOG_NAME} -e VERBOSE=${VERBOSE} ${containerName} bash /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/test.sh
+                                    """,
+                                    returnStatus: true
+                                )
+                                
+                                if (testResult != 0) {
+                                    error "❌ 测试脚本执行失败，退出代码: ${testResult}"
+                                }
 
                                 // 日志监控
                                 if (LOG_MONITOR_DURATION.toInteger() > 0) {
                                     sh """#!/bin/bash
                                         END_TIME=\$(date -d \"+${LOG_MONITOR_DURATION} seconds\" +%s)
                                         CURRENT_TIME=\$(date +%s)
-                                        while [ \$CURRENT_TIME -lt \$END_TIME ]; do
+                                        LAST_MONITOR_CONTENT=""
+                                        MONITOR_INTERVAL=60  # 监控间隔调整为60秒
+                                        COMPLETION_DETECTED=false
+                                        
+                                        while [ \$CURRENT_TIME -lt \$END_TIME ] && [ "\$COMPLETION_DETECTED" = "false" ]; do
                                             REMAINING=\$((END_TIME - CURRENT_TIME))
-                                            echo "=== 日志监控 (\$REMAINING 秒剩余) ==="
-                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/logs/test-logs/deepseek-${LOG_NAME}.log 2>/dev/null || echo "DeepSeek日志文件不存在"
-                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/logs/test-logs/qwen-${LOG_NAME}.log 2>/dev/null || echo "Qwen日志文件不存在"
-                                            sudo docker exec ${containerName} tail -n 10 /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/logs/test-logs/monitor-${LOG_NAME}.log 2>/dev/null || echo "监控日志文件不存在"
+                                            
+                                            # 检查测试是否已完成
+                                            MONITOR_LOG="/mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/logs/test-logs/monitor-${LOG_NAME}.log"
+                                            if sudo docker exec ${containerName} test -f "\$MONITOR_LOG" 2>/dev/null; then
+                                                if sudo docker exec ${containerName} grep -q "所有测试已完成" "\$MONITOR_LOG" 2>/dev/null; then
+                                                    COMPLETION_DETECTED=true
+                                                    echo ""
+                                                    echo "╔════════════════════════════════════════════════════════════════════════════════╗"
+                                                    printf "║ ✅ 测试完成检测 - 提前结束监控 %-45s ║\\n" ""
+                                                    echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+                                                    echo ""
+                                                    # 显示最终结果
+                                                    FINAL_RESULT=\$(sudo docker exec ${containerName} tail -n 20 "\$MONITOR_LOG" 2>/dev/null | grep -A 10 "所有测试已完成")
+                                                    if [ -n "\$FINAL_RESULT" ]; then
+                                                        echo "\$FINAL_RESULT"
+                                                    fi
+                                                    break
+                                                fi
+                                            fi
+                                            
+                                            # 只在有新内容或间隔时间到达时显示
+                                            if [ \$((REMAINING % MONITOR_INTERVAL)) -eq 0 ] || [ \$REMAINING -lt 30 ]; then
+                                                echo ""
+                                                echo "╔════════════════════════════════════════════════════════════════════════════════╗"
+                                                printf "║ 📊 测试监控 - 剩余时间: %-52s ║\\n" "\$REMAINING 秒"
+                                                echo "╠════════════════════════════════════════════════════════════════════════════════╣"
+                                                
+                                                # 检查监控总览
+                                                if sudo docker exec ${containerName} test -f "\$MONITOR_LOG" 2>/dev/null; then
+                                                    # 显示监控总览的最新状态
+                                                    LATEST_MONITOR=\$(sudo docker exec ${containerName} tail -n 50 "\$MONITOR_LOG" 2>/dev/null | grep -A 20 "╔.*监控时间.*╗" | tail -25)
+                                                    if [ -n "\$LATEST_MONITOR" ]; then
+                                                        echo "\$LATEST_MONITOR"
+                                                    else
+                                                        printf "║ 📝 监控状态: %-64s ║\\n" "等待监控数据..."
+                                                    fi
+                                                else
+                                                    printf "║ 📝 监控状态: %-64s ║\\n" "监控日志文件不存在"
+                                                fi
+                                                
+                                                echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+                                                echo ""
+                                            fi
+                                            
                                             sleep 30
                                             CURRENT_TIME=\$(date +%s)
                                         done
+                                        
+                                        if [ "\$COMPLETION_DETECTED" = "true" ]; then
+                                            echo "🎉 监控提前结束：检测到测试完成"
+                                        else
+                                            echo "⏰ 监控时间结束"
+                                        fi
                                     """
                                 }
 

@@ -1,7 +1,7 @@
 # ========== 基本配置 ==========
 basic:
   model_name: deepseek                     # 模型名称，用于日志命名、推理调用等
-  home_path: /home/yuyongzhong             # 代码根目录，用于构造路径
+  home_path: /mnt/vllm/yuyongzhong         # 代码根目录，用于构造路径
   log_info: yyz_test_20250723_1000 # 当前测试任务标识，会用于输出日志文件夹命名
   run_mode: skip     # 控制主运行流程：accuracy | benchmark | acc-then-bench | bench-then-acc | skip
   base_info:                               
@@ -26,6 +26,12 @@ accuracy:
   data_mode: subset                        # 数据集加载模式：subset（只测试一部分）或 all（全量）
   answer_num: 1                            # 每个问题生成答案的次数
   eval_batch_size: 10                       # 精度测试请求时的批处理大小
+  # 数据集缓存配置
+  dataset_cache:
+    enable: true                           # 是否启用数据集缓存优化
+    cache_dir: "/root/.cache/modelscope/hub/datasets"  # 数据集缓存目录
+    dataset_hub: "modelscope"              # 数据集来源Hub（modelscope或huggingface）
+    mem_cache: true                        # 是否启用内存缓存
 
 # ========== 飞书通知相关 ==========
 notification:

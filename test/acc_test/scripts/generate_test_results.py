@@ -14,11 +14,17 @@ def load_config(config_path: str) -> Dict[str, Any]:
     base_info = config.get('basic', {}).get('base_info', {})
     if 'software_version' in base_info:
         base_info['software_version'] = str(base_info['software_version'])
-    print(f"调试: 完整加载的 config: {config}")
+    # 只在详细模式下显示调试信息
+    if os.environ.get('VERBOSE', '').lower() == 'true':
+        print(f"调试: 完整加载的 config: {config}")
     return config
 
 def parse_benchmark_md(md_path: str) -> List[Dict[str, Any]]:
     """解析性能测试的Markdown结果文件"""
+    if not md_path or not os.path.exists(md_path):
+        print(f"⚠️ 性能测试 markdown 文件不存在或路径为空: {md_path}")
+        return []
+        
     results = []
     with open(md_path, "r") as f:
         lines = f.readlines()[2:]  # 跳过表头
@@ -45,6 +51,10 @@ def parse_benchmark_md(md_path: str) -> List[Dict[str, Any]]:
 
 def parse_accuracy_log(log_path: str, config: Dict[str, Any]) -> List[Dict[str, Any]]:
     """解析精度测试日志文件"""
+    if not log_path or not os.path.exists(log_path):
+        print(f"⚠️ 精度测试日志文件不存在或路径为空: {log_path}")
+        return []
+        
     accuracy_results = []
     with open(log_path, "r") as f:
         log_content = f.read()
@@ -149,15 +159,18 @@ def main():
         args.benchmark_md,
         args.acc_log
     )
-    print(f"调试: 生成的 data 中的 base_info: {data.get('base_info')}")  # 新增：打印生成的 base_info
-    print(f"调试: 生成的 data 中的 software_version: {data.get('base_info', {}).get('software_version')}")  # 新增
+    
+    # 只在详细模式下显示调试信息
+    if os.environ.get('VERBOSE', '').lower() == 'true':
+        print(f"调试: 生成的 data 中的 base_info: {data.get('base_info')}")
+        print(f"调试: 生成的 data 中的 software_version: {data.get('base_info', {}).get('software_version')}")
 
     # 保存JSON文件
     json_path = os.path.join(results_dir, f"test_results_{timestamp}.json")
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-    print(f"JSON文件已生成：{json_path}")
+    print(f"✅ JSON文件已生成：{json_path}")
 
 if __name__ == "__main__":
     main()

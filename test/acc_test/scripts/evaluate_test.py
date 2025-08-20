@@ -136,6 +136,13 @@ def main():
     parser.add_argument("--use_cache", type=str, required=False, default="", help="The  cache path for the inference results.")
     parser.add_argument("--eval_batch_size", type=int, required=False, default=1, help="并发量")
     parser.add_argument("--data_mode", type=str, required=False, default="all", help="The mode for loading subsets: 'subset' for specific subsets, 'all' for the entire module name.")
+    
+    # 数据集缓存相关参数
+    parser.add_argument("--dataset_cache_enable", type=str, required=False, default="true", help="Whether to enable dataset caching optimization")
+    parser.add_argument("--dataset_cache_dir", type=str, required=False, default="/root/.cache/modelscope/hub/datasets", help="Dataset cache directory")
+    parser.add_argument("--dataset_hub", type=str, required=False, default="modelscope", help="Dataset hub source (modelscope or huggingface)")
+    parser.add_argument("--mem_cache", type=str, required=False, default="true", help="Whether to enable memory cache")
+    
     parser.add_argument("--acc_log_file", type=str, required=True, help="The log file for accuracy test results. ")
     parser.add_argument("--webhook_url", type=str, required=False, default="https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49", help="The webhook URL for sending notifications.")
     parser.add_argument("--CHECK_INTERVAL", type=int, required=False, default=300, help="The interval in seconds to check the log file for updates(default=300).")
@@ -161,6 +168,12 @@ def main():
     use_cache = args.use_cache
     data_mode = args.data_mode
 
+    # 数据集缓存参数
+    dataset_cache_enable = args.dataset_cache_enable.lower() == 'true'
+    dataset_cache_dir = args.dataset_cache_dir
+    dataset_hub = args.dataset_hub
+    mem_cache = args.mem_cache.lower() == 'true'
+
     ###监控参数
     acc_log_file = args.acc_log_file
     
@@ -183,6 +196,11 @@ def main():
                 } for task_name, subset_list in subset_lists.items()
         },
 
+        # 数据集缓存配置（从配置文件读取）
+        dataset_dir=dataset_cache_dir if dataset_cache_enable else None,
+        dataset_hub=dataset_hub if dataset_cache_enable else "modelscope",
+        mem_cache=mem_cache if dataset_cache_enable else False,
+
         eval_batch_size=eval_batch_size,
         generation_config={
             'max_tokens': max_tokens,
@@ -202,7 +220,7 @@ def main():
         "file_path": acc_log_file,
         "base_info": base_info,
         "webhook_url": webhook_url,
-        "CHECK_INTERVAL": 300
+        "CHECK_INTERVAL": CHECK_INTERVAL
     })
     monitor_thread.daemon = True
     monitor_thread.start()

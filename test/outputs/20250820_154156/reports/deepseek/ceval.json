@@ -1,0 +1,49 @@
+{
+    "name": "deepseek@ceval",
+    "dataset_name": "ceval",
+    "dataset_pretty_name": "C-Eval",
+    "dataset_description": null,
+    "model_name": "deepseek",
+    "score": 0.15,
+    "metrics": [
+        {
+            "name": "AverageAccuracy",
+            "num": 40,
+            "score": 0.15,
+            "macro_score": 0.1464,
+            "categories": [
+                {
+                    "name": [
+                        "Humanities"
+                    ],
+                    "num": 22,
+                    "score": 0.1818,
+                    "macro_score": 0.1818,
+                    "subsets": [
+                        {
+                            "name": "logic",
+                            "score": 0.1818,
+                            "num": 22
+                        }
+                    ]
+                },
+                {
+                    "name": [
+                        "STEM"
+                    ],
+                    "num": 18,
+                    "score": 0.1111,
+                    "macro_score": 0.1111,
+                    "subsets": [
+                        {
+                            "name": "high_school_mathematics",
+                            "score": 0.1111,
+                            "num": 18
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "analysis": "N/A"
+}
