@@ -302,39 +302,50 @@ setup_distributed_cluster() {
     
     echo "🚀 设置分布式集群..."
     
+    # 读取主机列表
     mapfile -t hostlist < <(grep -v '^#\|^$' "$HOSTFILE" | awk '{print $1}' | tr -d '\r')
-    local first_host=true
-    local count=0
-    local first_host_ip
+    
+    # 准备环境变量数组
+    env_array=(
+        "MCCL_PROTOS=2"
+        "MUSA_PRINT_ENV=1" 
+        "MTHREADS_VISIBLE_DEVICES=0,1,2,3,4,5,6,7"
+        "MUSA_HOME=/usr/local/musa"
+        "TRITON_CACHE_DIR=/tmp/triton"
+        "LIBRARY_PATH=/opt/intel/oneapi/mkl/lib/intel64:"
+        "LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/:/usr/local/musa/lib"
+        "VLLM_NCCL_SO_PATH=/usr/local/musa/lib/libmccl.so.2"
+        "VLLM_TORCH_PROFILER_DIR=/home/model/"
+        "GLOO_SOCKET_IFNAME=bond0"
+        "TP_SOCKET_IFNAME=bond0"
+        "MUSA_VISIBLE_DEVICES=${MUSA_VISIBLE_DEVICES}"
+        "VLLM_USE_RAY_COMPILED_DAG_CHANNEL_TYPE=shm"
+        "RAY_CGRAPH_get_timeout=3000"
+    )
+    
+    first_host=true
+    first_host_ip=""
     
     for host in "${hostlist[@]}"; do
-        ((count++))
-        echo "[$count] 连接主机: $host"
+        echo "🔗 处理主机: $host"
         
-        # 检查并停止现有Ray进程
-        echo "   检查Ray进程..."
-        if ssh -p "$SSH_PORT" "$host" "pgrep -f 'ray'" >/dev/null 2>&1; then
-            echo "   停止现有Ray进程..."
-            ssh -p "$SSH_PORT" "$host" "ray stop"
-        fi
+        # 停止现有Ray进程
+        ssh -p "$SSH_PORT" "$host" "ray stop" || true
         
-        # 启动Ray节点
-        if $first_host; then
+        if [ "$first_host" = "true" ]; then
             first_host=false
             first_host_ip="$host"
-            echo "   启动头节点: $host"
-            ssh -p "$SSH_PORT" "$host" "${env_vars[@]} ray start --head --port=${RAY_PORT} --dashboard-host=\"0.0.0.0\" --num-gpus 8"
-            sleep 3
+            echo "   启动头节点..."
+            ssh -p "$SSH_PORT" "$host" "${env_array[@]}" ray start --head --port="${RAY_PORT}" --dashboard-host=0.0.0.0 --num-gpus=8
         else
-            echo "   加入集群: $host -> $first_host_ip:${RAY_PORT}"
-            ssh -p "$SSH_PORT" "$host" "${env_vars[@]} ray start --address ${first_host_ip}:${RAY_PORT} --num-gpus 8"
+            echo "   加入集群..."
+            ssh -p "$SSH_PORT" "$host" "${env_array[@]}" ray start --address "${first_host_ip}:${RAY_PORT}" --num-gpus=8
         fi
         
-        echo "   主机 $host 设置完成"
-        echo "   ----------------------------"
+        echo "   ✅ 主机 $host 完成"
     done
     
-    echo "🔍 集群状态:"
+    echo "🔍 检查集群状态:"
     ray status
 }
 

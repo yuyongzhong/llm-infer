@@ -304,38 +304,63 @@ pipeline {
                     nodeList.each { nodeLabel ->
                         branches["在节点 ${nodeLabel} 部署"] = {
                             node("${nodeLabel}") {
-                                def containerName = 'vllm-test-0805'
+                                // 动态生成容器名称，基于镜像名称
                                 def imageUrl = HARBOR_URL
                                 if (!HARBOR_URL.contains(':')) {
                                     imageUrl = "${HARBOR_URL}:${IMAGE_TAG}"
                                 }
+                                
+                                // 从镜像URL中提取容器名称（例如：vllm-test-0808）
+                                def imageName = imageUrl.split('/').last().split(':')[0]
+                                def containerName = imageName
+                                
+                                echo "=== 容器部署信息 ==="
+                                echo "镜像地址: ${imageUrl}"
+                                echo "容器名称: ${containerName}"
 
                                 // 根据RECREATE_CONTAINER参数决定是否删除现有容器
                                 if (RECREATE_CONTAINER == 'true') {
                                     echo "=== 删除并重新创建容器 ==="
-                                    sh '''
-                                        CONTAINER_ID=$(sudo docker ps -a --filter "name=vllm-test-0805" --format "{{.ID}}")
-                                        if [ ! -z "$CONTAINER_ID" ]; then
-                                            echo "停止容器: $CONTAINER_ID"
-                                            sudo docker stop $CONTAINER_ID
-                                            echo "删除容器: $CONTAINER_ID"
-                                            sudo docker rm $CONTAINER_ID
+                                    sh """
+                                        CONTAINER_ID=\$(sudo docker ps -a --filter "name=${containerName}" --format "{{.ID}}")
+                                        if [ ! -z "\$CONTAINER_ID" ]; then
+                                            echo "停止容器: \$CONTAINER_ID"
+                                            sudo docker stop \$CONTAINER_ID
+                                            echo "删除容器: \$CONTAINER_ID"
+                                            sudo docker rm \$CONTAINER_ID
                                         else
-                                            echo "未找到现有容器: vllm-test-0805"
+                                            echo "未找到现有容器: ${containerName}"
                                         fi
-                                    '''
+                                    """
                                 }
 
                                 // 检查容器是否存在和运行状态
                                 def containerExists = sh(
-                                    script: "sudo docker ps -a --filter 'name=vllm-test-0805' --format '{{.ID}}'",
+                                    script: "sudo docker ps -a --filter 'name=${containerName}' --format '{{.ID}}'",
                                     returnStdout: true
                                 ).trim()
                                 
                                 def containerRunning = sh(
-                                    script: "sudo docker ps --filter 'name=vllm-test-0805' --format '{{.ID}}'",
+                                    script: "sudo docker ps --filter 'name=${containerName}' --format '{{.ID}}'",
                                     returnStdout: true
                                 ).trim()
+                                
+                                // 检查现有容器是否使用了当前镜像
+                                def containerImageMismatch = false
+                                if (containerExists != '') {
+                                    def containerImage = sh(
+                                        script: "sudo docker inspect --format='{{.Config.Image}}' ${containerName}",
+                                        returnStdout: true
+                                    ).trim()
+                                    
+                                    echo "当前容器镜像: ${containerImage}"
+                                    echo "期望镜像: ${imageUrl}"
+                                    
+                                    if (containerImage != imageUrl) {
+                                        containerImageMismatch = true
+                                        echo "⚠️ 检测到镜像版本不匹配，需要重建容器"
+                                    }
+                                }
                                 
                                 if (containerExists == '') {
                                     echo "=== 创建新容器 ==="
@@ -354,9 +379,32 @@ pipeline {
                                             ${imageUrl} \\
                                             tail -f /dev/null
                                     """
+                                } else if (containerImageMismatch || RECREATE_CONTAINER == 'true') {
+                                    echo "=== 重建容器（镜像不匹配或强制重建）==="
+                                    // 停止并删除现有容器
+                                    if (containerRunning != '') {
+                                        sh "sudo docker stop ${containerName}"
+                                    }
+                                    sh "sudo docker rm ${containerName}"
+                                    
+                                    // 创建新容器
+                                    sh """#!/bin/bash
+                                        sudo docker run -d \\
+                                            --net host \\
+                                            --privileged \\
+                                            --pid host \\
+                                            -v /mnt/vllm:/mnt/vllm \\
+                                            -v /mnt/models:/mnt/models \\
+                                            -v /etc/localtime:/etc/localtime:ro \\
+                                            -e TZ=Asia/Shanghai \\
+                                            -e LOG_NAME=${LOG_NAME} \\
+                                            --name      ${containerName} \\
+                                            ${imageUrl} \\
+                                            tail -f /dev/null
+                                    """
                                 } else if (containerRunning == '') {
-                                    echo "=== 启动现有容器 ==="
-                                    sh "sudo docker start vllm-test-0805"
+                                    echo "=== 启动现有容器（镜像匹配）==="
+                                    sh "sudo docker start ${containerName}"
                                     // 等待容器完全启动
                                     sleep(5)
                                 } else {

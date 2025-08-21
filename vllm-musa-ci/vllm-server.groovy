@@ -260,6 +260,11 @@ pipeline {
                                         tail -f /dev/null
                                 """
 
+                                // 启动SSH服务（用于多机分布式通信）
+                                sh """
+                                    sudo docker exec ${containerName} service ssh start
+                                """
+
                                 // 执行启动脚本（传递 LOG_NAME 和 VERBOSE 环境变量）
                                 sh """
                                     sudo docker exec -e LOG_NAME=${LOG_NAME} -e VERBOSE=${VERBOSE} ${containerName} bash /mnt/vllm/yuyongzhong/llm-infer/vllm-musa-ci/startup.sh
