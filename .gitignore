@@ -2,3 +2,21 @@ vllm-musa-ci/logs/
 *.log
 vllm-server/output/
 .nfs*
+
+# 测试输出文件
+test/outputs/
+test/output/*/benchmark/logs/
+test/output/*/benchmark/result/
+test/output/*/results/
+test/acc_test/scripts/__pycache__/
+
+# Python缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 临时文件
+*.tmp
+test_encoding_*.py
