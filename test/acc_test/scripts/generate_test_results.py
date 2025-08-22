@@ -8,7 +8,7 @@ from typing import Dict, List, Any
 
 def load_config(config_path: str) -> Dict[str, Any]:
     """加载配置文件"""
-    with open(config_path, "r") as f:
+    with open(config_path, "r", encoding="utf-8", errors="ignore") as f:
         config = yaml.safe_load(f)
     # 强制将 software_version 转为字符串（预防八进制）
     base_info = config.get('basic', {}).get('base_info', {})
@@ -26,7 +26,7 @@ def parse_benchmark_md(md_path: str) -> List[Dict[str, Any]]:
         return []
         
     results = []
-    with open(md_path, "r") as f:
+    with open(md_path, "r", encoding="utf-8", errors="ignore") as f:
         lines = f.readlines()[2:]  # 跳过表头
         for line in lines:
             if line.strip():
@@ -56,7 +56,7 @@ def parse_accuracy_log(log_path: str, config: Dict[str, Any]) -> List[Dict[str, 
         return []
         
     accuracy_results = []
-    with open(log_path, "r") as f:
+    with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
         log_content = f.read()
 
         # 1. 从日志中提取报告文件路径
@@ -72,7 +72,7 @@ def parse_accuracy_log(log_path: str, config: Dict[str, Any]) -> List[Dict[str, 
             for report_abs_path in report_paths:
                 print(f"报告文件路径: {report_abs_path}")
                 if os.path.exists(report_abs_path):
-                    with open(report_abs_path, "r") as report_file:
+                    with open(report_abs_path, "r", encoding="utf-8", errors="ignore") as report_file:
                         report_data = json.load(report_file)
                         accuracy_results.append(report_data)
                 else:
