@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# 设置UTF-8编码环境，确保中文数据集处理正确
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+export PYTHONIOENCODING=utf-8
+
 ### ========= 参数与配置加载 ========= ###
 
 # 必须传入配置文件

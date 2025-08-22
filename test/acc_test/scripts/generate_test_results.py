@@ -1,3 +1,16 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+生成测试结果的脚本
+
+注意：此脚本处理来自evalscope的日志文件，这些日志可能包含：
+1. 中文测试数据集内容（如C-Eval）
+2. 不同机器环境下可能产生的编码差异
+3. 第三方库输出的多种字符编码
+
+为确保兼容性，脚本会自动尝试多种编码方式读取文件。
+"""
+
 import json
 import os
 import re
@@ -56,8 +69,45 @@ def parse_accuracy_log(log_path: str, config: Dict[str, Any]) -> List[Dict[str, 
         return []
         
     accuracy_results = []
-    with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
-        log_content = f.read()
+    
+    # 尝试不同的编码方式读取文件，以处理不同机器环境下的编码问题
+    encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252', 'iso-8859-1', 'gbk', 'gb2312']
+    log_content = None
+    used_encoding = None
+    
+    for encoding in encodings:
+        try:
+            with open(log_path, "r", encoding=encoding) as f:
+                log_content = f.read()
+                used_encoding = encoding
+                break
+        except (UnicodeDecodeError, UnicodeError):
+            continue
+    
+    if log_content is None:
+        # 最后尝试用二进制模式读取，然后尝试解码
+        try:
+            with open(log_path, "rb") as f:
+                raw_content = f.read()
+                # 尝试用 chardet 检测编码（如果可用）
+                try:
+                    import chardet
+                    detected = chardet.detect(raw_content)
+                    if detected['encoding']:
+                        log_content = raw_content.decode(detected['encoding'], errors='ignore')
+                        used_encoding = detected['encoding']
+                        print(f"✅ 使用chardet检测到编码: {detected['encoding']} (置信度: {detected['confidence']:.2f})")
+                except ImportError:
+                    # 如果没有chardet，使用errors='replace'强制解码
+                    log_content = raw_content.decode('utf-8', errors='replace')
+                    used_encoding = 'utf-8 (with replacement)'
+                    print(f"⚠️ 无法确定编码，使用UTF-8并替换无效字符")
+        except Exception as e:
+            print(f"❌ 读取日志文件失败: {e}")
+            return []
+    
+    if used_encoding:
+        print(f"✅ 成功使用 {used_encoding} 编码读取日志文件: {log_path}")
 
         # 1. 从日志中提取报告文件路径
         report_path_match = re.search(
