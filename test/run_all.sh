@@ -45,14 +45,21 @@ export RUN_MODE=$(yq e '.basic.run_mode' "$CONFIG_FILE")
 export ENABLE_JSON_OUTPUT=$(yq e '.basic.enable_json_output // false' "$CONFIG_FILE")  # 默认 false 如果未设置
 
 export api_url=$(yq e '.accuracy.api_url' "$CONFIG_FILE")
-export temperature=$(yq e '.accuracy.temperature' "$CONFIG_FILE")
-export top_p=$(yq e '.accuracy.top_p' "$CONFIG_FILE")
-export use_cache=$(yq e '.accuracy.use_cache' "$CONFIG_FILE")
-export max_tokens=$(yq e '.accuracy.max_tokens' "$CONFIG_FILE")
+# 共用参数（带默认值处理）
+export temperature=$(yq e '.accuracy.temperature // "0.6"' "$CONFIG_FILE")
+export top_p=$(yq e '.accuracy.top_p // "0.95"' "$CONFIG_FILE")
+export use_cache=$(yq e '.accuracy.use_cache // ""' "$CONFIG_FILE")
+export max_tokens=$(yq e '.accuracy.max_tokens // "3000"' "$CONFIG_FILE")
 export datasets=$(yq e '.accuracy.datasets' "$CONFIG_FILE")
-export data_mode=$(yq e '.accuracy.data_mode' "$CONFIG_FILE")
-export answer_num=$(yq e '.accuracy.answer_num' "$CONFIG_FILE")
-export eval_batch_size=$(yq e '.accuracy.eval_batch_size' "$CONFIG_FILE")
+# LLM模式专用参数（带默认值处理）
+export data_mode=$(yq e '.accuracy.data_mode // "all"' "$CONFIG_FILE")
+export answer_num=$(yq e '.accuracy.answer_num // "1"' "$CONFIG_FILE")
+export eval_batch_size=$(yq e '.accuracy.eval_batch_size // "1"' "$CONFIG_FILE")
+
+export eval_backend=$(yq e '.accuracy.eval_backend' "$CONFIG_FILE")
+# VL模式专用参数（带默认值处理）
+export limit=$(yq e '.accuracy.limit // null' "$CONFIG_FILE")  # 不加引号，让yq返回真正的null
+export mode=$(yq e '.accuracy.mode // "all"' "$CONFIG_FILE")
 
 # 数据集缓存配置
 export DATASET_CACHE_ENABLE=$(yq e '.accuracy.dataset_cache.enable // true' "$CONFIG_FILE")
@@ -114,25 +121,55 @@ run_accuracy() {
   # 记录开始时间（秒级时间戳）
   start_time=$(date +%s)
 
-  python3 "$ACC_SCRIPT" \
-    --api_url "$api_url" \
-    --model "$model_name" \
-    --max_tokens "$max_tokens" \
-    --datasets "$datasets" \
-    --temperature "$temperature" \
-    --top_p "$top_p" \
-    --answer_num "$answer_num" \
-    --use_cache "$use_cache" \
-    --eval_batch_size "$eval_batch_size" \
-    --acc_log_file "$ACC_LOG_FILE" \
-    --webhook_url "$webhook_url" \
-    --CHECK_INTERVAL "$CHECK_INTERVAL" \
-    --base_info "$BASE_INFO" \
-    --data_mode "$data_mode" \
-    --dataset_cache_enable "$DATASET_CACHE_ENABLE" \
-    --dataset_cache_dir "$DATASET_CACHE_DIR" \
-    --dataset_hub "$DATASET_HUB" \
-    --mem_cache "$MEM_CACHE" 2>&1 | tee "$ACC_LOG_FILE"
+  # 构建基础参数列表（所有模式通用）
+  python_args=(
+    --api_url "$api_url"
+    --model "$model_name"
+    --max_tokens "$max_tokens"
+    --datasets "$datasets"
+    --temperature "$temperature"
+    --top_p "$top_p"
+    --use_cache "$use_cache"
+    --acc_log_file "$ACC_LOG_FILE"
+    --webhook_url "$webhook_url"
+    --eval_backend "$eval_backend"
+    --CHECK_INTERVAL "$CHECK_INTERVAL"
+    --base_info "$BASE_INFO"
+    --dataset_cache_enable "$DATASET_CACHE_ENABLE"
+    --dataset_cache_dir "$DATASET_CACHE_DIR"
+    --dataset_hub "$DATASET_HUB"
+    --mem_cache "$MEM_CACHE"
+  )
+  
+  # 根据eval_backend添加模式特定参数
+  if [ "$eval_backend" = "Native" ]; then
+    # LLM模式专用参数
+    python_args+=(--data_mode "$data_mode")
+    python_args+=(--answer_num "$answer_num")
+    python_args+=(--eval_batch_size "$eval_batch_size")
+    # limit在Native模式下也可能需要
+    if [ "$limit" != "null" ]; then
+      python_args+=(--limit "$limit")
+    fi
+  elif [ "$eval_backend" = "VLMEvalKit" ]; then
+    # VL模式专用参数
+    python_args+=(--mode "$mode")
+    if [ "$limit" != "null" ]; then
+      python_args+=(--limit "$limit")
+    fi
+  else
+    # 其他后端（OpenCompass, RAGEval等）的默认处理
+    echo "⚠️ 使用后端: $eval_backend，使用默认参数配置"
+    python_args+=(--data_mode "$data_mode")
+    python_args+=(--answer_num "$answer_num")
+    python_args+=(--eval_batch_size "$eval_batch_size")
+    python_args+=(--mode "$mode")
+    if [ "$limit" != "null" ]; then
+      python_args+=(--limit "$limit")
+    fi
+  fi
+
+  python3 "$ACC_SCRIPT" "${python_args[@]}" 2>&1 | tee "$ACC_LOG_FILE"
 
   # 记录结束时间
   end_time=$(date +%s)

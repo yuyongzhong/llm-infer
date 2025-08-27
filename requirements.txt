@@ -44,7 +44,7 @@ cycler==0.12.1
 cymem==2.0.11
 Cython==3.1.2
 dataclasses==0.6
-datasets==2.18.0
+datasets==3.2.0
 decorator==5.2.1
 decord==0.6.0
 depyf==0.18.0
@@ -60,6 +60,26 @@ easydict==1.13
 einops==0.8.1
 email_validator==2.2.0
 evalscope==0.16.1
+# VLMEvalKit 相关依赖 - 添加于 2025-08-27 (实际安装版本)
+ms-vlmeval==0.0.18
+asttokens==3.0.0
+python-dotenv==1.1.0
+executing==2.2.0
+ipdb==0.13.13
+ipython==8.37.0
+jedi==0.19.2
+matplotlib-inline==0.1.7
+openpyxl==3.1.5
+parso==0.8.5
+pexpect==4.9.0
+ptyprocess==0.7.0
+qwen-vl-utils==0.0.11
+stack-data==0.6.3
+sty==1.0.6
+timeout-decorator==0.5.0
+traitlets==5.14.3
+validators==0.35.0
+xlsxwriter==3.2.5
 exceptiongroup==1.3.0
 fairscale==0.4.13
 fastai==2.8.2

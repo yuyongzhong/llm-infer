@@ -16,7 +16,7 @@ import time
 import requests
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 from evalscope import TaskConfig, run_task
-from evalscope.constants import EvalType
+from evalscope.constants import EvalType, EvalBackend
 from acc_test.scripts.tools import acc_log_monitor 
 import threading
 
@@ -109,7 +109,7 @@ def load_subset(tasks, data_mode="all"):
                 # return module.subset_list        
             elif data_mode == "all":
                 if not hasattr(module, 'all'):
-                    raise AttributeError(f"Module {module_name} has no attribute 'subset_list'")
+                    raise AttributeError(f"Module {module_name} has no attribute 'all'")
                 results[task_name] = module.all
                 # return module.all
             else:
@@ -136,6 +136,10 @@ def main():
     parser.add_argument("--use_cache", type=str, required=False, default="", help="The  cache path for the inference results.")
     parser.add_argument("--eval_batch_size", type=int, required=False, default=1, help="并发量")
     parser.add_argument("--data_mode", type=str, required=False, default="all", help="The mode for loading subsets: 'subset' for specific subsets, 'all' for the entire module name.")
+    ### add 0827
+    parser.add_argument("--eval_backend", type=str, required=False, default="Native", help="The evaluation backend to use.",choices=[EvalBackend.NATIVE, EvalBackend.OPEN_COMPASS, EvalBackend.VLM_EVAL_KIT, EvalBackend.RAG_EVAL])
+    parser.add_argument("--limit", type=int, required=False, default=None, help="Max evaluation samples num for each subset")
+    parser.add_argument("--mode", type=str, default='all', choices=['all', 'infer'])
     
     # 数据集缓存相关参数
     parser.add_argument("--dataset_cache_enable", type=str, required=False, default="true", help="Whether to enable dataset caching optimization")
@@ -166,7 +170,24 @@ def main():
     answer_num = args.answer_num
     eval_batch_size = args.eval_batch_size
     use_cache = args.use_cache
+    eval_backend = args.eval_backend
+    
+    # 共用参数 - 所有后端都可能需要
     data_mode = args.data_mode
+    answer_num = args.answer_num
+    eval_batch_size = args.eval_batch_size
+    mode = args.mode
+    limit = args.limit
+    
+    # 根据后端类型调整特定参数
+    if eval_backend == 'Native':
+        # Native后端不使用mode参数
+        mode = None
+    elif eval_backend == 'VLMEvalKit':
+        # VLMEvalKit后端不使用这些参数，设为None避免传递
+        data_mode = None
+        answer_num = None
+        eval_batch_size = None
 
     # 数据集缓存参数
     dataset_cache_enable = args.dataset_cache_enable.lower() == 'true'
@@ -181,35 +202,85 @@ def main():
     CHECK_INTERVAL = args.CHECK_INTERVAL
     base_info = args.base_info
 
-    subset_lists = load_subset(datasets, data_mode=data_mode)
+    # 根据后端规范处理 datasets 形态：
+    # - VLMEvalKit 需要 list[str]
+    # - NATIVE 维持为逗号分隔的字符串（也兼容 list）
+    datasets_for_vlmeval = (
+        [t.strip() for t in datasets.split(",") if t.strip()] if isinstance(datasets, str) else list(datasets)
+    )
 
-    task_cfg = TaskConfig(
+    if eval_backend=='Native':
+        subset_lists = load_subset(datasets, data_mode=data_mode)
+
+        task_cfg = TaskConfig(
+            model = model,
+            api_url = api_url,
+            api_key = api_key,
+            eval_type = EvalType.SERVICE,
+
+            datasets=list(subset_lists.keys()),
+            dataset_args={
+                task_name: {
+                    "subset_list": subset_list,
+                    } for task_name, subset_list in subset_lists.items()
+            },
+
+            # 数据集缓存配置（从配置文件读取）
+            dataset_dir=dataset_cache_dir if dataset_cache_enable else None,
+            dataset_hub=dataset_hub if dataset_cache_enable else "modelscope",
+            mem_cache=mem_cache if dataset_cache_enable else False,
+
+            eval_batch_size=eval_batch_size,
+            generation_config={
+                'max_tokens': max_tokens,
+                'temperature': temperature,
+                'top_p': top_p,
+                'n': answer_num
+            },
+
+                stream=True,
+                limit=limit
+            )
+
+    elif eval_backend=='VLMEvalKit':
+        # VLMEvalKit 强制使用 'KEY' 作为 api_key，这是框架要求
+        vlmeval_api_key = 'KEY'
+        
+        task_cfg = TaskConfig(
         model = model,
         api_url = api_url,
-        api_key = api_key,
+        api_key = vlmeval_api_key,
+    
         eval_type = EvalType.SERVICE,
+        eval_backend = eval_backend,
+        eval_config={
+            # 'data': ['MMMU_Pro_10c','MMMU_Pro_10c_COT','MMMU_Pro_V','MMMU_Pro_V_COT'],
+            'data': datasets_for_vlmeval,
+            'limit': limit,
+            'mode': mode,
+            'model': [ 
+                {
+                'api_base': api_url,
+                'key': api_key,  # 使用原始传入的 api_key
+                'name': 'CustomAPIModel',
+                'temperature': temperature,  # 使用配置文件中的温度参数
+                'type': 'OpenAI',  # VLMEvalKit 中 OpenAI 兼容接口的标准类型
+                'img_size': -1,
+                'video_llm': True,
+                'max_tokens': max_tokens,
+                'top_p': top_p,  # 添加 top_p 参数
+                }
+            ],
 
-        datasets=list(subset_lists.keys()),
-        dataset_args={
-            task_name: {
-                "subset_list": subset_list,
-                } for task_name, subset_list in subset_lists.items()
+        'reuse': False, 
+        'nproc': 16,  
+        'retry': 1,
+        'judge': 'exact_matching', 
         },
 
-        # 数据集缓存配置（从配置文件读取）
         dataset_dir=dataset_cache_dir if dataset_cache_enable else None,
         dataset_hub=dataset_hub if dataset_cache_enable else "modelscope",
-        mem_cache=mem_cache if dataset_cache_enable else False,
-
-        eval_batch_size=eval_batch_size,
-        generation_config={
-            'max_tokens': max_tokens,
-            'temperature': temperature,
-            'top_p': top_p,
-            'n': answer_num
-        },
-
-        stream=True,
+        # mem_cache=mem_cache if dataset_cache_enable else False
     )
 
     if use_cache != "":
@@ -239,10 +310,11 @@ def main():
             run_retries += 1  # 增加重试计数
             # 删除subset_list 列表数据
             # update_subset_main()
-            # 重新加载
-            subset_list = load_subset(datasets,data_mode=data_mode)
-            # 更新配置
-            task_cfg.dataset_args = {datasets: {"subset_list": subset_list}}
+            # 只有在Native后端时才重新加载subset_list
+            if eval_backend == 'Native' and data_mode is not None:
+                subset_list = load_subset(datasets, data_mode=data_mode)
+                # 更新配置
+                task_cfg.dataset_args = {datasets: {"subset_list": subset_list}}
             # 检查服务状态
             if check_service_availability(api_url, api_key, model):
                 print("服务已恢复，准备下一次重试...")

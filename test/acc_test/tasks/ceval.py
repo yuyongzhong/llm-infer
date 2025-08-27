@@ -1,5 +1,6 @@
 subset_list = [
     'high_school_mathematics',
+    'electrical_engineer', 
 ]
 all = [
     'electrical_engineer', 
