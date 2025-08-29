@@ -39,6 +39,13 @@ fi
 
 export model_name=$(yq e '.basic.model_name' "$CONFIG_FILE")
 export HOME_PATH=$(yq e '.basic.home_path' "$CONFIG_FILE")
+
+# 容器环境自动适配：如果在容器内且挂载了/workspace，自动调整HOME_PATH
+if [ -d "/workspace" ] && [ ! -d "$HOME_PATH" ] && [ -d "/workspace/llm-infer" ]; then
+    echo "🐳 检测到容器环境，自动调整路径: $HOME_PATH -> /workspace"
+    export HOME_PATH="/workspace"
+fi
+
 export LOG_INFO=$(yq e '.basic.log_info' "$CONFIG_FILE")
 export BASE_INFO=$(yq e '.basic.base_info | tojson' "$CONFIG_FILE")  # 将整个 base_info 对象转换为 JSON 字符串
 export RUN_MODE=$(yq e '.basic.run_mode' "$CONFIG_FILE")

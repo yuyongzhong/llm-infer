@@ -247,7 +247,7 @@ def main():
         vlmeval_api_key = 'KEY'
         
         task_cfg = TaskConfig(
-        model = model,
+        model = model,  # 在顶层指定模型名称
         api_url = api_url,
         api_key = vlmeval_api_key,
     
@@ -262,9 +262,9 @@ def main():
                 {
                 'api_base': api_url,
                 'key': api_key,  # 使用原始传入的 api_key
-                'name': 'CustomAPIModel',
+                'name': 'CustomAPIModel',  # 使用实际的模型名称作为name
                 'temperature': temperature,  # 使用配置文件中的温度参数
-                'type': 'OpenAI',  # VLMEvalKit 中 OpenAI 兼容接口的标准类型
+                'type': model,  
                 'img_size': -1,
                 'video_llm': True,
                 'max_tokens': max_tokens,
@@ -298,10 +298,24 @@ def main():
     # 执行评估任务
     max_run_retries = 5  # 最大运行重试次数
     run_retries = 0
+    
+    print(f"=== 调试信息 ===")
+    print(f"TaskConfig 创建完成")
+    print(f"eval_backend: {eval_backend}")
+    print(f"datasets: {datasets}")
+    print(f"api_url: {api_url}")
+    print(f"=== 开始运行评估任务 ===")
+    
     while run_retries < max_run_retries:
         try:
             print(f"开始第 {run_retries + 1} 次评估尝试...")
+            print(f"正在调用 run_task...")
+            
+            # 刷新输出确保立即显示
+            sys.stdout.flush()
+            
             run_task(task_cfg=task_cfg)
+            print(f"run_task 执行完成！")
             # 删除subset_list 列表数据
             # update_subset_main()
             break  # 评估成功，跳出循环

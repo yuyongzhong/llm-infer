@@ -1,14 +1,14 @@
 # ========== 基本配置 ==========
 basic:
-  model_name: deepseek                     # 模型名称，用于日志命名、推理调用等
+  model_name: qwen-vl                     # 模型名称，用于日志命名、推理调用等
   home_path: /mnt/vllm/yuyongzhong         # 代码根目录，用于构造路径
-  log_info: yyz_test_encoding_fix_20250822 # 当前测试任务标识，会用于输出日志文件夹命名
+  log_info: yyz_test_debug_20250829 # 当前测试任务标识，会用于输出日志文件夹命名
   run_mode: accuracy     # 控制主运行流程：accuracy | benchmark | acc-then-bench | bench-then-acc | skip
   base_info:                               
     device: s4000
     model: DeepSeek-R1-int4
     version: v1.0.0
-    remark: 编码修复验证测试
+    remark: 22机器yyz测试
     software_version: "0822"  # 添加双引号（或 '0701'），强制为字符串
     software_url: https://oss.mthreads.com:9001/buckets/release-ci/browse/Y29tcHV0ZVFBL2N1ZGFfY29tcGF0aWJsZS9DSS9yZWxlYXNlX211c2FfNC4xLjA=
     vllm_image_harbor:
@@ -17,7 +17,7 @@ basic:
   enable_json_output: true                 # 是否生成标准化JSON输出（true/false）
 # ========== 精度评估配置 ==========
 accuracy:
-  api_url: http://127.0.0.1:8000/v1         # 调用大模型服务的 API 地址（用于精度测试）
+
   
   # 共用参数 (所有后端通用)
   temperature: 0.6                         # 控制生成文本的随机性（越大越随机）
@@ -26,6 +26,7 @@ accuracy:
   max_tokens: 3000                         # 每轮生成最大 token 数
   
   ### LLM 模式 (Native后端)
+  # api_url: http://127.0.0.1:8000/v1         # 调用大模型服务的 API 地址（用于精度测试）
   # eval_backend: Native                     # 使用Native后端进行LLM评估
   # datasets: ceval                          # LLM评估数据集，多个用逗号分隔
   # data_mode: subset                        # 数据集加载模式：subset（只测试一部分）或 all（全量）
@@ -34,9 +35,10 @@ accuracy:
   # limit: 5                                 # 限制评估样本数量（用于快速测试）
   
   ### VL 模式 (VLMEvalKit后端) - 当前激活
+  api_url: http://localhost:8000/v1/chat/completions         # 调用大模型服务的 API 地址（用于精度测试）
   eval_backend: VLMEvalKit                  # 调用的后端:VLMEvalKit(vlm),Native(llm)
   datasets: MMMU_Pro_10c                   # 评估使用的数据集，多个用逗号分隔
-  limit: 5                                 # 限制评估样本数量（用于快速测试）
+  limit: null                              # 注释掉limit，运行完整数据集
   mode: all                                # VLMEvalKit评估模式：all（完整评估）或 infer（仅推理）
 
   # 数据集缓存配置
