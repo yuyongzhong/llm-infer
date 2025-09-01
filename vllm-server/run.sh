@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # =============================================================================
 # vLLM 服务启动脚本
 # 支持单机和多机分布式部署，包含完整的参数配置和性能优化选项
@@ -37,6 +36,7 @@ ENABLE_CHUNKED_PREFILL=""               # 启用分块预填充 (true/false)
 MAX_NUM_BATCHED_TOKENS=""               # 最大批处理token数
 ENABLE_PREFIX_CACHING=""                # 启用前缀缓存 (true/false)
 COMPILATION_CONFIG='{"cudagraph_capture_sizes": [1,2,3,4,5,6,7,8,10,12,14,16,18,20,24,28,30,32,64,128], "simple_cuda_graph": true}'  # 编译配置
+LIMIT_MM_PER_PROMPT=""                  # 多图模式启动
 
 # =============================================================================
 # 帮助信息函数
@@ -148,6 +148,8 @@ while [[ $# -gt 0 ]]; do
       ENABLE_PREFIX_CACHING="$2"; shift 2;;
     --compilation-config)
       COMPILATION_CONFIG="$2"; shift 2;;
+    --limit-mm-per-prompt)
+      LIMIT_MM_PER_PROMPT="$2"; shift 2;;
     
     # 分布式配置
     --hostfile)
@@ -380,6 +382,7 @@ build_vllm_command() {
     
     # 可选的基础参数
     [[ -n "$BLOCK_SIZE" && "$BLOCK_SIZE" != "" ]] && cmd="$cmd --block-size $BLOCK_SIZE"
+    [[ -n "$LIMIT_MM_PER_PROMPT" && "$LIMIT_MM_PER_PROMPT" != "" ]] && cmd="$cmd --limit-mm-per-prompt $LIMIT_MM_PER_PROMPT"
     
     # 性能优化参数
     [[ "$ENABLE_CHUNKED_PREFILL" = "true" ]] && cmd="$cmd --enable-chunked-prefill"
@@ -411,3 +414,4 @@ echo "$VLLM_CMD"
 echo ""
 
 eval "$VLLM_CMD" 2>&1 | tee -a "$LOG_FILE"
+

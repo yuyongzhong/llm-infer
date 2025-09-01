@@ -1,22 +1,26 @@
-FROM python:3.10-slim
+FROM python:3.10-slim-bookworm
 
 WORKDIR /workspace
 
 RUN mkdir -p /root/.pip && \
     echo "[global]\nindex-url = https://pypi.tuna.tsinghua.edu.cn/simple" > /root/.pip/pip.conf
 
-# 使用阿里源替换 Debian 的源
-RUN echo "deb http://mirrors.aliyun.com/debian bullseye main contrib non-free\n\
-deb http://mirrors.aliyun.com/debian-security bullseye-security main contrib non-free\n\
-deb http://mirrors.aliyun.com/debian bullseye-updates main contrib non-free" > /etc/apt/sources.list
+# 完全替换为阿里源，避免与基础镜像源冲突
+RUN rm -f /etc/apt/sources.list.d/* && \
+    echo "deb http://mirrors.aliyun.com/debian bookworm main contrib non-free non-free-firmware\n\
+deb http://mirrors.aliyun.com/debian-security bookworm-security main contrib non-free non-free-firmware\n\
+deb http://mirrors.aliyun.com/debian bookworm-updates main contrib non-free non-free-firmware" > /etc/apt/sources.list
 
 # DNS 问题常导致卡死，确保 Docker DNS 配置了
 # 然后再尝试更新和安装
 RUN apt-get update && \
-    apt-get install -y curl bash git  wget && \
-    wget -O /usr/local/bin/yq 'https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64' && \
-    chmod +x /usr/local/bin/yq && \
+    apt-get install -y --no-install-recommends curl bash git wget libgl1-mesa-glx libglib2.0-0 && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# 复制本地的yq二进制文件，避免网络下载
+COPY depens/yq_linux_amd64 /usr/local/bin/yq
+RUN chmod +x /usr/local/bin/yq
 
 
 

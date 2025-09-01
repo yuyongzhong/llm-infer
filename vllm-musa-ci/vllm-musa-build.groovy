@@ -1,5 +1,10 @@
 pipeline {
     agent none
+    triggers {
+    GenericTrigger(
+        genericVariables: [[key: 'REQUEST_JSON', value: '$', contentType: 'JSON']],
+        token: "vllm_musa_build_from_mr"
+    )}
     parameters {
         string(name: 'version_date', defaultValue: '2025-07-10', description: 'version_date of the software stack')
         string(name: 'ddk_url', defaultValue: '-', description: 'specify the download URL for DDK')
@@ -17,33 +22,121 @@ pipeline {
         string(name: 'torch_whl_path', defaultValue: '-', description: 'specify pytorch url')
         booleanParam(name: 'skip_base', defaultValue: true, description: 'Skip the base step')
         booleanParam(name: 'skip_vllm_musa_build', defaultValue: false, description: 'Skip the base step')
-        booleanParam(name: 'build_only', defaultValue: true, description: 'skip start test service if it is true')
-        booleanParam(name: 'VERBOSE', defaultValue: false, description: '是否启用详细调试输出（显示更多日志信息）')
+        booleanParam(name: 'build_only', defaultValue: false, description: 'skip start test service if it is true')
+        choice(name: 'node_label', choices: ['10.10.129.22', '10.10.129.25'], description: 'jenkins node')
     }
     options {
         ansiColor('xterm') // 启用 ANSI 颜色支持，选择颜色主题
     }
     stages {
+        stage('ParseMRParams') {
+            when {
+                expression {
+                    def causes = currentBuild.getBuildCauses()
+                    // 判断是否包含 Generic Webhook Trigger
+                    return causes.any { it.toString().contains("GenericCause") }
+                }
+            }
+            steps {
+                echo "Start parse MR params"
+                script {
+                    def payload = readJSON text: env.REQUEST_JSON
+                    
+                    // 提取关键信息
+                    def mrId = payload.object_attributes?.iid
+                    def sourceBranch = payload.object_attributes?.source_branch
+                    def targetBranch = payload.object_attributes?.target_branch
+                    def action = payload.object_attributes?.action
+                    def mergeStatus = payload.object_attributes?.merge_status
+                    env.ACTION = action
+                    env.GIT_URL = payload.project?.git_ssh_url
+                    env.SOURCE_BRANCH = sourceBranch
+                    env.TARGET_BRANCH = targetBranch
+                    env.MERGE_ID = mrId
+                    env.PRE_MERGE_BRANCH = "pre-merge/${mrId}"
+                    
+                    // 打印提取的信息
+                    echo "========================================="
+                    echo "Merge Request ID: ${mrId}"
+                    echo "源分支: ${sourceBranch}"
+                    echo "目标分支: ${targetBranch}"
+                    echo "操作类型: ${action}"
+                    echo "Merge status: ${mergeStatus}"
+                    if ("${action}" != "open") {
+                        echo "Merge request open not triggered, abort pipeline"
+                    }
+                }
+            }
+        }
+        stage('Pre-merge') {
+            agent { 
+                node {
+                    label "${node_label}"
+                } 
+            }
+            when {
+                expression {
+                    def causes = currentBuild.getBuildCauses()
+                    def isWebhook = causes.any { it.toString().contains("GenericCause")} 
+                    return isWebhook && env.ACTION == 'open' && env.TARGET_BRANCH == 'master'
+                }
+            }
+            steps {
+                echo "merge branch into the pre-merge branch"
+                echo "========================================"
+                script {
+                    sh """
+                    set -eux
+                    rm -rf vllm_musa
+                    git config --global --add core.sshCommand "ssh -o StrictHostKeyChecking=no"
+                    git clone ${env.GIT_URL} vllm_musa
+                    cd vllm_musa
+                    git fetch origin ${env.SOURCE_BRANCH}:${env.SOURCE_BRANCH}
+                    git push origin --delete ${env.PRE_MERGE_BRANCH} || true
+                    git checkout -b ${env.PRE_MERGE_BRANCH} origin/master
+                    git merge origin/${env.SOURCE_BRANCH} --no-edit
+                    git push origin ${env.PRE_MERGE_BRANCH}
+                    """
+                }
+            }
+        }
         stage('Cleanup') {
             agent { 
                 node {
-                    label '10.10.129.22'
+                    label "${node_label}"
+                } 
+            }
+            when { 
+                expression { 
+                    def causes = currentBuild.getBuildCauses()
+                    def isWebhook = causes.any { it.toString().contains("GenericCause")} 
+                    if (isWebhook) {
+                        return env.ACTION == 'open' && env.TARGET_BRANCH == 'master'
+                    }
+                    return true
                 } 
             }
             steps {
                 sh 'rm -rf torch-musa-build'
                 sh "echo ${env.BUILD_NUMBER}"
-                sh "docker login sh-harbor.mthreads.com"
+                //sh "docker login sh-harbor.mthreads.com"
             }
         }
         // 根据 skip_prepare 参数决定是否执行 Prepare 阶段
         stage('Prepare') {
-            when {
-                expression { return !params.skip_prepare }
-            }
             agent { 
                 node {
-                    label '10.10.129.22'
+                    label "${node_label}"
+                } 
+            }
+            when { 
+                expression { 
+                    def causes = currentBuild.getBuildCauses()
+                    def isWebhook = causes.any { it.toString().contains("GenericCause")} 
+                    if (isWebhook) {
+                        return env.ACTION == 'open' && env.TARGET_BRANCH == 'master' && !params.skip_prepare
+                    }
+                    return !params.skip_prepare
                 } 
             }
             steps {
@@ -52,17 +145,27 @@ pipeline {
                     runPrepareSteps()
                     
                     
-                    build job: "UPDATE_BUILD_ENV", parameters: [
-                        string(name: "version_date", value: "${env.VERSION_DATE}"), 
-                        string(name: "version_base_url", value: "${params.version_base_url}"),
-                    ], wait: true
+                    // build job: "UPDATE_BUILD_ENV", parameters: [
+                    //     string(name: "version_date", value: "${env.VERSION_DATE}"), 
+                    //     string(name: "version_base_url", value: "${params.version_base_url}"),
+                    // ], wait: true
                 }
             }
         }
         stage('BuildTrainImage') {
             agent { 
                 node {
-                    label '10.10.129.22'
+                    label "${node_label}"
+                } 
+            }
+            when { 
+                expression { 
+                    def causes = currentBuild.getBuildCauses()
+                    def isWebhook = causes.any { it.toString().contains("GenericCause")} 
+                    if (isWebhook) {
+                        return env.ACTION == 'open' && env.TARGET_BRANCH == 'master'
+                    }
+                    return true
                 } 
             }
             steps {
@@ -82,7 +185,11 @@ pipeline {
                         } else {
                             echo "Skipping compile step"
                         }
-                        
+                        sh """
+                        image=
+                        new_tag="registry.mthreads.com/mcconline/\$(echo $image | cut -d'/' -f3-)"
+                        echo "\${new_tag}"
+                        """
                         // 清理旧的docker镜像，避免磁盘空间过度占用
                         sh "/bin/bash clean_old_images.sh"
                     }
@@ -92,14 +199,28 @@ pipeline {
                         build job: "VLLM-MUSA-SERVER-CI", parameters: [
                             string(name: "SERVICE_HARBOR_IMAGE_URL", value: "sh-harbor.mthreads.com/mcctest/vllm-musa-${env.GPU_TYPE}"), 
                             string(name: "SERVICE_IMAGE_TAG", value: "${env.TAG}"),
-                            booleanParam(name: "VERBOSE", value: params.VERBOSE)
                         ], wait: true
                     }
                 }
             }
         }
     }
-    
+    post {
+        always {
+            node("${node_label}") {
+                script {
+                    if (env.PRE_MERGE_BRANCH && env.ACTION == 'open') {
+                        sh """
+                        set -eux
+                        cd vllm_musa
+                        git ls-remote --exit-code ${env.GIT_URL} refs/heads/${env.PRE_MERGE_BRANCH} && \
+                        git push origin --delete ${env.PRE_MERGE_BRANCH}
+                        """
+                    }
+                }
+            }
+        }
+    }
 }
 
 // 定义一个共享方法，封装重复的逻辑
@@ -150,7 +271,7 @@ def runPrepareSteps() {
             prepareArgs += ["--vllm_musa_tag", "${params.vllm_musa_tag}"]
         }
         if (params.vllm_musa_img_tag == '-') {
-            def today = sh(script: "date +%Y%m%d", returnStdout: true).trim()
+            def today = sh(script: "date +%Y%m%d-%H%M", returnStdout: true).trim()
             echo "vllm_musa_img_tag not specified, use date: ${today}"
             prepareArgs += ["--vllm_musa_img_tag", "${today}"]
         }
@@ -205,9 +326,13 @@ def runPrepareSteps() {
         env.TAG = properties['TAG_VLLM_MUSA']
         env.DDK_URL = properties['DDK_URL']
         env.GPU_TYPE = properties['GPU_TYPE']
+        env.VLLM_MUSA_TAG = properties['TAG_VLLM_MUSA']
+        env.SH_IMG_NAME_VLLM_MUSA = properties['SH_IMG_NAME_VLLM_MUSA']
     
         // 打印输出以验证结果
         echo "VERSION_DATE: ${env.VERSION_DATE}"
+        echo "VLLM_MUSA_TAG: ${env.VLLM_MUSA_TAG}"
+        echo "SH_IMG_NAME_VLLM_MUSA: ${env.SH_IMG_NAME_VLLM_MUSA}"
         echo "TAG: ${env.TAG}"
     }
 }

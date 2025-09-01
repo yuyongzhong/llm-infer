@@ -3,7 +3,7 @@ pipeline {
 
     parameters {
 
-        string(name: 'SERVICE_HARBOR_IMAGE_URL', defaultValue: 'sh-harbor.mthreads.com/mcctest/vllm-musa-s4000:20250813', description: 'Harbor镜像的完整地址')
+        string(name: 'SERVICE_HARBOR_IMAGE_URL', defaultValue: 'sh-harbor.mthreads.com/mcctest/vllm-musa-s4000:20250829-78', description: 'Harbor镜像的完整地址')
         string(name: 'SERVICE_IMAGE_TAG', defaultValue: 'v0.8.4-release', description: '镜像标签')
         string(name: 'SERVICE_NODE_LABELS', defaultValue: '10.10.129.22', description: '执行节点标签')
         booleanParam(name: 'SERVICE_FORCE_PULL', defaultValue: false, description: '是否强制拉取镜像')

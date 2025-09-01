@@ -3,7 +3,7 @@ basic:
   model_name: deepseek                     # 模型名称，用于日志命名、推理调用等
   home_path: /mnt/vllm/yuyongzhong         # 代码根目录，用于构造路径
   log_info: yyz_test_dsv2_20250807_1200   # 当前测试任务标识，会用于输出日志文件夹命名
-  run_mode: accuracy                 # 控制主运行流程：accuracy | benchmark | acc-then-bench | bench-then-acc | skip
+  run_mode: acc-then-bench                 # 控制主运行流程：accuracy | benchmark | acc-then-bench | bench-then-acc | skip
   base_info:                               
     device: s4000
     model: DeepSeek-V2-Lite
@@ -18,39 +18,51 @@ basic:
   
 # ========== 精度评估配置 ==========
 accuracy:
-  api_url: http://127.0.0.1:8000/v1         # 调用大模型服务的 API 地址（用于精度测试）
+
+  
+  # 共用参数 (所有后端通用)
   temperature: 0.6                         # 控制生成文本的随机性（越大越随机）
   top_p: 0.95                              # nucleus sampling 中的概率阈值
   use_cache: ""                            # 是否使用缓存（保留空字符串时视为不传）
   max_tokens: 3000                         # 每轮生成最大 token 数
-  datasets: ceval                          # 评估使用的数据集，多个用逗号分隔
+  
+  ### LLM 模式 (Native后端)
+  api_url: http://127.0.0.1:8000/v1         # 调用大模型服务的 API 地址（用于精度测试）
+  eval_backend: Native                     # 使用Native后端进行LLM评估
+  datasets: ceval                          # LLM评估数据集，多个用逗号分隔
   data_mode: subset                        # 数据集加载模式：subset（只测试一部分）或 all（全量）
-  answer_num: 1                            # 每个问题生成答案的次数
+  answer_num: 5                            # 每个问题生成答案的次数
   eval_batch_size: 10                      # 精度测试请求时的批处理大小
+  limit: 5                                 # 限制评估样本数量（用于快速测试）
+  
+  ### VL 模式 (VLMEvalKit后端) - 当前激活
+  # api_url: http://localhost:8000/v1/chat/completions         # 调用大模型服务的 API 地址（用于精度测试）
+  # eval_backend: VLMEvalKit                  # 调用的后端:VLMEvalKit(vlm),Native(llm)
+  # datasets: MMMU_Pro_10c                   # 评估使用的数据集，多个用逗号分隔
+  # limit: null                              # 注释掉limit，运行完整数据集
+  # mode: all                                # VLMEvalKit评估模式：all（完整评估）或 infer（仅推理）
+
   # 数据集缓存配置
   dataset_cache:
     enable: true                           # 是否启用数据集缓存优化
-    cache_dir: "/root/.cache/modelscope/hub/datasets"  # 数据集缓存目录
+    cache_dir: "/mnt/vllm/yuyongzhong/.cache/modelscope/hub/datasets"  # 数据集缓存目录
     dataset_hub: "modelscope"              # 数据集来源Hub（modelscope或huggingface）
     mem_cache: true                        # 是否启用内存缓存
 
 # ========== 飞书通知相关 ==========
 notification:
-  webhook_url: https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49  # 钉钉机器人 webhook
-  check_interval: 10                       # 精度测试运行中监控间隔（秒）
+  webhook_url: https://oapi.dingtalk.com/robot/send?access_token=bc2b99de9c001fa267b066f2d77f9a506bad119953482b35ab34c3f8fa68c6f8  # 钉钉机器人正式 webhook
+  # webhook_url: https://oapi.dingtalk.com/robot/send?access_token=9ad9373a15c82ad31bca9da0d92f8602432b79c3ae5975bc6160cf9ab5d82b49  # 钉钉机器人测试 webhook
+  check_interval: 60                       # 精度测试运行中监控间隔（秒）
 
 # ========== 性能评估配置 ==========
 benchmark:
   base_url: http://127.0.0.1:8000           # 推理服务基地址（无 /v1 后缀）
-  tokenizer_path: /home/yuyongzhong/models/DeepSeek-V2-Lite  # tokenizer 路径（传给性能测试脚本）
+  tokenizer_path: /mnt/models/DeepSeek-R1-int4  # tokenizer 路径（传给性能测试脚本）
   batch_sizes:                             # 并发请求设置：支持多组 batch size
-    - 1
-    - 4
-    - 8
     - 16
+    - 32
   prompt_pairs:                            # 输入输出长度组合：每对 [输入长度, 输出长度]
     - [128, 128]
-    - [256, 256]
-    - [1024, 1024]
-    - [2048, 200]
-  num_prompts: 100                         # 每组配置运行请求的样本数
+    - [128, 64]
+  num_prompts: 10                          # 每组配置运行请求的样本数
